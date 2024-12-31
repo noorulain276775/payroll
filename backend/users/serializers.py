@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from .models import Admin
+from .models import CustomUser
 
-
-class AdminSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Admin
-        fields = ['id', 'username', 'email', 'date_joined', 'last_login'] 
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'user_type']

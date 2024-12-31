@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Employee, PayrollRecord, SalaryDetails
 
-# Register your models here.
+admin.site.register(Employee)
+admin.site.register(PayrollRecord)
+admin.site.register(SalaryDetails)
