@@ -99,7 +99,8 @@ def view_all_payroll(request):
     serializer = PayrollRecordSerializer(payroll_records, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-# Admin sending payroll t employees email address
+
+# Admin sending payroll to employees email address
 def send_salary_slip_email(employee, payroll_record):
     pdf_path = generate_salary_pdf(employee, payroll_record)
     subject = f"Salary Slip for {payroll_record.month}/{payroll_record.year}"
@@ -133,6 +134,9 @@ def send_salary_slip(request, payroll_id):
     return Response({"detail": "Salary slip sent successfully."}, status=status.HTTP_200_OK)
 
 
+
+
+
 """
 ===================== Employee Views =====================
 
@@ -142,8 +146,6 @@ def send_salary_slip(request, payroll_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_employee(request):
-    if request.user.user_type == 'Admin':
-        return Response({"detail": "Admins cannot view this page."}, status=status.HTTP_403_FORBIDDEN)
     try:
         employee_details = Employee.objects.get(user=request.user)
         serializer = EmployeeSerializer(employee_details)
@@ -156,11 +158,8 @@ def view_employee(request):
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def update_own_details(request):
-    if request.user.user_type != 'Employee':
-        return Response({"detail": "Only employees can update their details."}, status=status.HTTP_403_FORBIDDEN)
     try:
         employee = Employee.objects.get(user=request.user)
-        # Serializer to update employee details, excluding designation and department
         serializer = EmployeeUpdateSerializer(employee, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -174,11 +173,10 @@ def update_own_details(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_colleagues(request):
-    if request.user.user_type == 'Employee':
-        colleagues = Employee.objects.exclude(user=request.user)  # Exclude the logged-in user
-        serializer = ColleagueSerializer(colleagues, many=True)
-        return Response(serializer.data)
-    return Response({"detail": "Only employees can view colleagues."}, status=status.HTTP_403_FORBIDDEN)
+    colleagues = Employee.objects.exclude(user=request.user)
+    serializer = ColleagueSerializer(colleagues, many=True)
+    return Response(serializer.data)
+
 
 
 # Employee-only view to view their own payroll records
