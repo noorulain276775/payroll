@@ -3,6 +3,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
+from decimal import Decimal
 
 class Employee(models.Model):
     DEPARTMENT_CHOICES = [
@@ -76,34 +77,52 @@ class SalaryDetails(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def calculate_gross_salary(self):
+        try:
+            gross_Salary = self.basic_salary + self.housing_allowance + self.transport_allowance + self.other_allowance
+            return gross_Salary
+        except AttributeError:
+            raise ValidationError("Salary details for this employee are not defined.")
+
+    def save(self, *args, **kwargs):
+        self.gross_salary= self.calculate_gross_salary()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.employee.first_name} {self.employee.last_name} - Salary Details'
     
 
 class PayrollRecord(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE)
     month = models.PositiveIntegerField(verbose_name="Month", validators=[
         MinValueValidator(1), MaxValueValidator(12)])
     year = models.PositiveIntegerField(verbose_name="Year", validators=[
         MinValueValidator(1900), MaxValueValidator(2100)])
-    total_salary_for_month = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total Salary for Month")
+    total_salary_for_month = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Total Salary for Month")
     overtime_days = models.PositiveIntegerField(default=0, verbose_name="Overtime Days")
     unpaid_days = models.PositiveIntegerField(default=0, verbose_name="Unpaid Days")
-    other_deductions = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Other Deductions")
+    other_deductions = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Other Deductions")
     remarks = models.TextField(blank=True, null=True, verbose_name="Remarks")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def calculate_salary(self):
         try:
             salary_details = self.employee.salary_details
-            basic_salary = salary_details.basic_salary
-            daily_salary = basic_salary / 30
-            overtime = self.overtime_days * (daily_salary * 1.5)
+            basic_salary = Decimal(salary_details.basic_salary)
+            daily_salary = basic_salary / Decimal(30)
+            overtime = self.overtime_days * (daily_salary * Decimal(1.5))
             unpaid_deduction = self.unpaid_days * daily_salary
-            self.total_salary_for_month = (salary_details.gross_salary + overtime) - (unpaid_deduction + self.other_deductions)
-            self.save()
+            return (Decimal(salary_details.gross_salary) + overtime) - (unpaid_deduction + self.other_deductions)
         except AttributeError:
             raise ValidationError("Salary details for this employee are not defined.")
 
+    def save(self, *args, **kwargs):
+        self.total_salary_for_month = self.calculate_salary()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Payroll for {self.employee.first_name} {self.employee.last_name} ({self.month}/{self.year})"
+
+

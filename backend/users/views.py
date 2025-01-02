@@ -6,8 +6,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
 from rest_framework import status
 from .serializers import CustomUserSerializer
+from rest_framework.permissions import AllowAny
 
 class UserLoginView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
