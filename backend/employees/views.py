@@ -100,24 +100,26 @@ def view_all_payroll(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# Admin sending payroll to employees email address
+# Helper Function to Send the Email
 def send_salary_slip_email(employee, payroll_record):
     pdf_path = generate_salary_pdf(employee, payroll_record)
     subject = f"Salary Slip for {payroll_record.month}/{payroll_record.year}"
     message = f"Dear {employee.first_name},\n\nPlease find your salary slip for the month {payroll_record.month}/{payroll_record.year} attached."
+    
     email = EmailMessage(
         subject=subject,
         body=message,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[employee.user.email] 
+        to=[employee.user.email]
     )
+
     with open(pdf_path, 'rb') as pdf_file:
         email.attach(f"salary_slip_{payroll_record.month}_{payroll_record.year}.pdf", pdf_file.read(), 'application/pdf')
+    
     email.send(fail_silently=False)
 
-
 # Admin-only view to send the salary slip email to the respective employee
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def send_salary_slip(request, payroll_id):
     if request.user.user_type != 'Admin':
