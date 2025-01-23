@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   CAvatar,
   CCard,
@@ -24,156 +24,25 @@ import MainChart from './MainChart';
 import { DashboardWidgets } from '../../components/DashboardWidgets';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  // Authentication check
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      navigate('/'); // Redirect to login if no token
+    }
+  }, [navigate]);
+
   const monthlyPayrollData = [20000, 22000, 25000, 24000, 21000, 23000];
   const employeeData = [
     { avatar: avatar1, name: 'Noor ul ain Ibrahim', designation: 'Software Engineer', department: 'IT' },
-    { avatar: avatar2, name: 'Ghazia', designation: 'Assistant Accounts', department: "Accounts" },
+    { avatar: avatar2, name: 'Ghazia', designation: 'Assistant Accounts', department: 'Accounts' },
     { avatar: avatar3, name: 'Wasim Bhai', designation: 'Manager Operations', department: 'Operations' },
   ];
 
   return (
     <>
-      {/* <div className='mb-4'>
-        <CRow>
-          <CCol sm={4}>
-            <CCard
-              className="text-white bg-danger"
-              style={{
-                height: '200px',
-                borderRadius: '15px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <CCardBody
-                className="d-flex justify-content-center align-items-center text-center"
-                style={{
-                  position: 'relative',
-                  height: '100%',
-                  padding: 0,  
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 100 100"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '200px',
-                    opacity: 0.3,
-                    zIndex: 1,
-                  }}
-                >
-                  <circle cx="50" cy="50" r="40" fill="white" />
-                  <circle cx="25" cy="25" r="10" fill="#ffdd57" />
-                  <circle cx="75" cy="25" r="10" fill="#ffdd57" />
-                  <circle cx="75" cy="75" r="10" fill="#ffdd57" />
-                  <circle cx="25" cy="75" r="10" fill="#ffdd57" />
-                </svg>
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                  <div className="fs-5">Total Employees</div>
-                  <div className="fw-semibold" style={{ fontSize: '2rem' }}>
-                    {totalEmployees.toLocaleString()}
-                  </div>
-                </div>
-              </CCardBody>
-            </CCard>
-          </CCol>
-
-          <CCol sm={4}>
-            <CCard
-              className="text-white bg-success"
-              style={{
-                height: '200px',
-                borderRadius: '15px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <CCardBody
-                className="d-flex justify-content-center align-items-center text-center"
-                style={{
-                  position: 'relative',
-                  height: '100%',
-                  padding: 0,
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 100 100"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '200px',
-                    opacity: 0.3,
-                    zIndex: 1,
-                  }}
-                >
-                  <circle cx="50" cy="50" r="40" fill="white" />
-                  <circle cx="25" cy="25" r="10" fill="#ffdd57" />
-                  <circle cx="75" cy="25" r="10" fill="#ffdd57" />
-                  <circle cx="75" cy="75" r="10" fill="#ffdd57" />
-                  <circle cx="25" cy="75" r="10" fill="#ffdd57" />
-                </svg>
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                  <div className="fs-5">Previous Payroll</div>
-                  <div className="fw-semibold" style={{ fontSize: '2rem' }}>
-                    ${previousPayroll.toLocaleString()}
-                  </div>
-                </div>
-              </CCardBody>
-            </CCard>
-          </CCol>
-
-          <CCol sm={4}>
-            <CCard
-              className="text-white bg-warning"
-              style={{
-                height: '200px',
-                borderRadius: '15px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <CCardBody
-                className="d-flex justify-content-center align-items-center text-center"
-                style={{
-                  position: 'relative',
-                  height: '100%',
-                  padding: 0,
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 100 100"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '200px',
-                    opacity: 0.3,
-                    zIndex: 1,
-                  }}
-                >
-                  <circle cx="50" cy="50" r="40" fill="white" />
-                  <circle cx="25" cy="25" r="10" fill="#ffdd57" />
-                  <circle cx="75" cy="25" r="10" fill="#ffdd57" />
-                  <circle cx="75" cy="75" r="10" fill="#ffdd57" />
-                  <circle cx="25" cy="75" r="10" fill="#ffdd57" />
-                </svg>
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                  <div className="fs-5">Average Salary</div>
-                  <div className="fw-semibold" style={{ fontSize: '2rem' }}>
-                    ${averageSalary.toLocaleString()}
-                  </div>
-                </div>
-              </CCardBody>
-            </CCard>
-          </CCol>
-        </CRow>
-      </div> */}
       <DashboardWidgets />
       <CCard className="mb-4">
         <CCardBody>
@@ -212,7 +81,7 @@ const Dashboard = () => {
                   </CTableDataCell>
                   <CTableDataCell>{item.name}</CTableDataCell>
                   <CTableDataCell>{item.designation}</CTableDataCell>
-                  <CTableDataCell>${item.department}</CTableDataCell>
+                  <CTableDataCell>{item.department}</CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>

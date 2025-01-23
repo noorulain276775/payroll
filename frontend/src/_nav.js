@@ -33,12 +33,12 @@ const _nav = [
     to: '/employees/salary-details',
     icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
   },
-  {
-    component: CNavItem,
-    name: 'Company Data',
-    to: '/employees/company-data',
-    icon: <CIcon icon={cilIndustry} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Company Data',
+  //   to: '/employees/company-data',
+  //   icon: <CIcon icon={cilIndustry} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
     name: 'Payroll',
@@ -50,20 +50,20 @@ const _nav = [
     name: 'Register',
     icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
     items: [
+      // {
+      //   component: CNavItem,
+      //   name: 'New User',
+      //   to: '/register',
+      // },
       {
         component: CNavItem,
         name: 'New User',
-        to: '/register',
-      },
-      {
-        component: CNavItem,
-        name: 'New Admin',
         to: '/admin-register',
       },
       {
         component: CNavItem,
         name: 'New Employee',
-        to: '/employee-register',
+        to: '/employees/add-employee',
       },
     ],
   },

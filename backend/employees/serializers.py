@@ -4,15 +4,7 @@ from .models import Employee, SalaryDetails, PayrollRecord
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = [
-            'id', 'user', 'first_name', 'last_name', 'date_of_birth', 'place_of_birth',
-            'nationality', 'gender', 'marital_status', 'spouse_name', 'children',
-            'photo', 'father_name', 'mother_name', 'phone_number', 'email', 'address',
-            'emirates_id', 'passport_no', 'qualification', 'visa_no', 'visa_expiry',
-            'designation', 'department', 'previous_company_name',
-            'previous_company_designation', 'emirates_id_image', 'passport_image',
-            'visa_image', 'highest_degree_certificate',
-        ]
+        fields = '__all__'
         read_only_fields = ['id']
 
     def validate(self, data):
@@ -25,14 +17,19 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return data
     
 class SalaryDetailsSerializer(serializers.ModelSerializer):
+    employee_full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = SalaryDetails
         fields = [
-            'id', 'employee', 'basic_salary', 'housing_allowance', 'transport_allowance',
-            'other_allowance', 'gross_salary', 'bank_name', 'account_no', 'iban', 'swift_code',
-            'created_at', 'updated_at',
+            'id', 'employee', 'employee_full_name', 'basic_salary', 'housing_allowance', 
+            'transport_allowance', 'other_allowance', 'gross_salary', 'bank_name', 
+            'account_no', 'iban', 'swift_code', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'gross_salary', 'created_at', 'updated_at']
+
+    def get_employee_full_name(self, obj):
+        return f"{obj.employee.first_name} {obj.employee.last_name}"
 
     def validate(self, data):
         """
@@ -100,7 +97,4 @@ class ColleagueSerializer(serializers.ModelSerializer):
 class EmployeeUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['first_name', 'last_name', 'date_of_birth', 'place_of_birth', 'nationality', 'gender', 
-                  'marital_status', 'spouse_name', 'children', 'father_name', 'mother_name', 'phone_number', 
-                  'email', 'address', 'photo', 'emirates_id', 'passport_no', 'qualification', 'visa_no', 
-                  'visa_expiry', 'emirates_id_image', 'passport_image', 'visa_image', 'highest_degree_certificate']
+        fields = '__all__'

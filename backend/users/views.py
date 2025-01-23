@@ -44,3 +44,10 @@ class UserRegisterView(APIView):
             'message': 'User registered successfully',
             'user': user_data
         }, status=status.HTTP_201_CREATED)
+
+
+class UserListView(APIView):
+    def get(self, request):
+        users = CustomUser.objects.all()
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data, status=200)
