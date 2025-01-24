@@ -58,43 +58,75 @@ const Salary = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate('/')
-      return
+      navigate('/');
+      return;
     }
-    axios
-      .get('http://127.0.0.1:8000/view_all_employees/', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setEmployees(response.data)
-        console.log('Employees:', response.data)
-      })
-      .catch((error) => {
+  
+    // Timer for alerts
+    let timer;
+    if (editAlertVisible || editSuccessAlertVisible || alertVisible || successAlertVisible) {
+      timer = setTimeout(() => {
+        setEditAlertVisible(false);
+        setEditSuccessAlertVisible(false);
+        setAlertVisible(false);
+        setSuccessAlertVisible(false);
+      }, 10000); // 10 seconds
+    }
+  
+    // Fetch Employees
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/view_all_employees/', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setEmployees(response.data);
+        console.log('Employees:', response.data);
+      } catch (error) {
         if (error.response && error.response.status === 401) {
-          localStorage.removeItem('authToken')
-          navigate('/')
+          localStorage.removeItem('authToken');
+          navigate('/');
         }
-      })
-
-    axios
-      .get('http://127.0.0.1:8000/salaries/', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setSalary(response.data)
-        console.log('Salary of Employees:', response.data)
-      })
-      .catch((error) => {
+      }
+    };
+  
+    // Fetch Salaries
+    const fetchSalaries = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/salaries/', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setSalary(response.data);
+        console.log('Salary of Employees:', response.data);
+      } catch (error) {
         if (error.response && error.response.status === 401) {
-          localStorage.removeItem('authToken')
-          navigate('/')
+          localStorage.removeItem('authToken');
+          navigate('/');
         }
-      })
-  }, [navigate, token])
+      }
+    };
+  
+    fetchEmployees();
+    fetchSalaries();
+  
+    // Cleanup function
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [
+    navigate,
+    token,
+    editAlertVisible,
+    editSuccessAlertVisible,
+    alertVisible,
+    successAlertVisible,
+  ]);
+  
 
   const handleView = (s) => {
     setSelectedEmployeeSalary(s)
@@ -181,6 +213,7 @@ const Salary = () => {
         setEditSuccessAlertVisible(true);
         setEditSuccessMessage('Record updated successfully.');
         setEditErrorMessage(null);
+        setEditModalVisible(false);
       })
       .catch((error) => {
         console.error(error);

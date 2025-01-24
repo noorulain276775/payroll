@@ -23,7 +23,7 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Personal Information',
+    name: 'Employees Information',
     to: '/employees',
     icon: <CIcon icon={cilAddressBook} customClassName="nav-icon" />,
   },
@@ -58,7 +58,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'New User',
-        to: '/admin-register',
+        to: '/register/new-user',
       },
       {
         component: CNavItem,

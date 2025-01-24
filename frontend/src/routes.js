@@ -30,7 +30,7 @@ const routes = [
   { path: '/employees/company-data', name: 'Company Data', element: CompanyData },
   { path: '/employees/payroll', name: 'Payroll', element: Payroll },
   { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee },
-  { path: '/admin-register', name: 'Add Admin', element: AddUser },
+  { path: '/register/new-user', name: 'Add Admin', element: AddUser },
 ]
 
 export default routes
