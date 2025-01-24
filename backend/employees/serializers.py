@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Employee, SalaryDetails, PayrollRecord
+from decimal import Decimal
 
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,11 +47,15 @@ class SalaryDetailsSerializer(serializers.ModelSerializer):
     
 
 class PayrollRecordSerializer(serializers.ModelSerializer):
+    employee_full_name = serializers.SerializerMethodField()
+    daily_salary = serializers.SerializerMethodField()
+    gross_salary = serializers.SerializerMethodField()
+
     class Meta:
         model = PayrollRecord
         fields = [
-            'id', 'employee', 'month', 'year', 'total_salary_for_month', 'overtime_days',
-            'unpaid_days', 'other_deductions', 'remarks', 'created_at',
+            'id', 'employee', 'employee_full_name', 'month', 'year', 'total_salary_for_month', 'overtime_days',
+            'unpaid_days', 'other_deductions', 'remarks', 'created_at', 'daily_salary', 'gross_salary'
         ]
         read_only_fields = ['id', 'total_salary_for_month', 'created_at']
 
@@ -64,11 +69,30 @@ class PayrollRecordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"month": "Month must be between 1 and 12."})
         return data
 
-    def calculate_salary(self):
+    def get_employee_full_name(self, obj):
+        return f"{obj.employee.first_name} {obj.employee.last_name}"
+
+    def get_daily_salary(self, obj):
         """
-        Logic to calculate total salary for the month, based on model's method.
+        Calculate the daily salary dynamically and return it.
         """
-        self.instance.calculate_salary()
+        try:
+            basic_salary = Decimal(obj.employee.salary_details.basic_salary)
+            daily_salary = basic_salary / Decimal(30)
+            return round(daily_salary, 2) 
+        except AttributeError:
+            return None
+
+    def get_gross_salary(self, obj):
+        """
+        Retrieve the gross salary from the employee's salary details.
+        """
+        try:
+            return Decimal(obj.employee.salary_details.gross_salary)
+        except AttributeError:
+            return None
+
+
 
 
 class EmployeeDetailsWithSalarySerializer(serializers.ModelSerializer):

@@ -14,6 +14,10 @@ from django.core.mail import EmailMessage
 ===================== Admin Views =====================
 """
 
+"""
+EMPLOYEES PERSONAL AND WORK INFORMATION
+"""
+
 # Admin can view all employees
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -24,19 +28,6 @@ def view_all_employees(request):
     
     employees = Employee.objects.all()
     serializer = EmployeeSerializer(employees, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# Admin can view all employees salaries
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def view_all_employees_salaries(request):
-    print(f"Authenticated User: {request.user}")
-    if request.user.user_type != 'Admin':
-        return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
-    
-    employees = SalaryDetails.objects.all()
-    serializer = SalaryDetailsSerializer(employees, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -69,7 +60,7 @@ def update_employee(request, employee_id):
     except Employee.DoesNotExist:
         return Response({"detail": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
     
-
+# Admin can get single employee details
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_view_single_employee(request, employee_id):
@@ -82,6 +73,10 @@ def admin_view_single_employee(request, employee_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Employee.DoesNotExist:
         return Response({"detail": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+"""
+SALARIES
+"""
     
 # Admin can create a new Salary Details record
 @api_view(['POST'])
@@ -119,6 +114,38 @@ def update_salary_record(request, employee_id):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Admin can view all employees salaries
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_all_employees_salaries(request):
+    print(f"Authenticated User: {request.user}")
+    if request.user.user_type != 'Admin':
+        return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
+    
+    employees = SalaryDetails.objects.all()
+    serializer = SalaryDetailsSerializer(employees, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Admin can view all single employee salary record
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_view_single_employee_salary(request, employee_id):
+    if request.user.user_type != 'Admin':
+        return Response({"detail": "Only admins can view employee salary details."}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        employee = Employee.objects.get(id=employee_id)
+        salary = SalaryDetails.objects.get(employee=employee)
+        serializer = SalaryDetailsSerializer(salary)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Employee.DoesNotExist:
+        return Response({"detail": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+"""
+PAYROLLS
+"""
+
 # Admin-only view to create payroll record
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -146,7 +173,10 @@ def create_payroll(request):
     serializer = PayrollRecordSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        payroll_records = PayrollRecord.objects.all().order_by('-year', '-month')
+        serialized_records = PayrollRecordSerializer(payroll_records, many=True)
+        return Response(serialized_records.data, status=status.HTTP_201_CREATED)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -156,10 +186,34 @@ def create_payroll(request):
 def view_all_payroll(request):
     if request.user.user_type != 'Admin':
         return Response({"detail": "Only admins can view all payroll records."}, status=status.HTTP_403_FORBIDDEN)
-
-    payroll_records = PayrollRecord.objects.all()
+    payroll_records = PayrollRecord.objects.all().order_by('-year', '-month')
     serializer = PayrollRecordSerializer(payroll_records, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Admin can Edit a Payroll Record
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def update_payroll_record(request, payroll_id):
+    """
+    API to update a payroll record.
+    Only admins are allowed to perform this operation.
+    """
+    if request.user.user_type != 'Admin':
+        return Response({"detail": "Only admins can update payroll records."}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        payroll_record = PayrollRecord.objects.get(id=payroll_id)
+    except PayrollRecord.DoesNotExist:
+        return Response({"detail": "Payroll record not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = PayrollRecordSerializer(payroll_record, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # Helper Function to Send the Email
