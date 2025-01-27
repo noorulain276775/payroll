@@ -276,6 +276,7 @@ const AddEmployee = () => {
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
                     localStorage.removeItem('authToken');
+                    window.location.reload();
                     navigate('/');
                 }
             });

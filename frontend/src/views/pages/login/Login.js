@@ -35,9 +35,8 @@ const Login = () => {
       
       if (response.status === 200) {
         localStorage.setItem('authToken', response.data.access);
-        console.log('Navigating to /dashboard...');
-        navigate('/dashboard');
-        console.log('After navigate call');
+        localStorage.setItem('refreshToken', response.data.refresh);
+        window.location.reload();
       }
     } catch (error) {
       navigate('/')

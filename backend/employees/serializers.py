@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from .models import Employee, SalaryDetails, PayrollRecord
 from decimal import Decimal
+from django.db.models import Sum, F, Count
+from django.utils import timezone
+
 
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,3 +125,83 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
+
+
+class DashboardSerializer(serializers.Serializer):
+    total_salary_for_month = serializers.DecimalField(max_digits=10, decimal_places=2)
+    total_overtime_for_month = serializers.DecimalField(max_digits=10, decimal_places=2)
+    previous_month_salary = serializers.DecimalField(max_digits=10, decimal_places=2)
+    previous_month_overtime = serializers.DecimalField(max_digits=10, decimal_places=2)
+    monthly_data = serializers.ListField(child=serializers.DictField())
+    total_employees = serializers.IntegerField()
+    average_salary_for_month = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def to_representation(self, instance):
+        # Get the current year and month
+        today = timezone.now()
+        current_month = today.month
+        print(today)
+        print(current_month)
+        current_year = today.year
+        previous_month = current_month - 1 if current_month > 1 else 12
+        previous_month_year = current_year if current_month > 1 else current_year - 1
+
+        # Get total salary for the current month
+        total_salary_for_month = PayrollRecord.objects.filter(
+            month=current_month, year=current_year
+        ).aggregate(total_salary=Sum('total_salary_for_month'))['total_salary'] or Decimal(0)
+
+        # Get total overtime for the current month
+        total_overtime_for_month = PayrollRecord.objects.filter(
+            month=current_month, year=current_year
+        ).aggregate(total_overtime=Sum('overtime_days'))['total_overtime'] or Decimal(0)
+
+        # Get previous month's total salary
+        previous_month_salary = PayrollRecord.objects.filter(
+            month=previous_month, year=previous_month_year
+        ).aggregate(total_salary=Sum('total_salary_for_month'))['total_salary'] or Decimal(0)
+
+        # Get previous month's total overtime
+        previous_month_overtime = PayrollRecord.objects.filter(
+            month=previous_month, year=previous_month_year
+        ).aggregate(total_overtime=Sum('overtime_days'))['total_overtime'] or Decimal(0)
+
+        # Gather monthly totals for all months available in the PayrollRecord database
+        monthly_data = PayrollRecord.objects.values('year', 'month').annotate(
+            total_salary=Sum('total_salary_for_month'),
+            total_overtime=Sum('overtime_days')
+        ).order_by('-year', '-month')
+
+        # Prepare monthly data in a list of dicts format for serialization
+        monthly_data_list = [
+            {
+                'month': data['month'],
+                'year': data['year'],
+                'total_salary': data['total_salary'] or Decimal(0),
+                'total_overtime': data['total_overtime'] or Decimal(0),
+            }
+            for data in monthly_data
+        ]
+
+        # Get the total number of employees
+        total_employees = Employee.objects.count()
+
+        # Calculate the average salary for the current month
+        # Get the total salary of all employees for the current month
+        total_salary_current_month = PayrollRecord.objects.filter(
+            month=current_month, year=current_year
+        ).aggregate(total_salary=Sum('total_salary_for_month'))['total_salary'] or Decimal(0)
+
+        # Calculate the average salary if there are employees
+        average_salary_for_month = total_salary_current_month / total_employees if total_employees > 0 else Decimal(0)
+
+        # Return the aggregated data including the total number of employees and average salary
+        return {
+            'total_salary_for_month': total_salary_for_month,
+            'total_overtime_for_month': total_overtime_for_month,
+            'previous_month_salary': previous_month_salary,
+            'previous_month_overtime': previous_month_overtime,
+            'monthly_data': monthly_data_list,
+            'total_employees': total_employees,
+            'average_salary_for_month': average_salary_for_month, 
+        }

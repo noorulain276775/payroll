@@ -95,6 +95,7 @@ const Payroll = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
+          window.location.reload();
           navigate('/');
         }
       }
@@ -113,6 +114,7 @@ const Payroll = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
+          window.location.reload();
           navigate('/');
         }
       }
@@ -286,7 +288,7 @@ const Payroll = () => {
       })
       .catch((error) => {
         console.error(error);
-        setEditErrorMessage('Failed to update the record. Please try again.');
+        setEditErrorMessage(error.response.data.detail);
         setEditAlertVisible(true);
       });
   };
@@ -329,7 +331,7 @@ const Payroll = () => {
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.year}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.overtime_days}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.unpaid_days}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_deduction || 0}</CTableDataCell>
+              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_deductions || 0}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>AED {s.total_salary_for_month}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                 <CDropdown>

@@ -95,6 +95,7 @@ const Employees = () => {
       .catch((error) => {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
+          window.location.reload();
           navigate('/')
         }
       })
@@ -182,6 +183,7 @@ const Employees = () => {
         console.log(error.response.data)
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
+          window.location.reload();
           navigate('/');
         }
       });

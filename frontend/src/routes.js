@@ -1,5 +1,4 @@
 import React from 'react'
-import AddUser from './views/Employees/AddUser'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 
@@ -18,12 +17,16 @@ const Payroll = React.lazy(() => import('./views/Payroll/Payroll'))
 // Add Employee
 const AddEmployee = React.lazy(() => import('./views/Employees/AddEmployee'))
 
-// Add Admin
-const AddAdmin = React.lazy(() => import('./views/Employees/AddUser'))
+// Add User
+const AddUser = React.lazy(() => import('./views/Employees/AddUser'))
+
+// Add Login
+const Login = React.lazy(() => import('./views/pages/login/Login'))
 
 
 const routes = [
-  { path: '/', exact: true, name: 'Home' },
+
+  { path: '/', exact: true, name: 'Login Page', element: Login },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/employees', name: 'Employees', element: Employees },
   { path: '/employees/salary-details', name: 'Salary', element: Salary },

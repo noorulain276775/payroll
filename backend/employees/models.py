@@ -117,6 +117,9 @@ class PayrollRecord(models.Model):
     remarks = models.TextField(blank=True, null=True, verbose_name="Remarks")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('employee', 'month', 'year')
+
     def calculate_salary(self):
         try:
             salary_details = self.employee.salary_details
