@@ -39,7 +39,9 @@ const Payroll = () => {
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [overtimeDays, setOverTimeDays] = useState(0)
+  const [normalOvertimeDays, setNormalOvertimeDays] = useState(0)
   const [overtimeAmount, setOvertimeAmount] = useState(0)
+  const [normalOvertimeAmount, setNormalOvertimeAmount] = useState(0)
   const [unpaidDays, setUnpaidDays] = useState(0)
   const [UnpaidAmount, setUnpaidAmount] = useState(0)
   const [otherDeduction, setOtherDeduction] = useState(0)
@@ -145,7 +147,16 @@ const Payroll = () => {
   }
 
   const handleSendSalary = (s) => {
-    console.log('Send Salary:', s)
+    axios
+      .get(`http://127.0.0.1:8000/send_salary_slip/${s.id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.error(error.response.data.detail);
+      });
   }
 
 
@@ -159,11 +170,14 @@ const Payroll = () => {
   };
 
   const handleCreateRecord = () => {
+    console.log(normalOvertimeDays)
+    console.log(normalOvertimeAmount)
     const data = {
       employee: selectedEmployee,
       month: month,
       year: year,
       overtime_days: overtimeDays,
+      normal_overtime_days: normalOvertimeDays,
       unpaid_days: unpaidDays,
       other_deduction: otherDeduction,
       remarks: remarks
@@ -177,6 +191,8 @@ const Payroll = () => {
       setUnpaidDays(0);
       setUnpaidAmount(0);
       setOtherDeduction(0);
+      setNormalOvertimeAmount(0);
+      setNormalOvertimeDays(0);
       setGrossSalary(0);
       setdailySalary(0);
       setBasicSalary(0);
@@ -222,10 +238,13 @@ const Payroll = () => {
     const gross_salary = parseFloat(grossSalary) || 0;
     const overtime_amount = overtimeDays * (dailySalary * 1.5) || 0;
     setOvertimeAmount(overtime_amount);
+    const normal_overtime_amount = normalOvertimeDays * (dailySalary * 1.25) || 0;
+    setNormalOvertimeAmount(normal_overtime_amount);
+    console.log(normalOvertimeAmount)
     const unpaid_days_amount = unpaidDays * dailySalary || 0;
     setUnpaidAmount(unpaid_days_amount)
     const other_deductions = parseFloat(otherDeduction) || 0;
-    const total_salary_for_month = (gross_salary + overtime_amount) - (unpaid_days_amount + other_deductions)
+    const total_salary_for_month = (gross_salary + overtime_amount + normal_overtime_amount) - (unpaid_days_amount + other_deductions)
     setCalculatedTotalSalary(total_salary_for_month);
   };
 
@@ -316,7 +335,8 @@ const Payroll = () => {
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Employee Name</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Month</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Year</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Overtime Days</CTableHeaderCell>
+            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Holiday Overtime Days</CTableHeaderCell>
+            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Normal Overtime Days</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Unpaid Days</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Other Deductions</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Total Salary</CTableHeaderCell>
@@ -329,7 +349,8 @@ const Payroll = () => {
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee_full_name}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{getMonthName(s.month)}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.year}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.overtime_days}</CTableDataCell>
+              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.overtime_days || 0}</CTableDataCell>
+              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.normal_overtime_days || 0}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.unpaid_days}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_deductions || 0}</CTableDataCell>
               <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>AED {s.total_salary_for_month}</CTableDataCell>
@@ -375,10 +396,15 @@ const Payroll = () => {
                 <CRow>
                   <CCol md={12}>
                     <hr />
-                    <p><strong style={{ marginRight: '10px' }}>Overtime Days:</strong> {selectedEmployeePayroll.overtime_days}</p>
+                    <p><strong style={{ marginRight: '10px' }}>Holiday Overtime Days:</strong> {selectedEmployeePayroll.overtime_days}</p>
                     <p>
-                      <strong style={{ marginRight: '10px' }}>Total Overtime:</strong>
+                      <strong style={{ marginRight: '10px' }}>Holiday Overtime Amount:</strong>
                       AED {((selectedEmployeePayroll?.daily_salary || 0) * 1.5 * (selectedEmployeePayroll?.overtime_days || 0)).toFixed(2)}
+                    </p>
+                    <p><strong style={{ marginRight: '10px' }}>Normal Overtime Days:</strong> {selectedEmployeePayroll.normal_overtime_days || 0}</p>
+                    <p>
+                      <strong style={{ marginRight: '10px' }}>Normal Overtime Amount:</strong>
+                      AED {((selectedEmployeePayroll?.daily_salary || 0) * 1.25 * (selectedEmployeePayroll?.normal_overtime_days || 0)).toFixed(2)}
                     </p>
                     <p><strong style={{ marginRight: '10px' }}>Unpaid Days:</strong>{selectedEmployeePayroll.unpaid_days}</p>
                     <p>
@@ -500,6 +526,14 @@ const Payroll = () => {
                     onChange={(e) => handleInputChange(e, setOverTimeDays)}
                   />
                 </CCol>
+                <CCol md={6} className="mb-3">
+                  <label>Normal Overtime Days <span style={{ color: 'red' }}>*</span></label>
+                  <CFormInput
+                    type="number"
+                    value={normalOvertimeDays}
+                    onChange={(e) => handleInputChange(e, setNormalOvertimeDays)}
+                  />
+                </CCol>
 
                 <CCol md={6} className="mb-3">
                   <label>Unpaid Leaves <span style={{ color: 'red' }}>*</span></label>
@@ -531,6 +565,7 @@ const Payroll = () => {
                     Click to Calculate
                   </CButton>
                   <p><strong>Holiday overtime amount: </strong>{(overtimeAmount || 0).toFixed(2)}</p>
+                  <p><strong>Normal overtime amount: </strong>{(normalOvertimeAmount || 0).toFixed(2)}</p>
                   <p><strong>Unpaid leaves amount: </strong>{(UnpaidAmount || 0).toFixed(2)}</p>
                   <p><strong>Total Salary for the month Salary: </strong>{(calculatedTotalSalary || 0).toFixed(2)}</p>
 
@@ -640,6 +675,29 @@ const Payroll = () => {
                   type="number"
                   value={selectedRecord.overtime_days}
                   onChange={(e) => handleInputEditChange(e, 'overtime_days')}
+                  style={{
+                    padding: '10px',
+                    fontSize: '14px',
+                    borderRadius: '5px',
+                    border: '1px solid #ccc',
+                    width: '100%',
+                  }}
+                />
+              </CCol>
+              <CCol md={6} style={{ marginBottom: '15px' }}>
+                <label
+                  style={{
+                    fontWeight: 'bold',
+                    marginBottom: '5px',
+                    display: 'block',
+                  }}
+                >
+                  Normal Overtime Days
+                </label>
+                <CFormInput
+                  type="number"
+                  value={selectedRecord.normal_overtime_days}
+                  onChange={(e) => handleInputEditChange(e, 'normal_overtime_days')}
                   style={{
                     padding: '10px',
                     fontSize: '14px',

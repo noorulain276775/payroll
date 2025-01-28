@@ -43,7 +43,7 @@ class Employee(models.Model):
     phone_number = models.CharField(max_length=15, verbose_name='Phone Number')
     company_phone_number = models.CharField(max_length=15, verbose_name='Company Phone Number', null=True, blank=True)
     home_town_number = models.CharField(max_length=15, verbose_name='Home Town Number', null=True, blank=True)
-    email = models.EmailField(verbose_name='Company Email', null=True, blank=True)
+    email = models.EmailField(verbose_name='Company Email', default="example@liya.ae")
     personal_email = models.EmailField(verbose_name='Personal Email')
     joining_date = models.DateField(verbose_name='Joining Date')
     insurance_expiry_date = models.DateField(verbose_name='Insurance Expiry Date', null=True, blank=True)
@@ -110,7 +110,8 @@ class PayrollRecord(models.Model):
         MinValueValidator(1900), MaxValueValidator(2100)])
     total_salary_for_month = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Total Salary for Month")
-    overtime_days = models.PositiveIntegerField(default=0, verbose_name="Overtime Days")
+    overtime_days = models.PositiveIntegerField(default=0, verbose_name="Holiday Overtime Days")
+    normal_overtime_days = models.PositiveIntegerField(default=0, verbose_name="Normal Overtime Days")
     unpaid_days = models.PositiveIntegerField(default=0, verbose_name="Unpaid Days")
     other_deductions = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Other Deductions")
@@ -126,8 +127,9 @@ class PayrollRecord(models.Model):
             basic_salary = Decimal(salary_details.basic_salary)
             daily_salary = basic_salary / Decimal(30)
             overtime = self.overtime_days * (daily_salary * Decimal(1.5))
+            normal_overtime = self.normal_overtime_days * (daily_salary * Decimal(1.25))
             unpaid_deduction = self.unpaid_days * daily_salary
-            return (Decimal(salary_details.gross_salary) + overtime) - (unpaid_deduction + self.other_deductions)
+            return (Decimal(salary_details.gross_salary) + overtime + normal_overtime) - (unpaid_deduction + self.other_deductions)
         except AttributeError:
             raise ValidationError("Salary details for this employee are not defined.")
 

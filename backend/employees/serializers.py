@@ -58,7 +58,7 @@ class PayrollRecordSerializer(serializers.ModelSerializer):
         model = PayrollRecord
         fields = [
             'id', 'employee', 'employee_full_name', 'month', 'year', 'total_salary_for_month', 'overtime_days',
-            'unpaid_days', 'other_deductions', 'remarks', 'created_at', 'daily_salary', 'gross_salary'
+            'unpaid_days', 'other_deductions', 'remarks', 'created_at', 'daily_salary', 'gross_salary', 'normal_overtime_days'
         ]
         read_only_fields = ['id', 'total_salary_for_month', 'created_at']
 

@@ -146,6 +146,12 @@ const AddEmployee = () => {
             setAlertVisible(true);
             return false;
         }
+        if (!companyEmail) {
+            setAlertMessage("Company Email is required.");
+            setAlertColor("danger");
+            setAlertVisible(true);
+            return false;
+        }
         if (!gender) {
             setAlertMessage("Gender is required");
             setAlertColor("danger");
@@ -592,7 +598,7 @@ const AddEmployee = () => {
                                     />
                                 </CCol>
                                 <CCol md={6}>
-                                    <label>Company Email</label>
+                                    <label>Company Email<span style={{ color: 'red' }}>*</span></label>
                                     <CFormInput
                                         value={companyEmail}
                                         onChange={(e) => handleInputChange(e, setCompanyEmail)}
