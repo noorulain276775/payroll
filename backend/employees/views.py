@@ -369,7 +369,7 @@ def view_employee(request):
         return Response({"detail": "Employee details not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-# Employee can update their own details (excluding designation and department)
+# Employee can update their own details (excluding mandatory information created by admin)
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def update_own_details(request):

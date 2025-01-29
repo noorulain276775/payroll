@@ -20,6 +20,25 @@ class EmployeeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"children": "Number of children cannot be negative."})
         return data
     
+
+class EmployeeUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['photo', 'spouse_name', 'children', 'company_phone_number', 'home_town_number', 'insurance_expiry_date', 'emergency_contact_name', 
+                  'emergency_contact_number', 'emergency_contact_relation', 'emirates_id', 'emirates_id_expiry', 'passport_no', 'visa_no', 'visa_expiry',
+                   'previous_company_name', 'previous_company_designation', 'emirates_id_image', 'passport_image', 'visa_image', 'highest_degree_certificate', 'insurance_card' ]
+        read_only_fields = ['id']
+
+    def validate(self, data):
+        """
+        Custom validation for the serializer.
+        Example: Add any field-specific or model-level validation here.
+        """
+        if data.get('children', 0) < 0:
+            raise serializers.ValidationError({"children": "Number of children cannot be negative."})
+        return data
+
+
 class SalaryDetailsSerializer(serializers.ModelSerializer):
     employee_full_name = serializers.SerializerMethodField()
 
@@ -121,10 +140,6 @@ class ColleagueSerializer(serializers.ModelSerializer):
         return f"{obj.first_name} {obj.last_name}"
     
 
-class EmployeeUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Employee
-        fields = '__all__'
 
 
 class DashboardSerializer(serializers.Serializer):

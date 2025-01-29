@@ -17,8 +17,9 @@ urlpatterns = [
     path('update-payroll-record/<int:payroll_id>/', update_payroll_record, name='update_payroll_record'),
     path('send_salary_slip/<int:payroll_id>/', send_salary_slip, name='send_salary_slip_to_employeees'),
     # For Admin  -------------- Dashbaord endpoints
-    path('new_employees/', view_new_employees, name="view_new_employee" ),
     path('dashboard-summary/', dashboard_summary, name="dashboard-summary" ),
+    # (All authenticated Users) -------------- Dashbaord endpoints
+    path('new_employees/', view_new_employees, name="view_new_employee" ),
     # For Employee ------------- Employee endpoints
     path('employee/profile/', view_employee, name='view_employee'), 
     path('employee/update/', update_own_details, name='update_own_details'),  # Update own details
