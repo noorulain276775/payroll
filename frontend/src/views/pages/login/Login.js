@@ -31,15 +31,20 @@ const Login = () => {
         username,
         password,
       })
-      console.log('API response:', response)
-      
+
       if (response.status === 200) {
         localStorage.setItem('authToken', response.data.access);
         localStorage.setItem('refreshToken', response.data.refresh);
-        window.location.reload();
+        localStorage.setItem('user_type', response.data.user_type);
+        localStorage.setItem("logged_in_status", JSON.stringify(true));
+        if (response.data.user_type === 'Admin') {
+          window.location.href = "/dashboard";
+        } else {
+          window.location.href = "/employee-dashboard";
+
+        }
       }
     } catch (error) {
-      navigate('/')
       setError('Invalid credentials or server error')
     }
   }
@@ -68,7 +73,7 @@ const Login = () => {
                         required
                       />
                     </CInputGroup>
-                    
+
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />

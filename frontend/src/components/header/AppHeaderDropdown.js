@@ -32,6 +32,7 @@ const AppHeaderDropdown = () => {
       );
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
+      localStorage.setItem("logged_in_status", JSON.stringify(false));
       navigate('/');
       window.location.reload();
     } catch (error) {

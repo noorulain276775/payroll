@@ -276,8 +276,6 @@ def send_salary_slip(request, payroll_id):
 @permission_classes([IsAuthenticated])
 def view_new_employees(request):
     print(f"Authenticated User: {request.user}")
-    if request.user.user_type != 'Admin':
-        return Response({"detail": "Only admins can view new employees."}, status=status.HTTP_403_FORBIDDEN)
     employees = Employee.objects.all().order_by('-created_at')[:3]
     serializer = EmployeeSerializer(employees, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

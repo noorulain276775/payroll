@@ -90,7 +90,6 @@ const Employees = () => {
       })
       .then((response) => {
         setEmployees(response.data)
-        console.log('Employees:', response.data)
       })
       .catch((error) => {
         if (error.response && error.response.status === 401) {
@@ -174,13 +173,11 @@ const Employees = () => {
         },
       })
       .then((response) => {
-        console.log('Employee updated:', response.data);
         setEditModalVisible(false);
         window.location.reload();
       })
       .catch((error) => {
         console.error('Error updating employee:', error.response?.data || error.message);
-        console.log(error.response.data)
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
           window.location.reload();
@@ -188,12 +185,6 @@ const Employees = () => {
         }
       });
   };
-
-
-
-  // const handleDelete = (employeeId) => {
-  //   console.log('Delete clicked for employee ID:', employeeId)
-  // }
 
   const getValue = (value) => value ? value : 'N/A'
 

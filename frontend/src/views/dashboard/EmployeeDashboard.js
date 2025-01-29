@@ -8,7 +8,7 @@ import { DashboardWidgets } from '../../components/DashboardWidgets';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../../config';
 
-const Dashboard = () => {
+const EmployeeDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [newEmployees, setNewEmployees] = useState([]);
   const navigate = useNavigate();
@@ -21,24 +21,7 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-  // Fetch dashboard summary and new employees
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/dashboard-summary/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
-        });
-        setDashboardData(response.data);
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('authToken');
-          window.location.reload();
-          navigate('/');
-        } else {
-          console.error('Error fetching dashboard data:', error);
-        }
-      }
-    };
 
     const fetchNewEmployees = async () => {
       try {
@@ -57,17 +40,14 @@ const Dashboard = () => {
       }
     };
 
-    fetchDashboardData();
     fetchNewEmployees();
   }, [navigate]);
 
-  if (!dashboardData) {
-    return <div>Loading...</div>; // Show a loading state if data is not yet loaded
-  }
+
 
   return (
     <>
-      <DashboardWidgets
+      {/* <DashboardWidgets
         totalSalaryForMonth={dashboardData.total_salary_for_month}
         totalOvertimeForMonth={dashboardData.total_overtime_for_month}
         previousMonthSalary={dashboardData.previous_month_salary}
@@ -88,7 +68,7 @@ const Dashboard = () => {
           </CRow>
           <MainChart monthlyData={dashboardData.monthly_data} />
         </CCardBody>
-      </CCard>
+      </CCard> */}
 
       {/* Newly Added Employees Table */}
       <CCard>
@@ -124,4 +104,5 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default EmployeeDashboard;
+

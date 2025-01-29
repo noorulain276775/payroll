@@ -93,7 +93,6 @@ const Payroll = () => {
           },
         });
         setPayroll(response.data);
-        console.log('payrolls:', response.data);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
@@ -112,7 +111,6 @@ const Payroll = () => {
           },
         });
         setEmployees(response.data);
-        console.log('Employees:', response.data);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
@@ -152,7 +150,6 @@ const Payroll = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        console.log(response.data)
       })
       .catch((error) => {
         console.error(error.response.data.detail);
@@ -170,8 +167,6 @@ const Payroll = () => {
   };
 
   const handleCreateRecord = () => {
-    console.log(normalOvertimeDays)
-    console.log(normalOvertimeAmount)
     const data = {
       employee: selectedEmployee,
       month: month,
@@ -207,7 +202,6 @@ const Payroll = () => {
         },
       })
       .then((response) => {
-        console.log('Payroll Created:', response.data)
         setMakePayroll([...makePayroll, response.data])
         setErrorMessage(null);
         setSuccessMessage('Salary details created successfully.');
@@ -240,7 +234,6 @@ const Payroll = () => {
     setOvertimeAmount(overtime_amount);
     const normal_overtime_amount = normalOvertimeDays * (dailySalary * 1.25) || 0;
     setNormalOvertimeAmount(normal_overtime_amount);
-    console.log(normalOvertimeAmount)
     const unpaid_days_amount = unpaidDays * dailySalary || 0;
     setUnpaidAmount(unpaid_days_amount)
     const other_deductions = parseFloat(otherDeduction) || 0;
@@ -256,7 +249,6 @@ const Payroll = () => {
   }
   const handleEmployeeChange = (e) => {
     const employeeId = e.target.value;
-    console.log("This is employee ID: ", employeeId);
     setSelectedEmployee(employeeId);
 
     axios.get(`http://127.0.0.1:8000/salary-details/${employeeId}/`, {
@@ -266,7 +258,6 @@ const Payroll = () => {
     })
       .then((response) => {
         const salaryDetails = response.data;
-        console.log("salary_details:", salaryDetails);
 
         const basicSalaryValue = salaryDetails.basic_salary; // Extract basic salary
         const dailySalaryValue = basicSalaryValue / 30; // Calculate daily salary
@@ -283,7 +274,6 @@ const Payroll = () => {
 
   const handleEdit = (record) => {
     setSelectedRecord(record)
-    console.log(selectedRecord)
     setEditModalVisible(true)
   }
 
@@ -446,9 +436,6 @@ const Payroll = () => {
           )}
         </CModalBody>
       </CModal>
-
-
-
 
       {/* Modal for Creating Salary Details */}
       <CModal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} size="lg" centered>

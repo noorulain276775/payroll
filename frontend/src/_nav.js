@@ -1,16 +1,18 @@
-import React from 'react'
-import CIcon from '@coreui/icons-react'
+import React from 'react';
+import CIcon from '@coreui/icons-react';
 import {
   cilSpeedometer,
   cilAddressBook,
   cilMoney,
-  cilIndustry,
   cilWallet,
   cilUserPlus,
-} from '@coreui/icons'
-import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
+  cilFile,
+  cilUser,
+} from '@coreui/icons';
+import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react';
 
-const _nav = [
+// Navigation for Admin Users
+const adminNav = [
   {
     component: CNavItem,
     name: 'Dashboard',
@@ -33,12 +35,6 @@ const _nav = [
     to: '/employees/salary-details',
     icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
   },
-  // {
-  //   component: CNavItem,
-  //   name: 'Company Data',
-  //   to: '/employees/company-data',
-  //   icon: <CIcon icon={cilIndustry} customClassName="nav-icon" />,
-  // },
   {
     component: CNavItem,
     name: 'Payroll',
@@ -50,11 +46,6 @@ const _nav = [
     name: 'Register',
     icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
     items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'New User',
-      //   to: '/register',
-      // },
       {
         component: CNavItem,
         name: 'New User',
@@ -67,6 +58,39 @@ const _nav = [
       },
     ],
   },
-]
+];
 
-export default _nav
+// Navigation for Employee Users
+const employeeNav = [
+  {
+    component: CNavItem,
+    name: 'Dashboard',
+    to: '/employee-dashboard',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'My Payslips',
+    to: '/employee/payslips',
+    icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'My Profile',
+    to: '/employee/profile',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'My Salary details',
+    to: '/employee/salary-details',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  },
+];
+
+const getNavigation = () => {
+  const userType = localStorage.getItem('user_type');
+  return userType === 'Admin' ? adminNav : employeeNav;
+};
+
+export default getNavigation;

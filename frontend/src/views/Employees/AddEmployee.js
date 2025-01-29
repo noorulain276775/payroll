@@ -348,7 +348,7 @@ const AddEmployee = () => {
                 setAlertMessage('Employee added successfully!');
                 setAlertColor('success');
                 setAlertVisible(true);
-                console.log(response.data);
+                window.scrollTo({ top: 0, behavior: "smooth" });
                 resetForm();
             })
             .catch((error) => {

@@ -82,7 +82,6 @@ const Salary = () => {
           },
         });
         setEmployees(response.data);
-        console.log('Employees:', response.data);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
@@ -101,7 +100,6 @@ const Salary = () => {
           },
         });
         setSalary(response.data);
-        console.log('Salary of Employees:', response.data);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
@@ -167,7 +165,6 @@ const Salary = () => {
         },
       })
       .then((response) => {
-        console.log('Salary Details Created:', response.data)
         setSalary([...salary, response.data])
         setErrorMessage(null);
         setSuccessMessage('Salary details created successfully.');
