@@ -26,7 +26,8 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['photo', 'spouse_name', 'children', 'company_phone_number', 'home_town_number', 'insurance_expiry_date', 'emergency_contact_name', 
                   'emergency_contact_number', 'emergency_contact_relation', 'emirates_id', 'emirates_id_expiry', 'passport_no', 'visa_no', 'visa_expiry',
-                   'previous_company_name', 'previous_company_designation', 'emirates_id_image', 'passport_image', 'visa_image', 'highest_degree_certificate', 'insurance_card' ]
+                   'previous_company_name', 'previous_company_designation', 'emirates_id_image', 'passport_image', 'visa_image', 'highest_degree_certificate', 'insurance_card',
+                    'phone_number', 'address', 'nationality', 'gender', 'marital_status', 'mother_name', 'personal_email', 'qualification']
         read_only_fields = ['id']
 
     def validate(self, data):

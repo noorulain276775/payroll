@@ -10,6 +10,14 @@ from django.core.mail import EmailMessage
 from django.db.models import Sum
 from django.utils import timezone
 from decimal import Decimal
+import io
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.http import FileResponse
+from reportlab.lib.utils import ImageReader
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 
 """
@@ -400,8 +408,130 @@ def view_colleagues(request):
 def view_own_payroll(request):
     try:
         employee_details = Employee.objects.get(user=request.user)
-        payroll_records = PayrollRecord.objects.filter(employee=employee_details)
+        payroll_records = PayrollRecord.objects.filter(employee=employee_details).order_by('-year', '-month')
         serializer = PayrollRecordSerializer(payroll_records, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    except Employee.DoesNotExist:
+        return Response({"detail": "Employee details not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+# Employee-only view to view their own Salary details
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_own_salary_details(request):
+    try:
+        employee_details = Employee.objects.get(user=request.user)
+        salary_details = SalaryDetails.objects.get(employee=employee_details)
+        serializer = SalaryDetailsSerializer(salary_details)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Employee.DoesNotExist:
+        return Response({"detail": "Employee details not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+# Employee-only view to download their own Payslip
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_payroll_pdf(request, payroll_id):
+    try:
+        employee = Employee.objects.get(user=request.user)
+        try:
+            payroll_record = PayrollRecord.objects.get(id=payroll_id, employee=employee)
+        except PayrollRecord.DoesNotExist:
+            return Response({"detail": "Payroll record not found or doesn't belong to this employee."}, 
+                            status=status.HTTP_404_NOT_FOUND)
+
+        buffer = io.BytesIO()
+        pdf = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=20, leftMargin=20, topMargin=40, bottomMargin=20)
+        pdf.title = f"Payslip - {employee.first_name} {employee.last_name} - {payroll_record.month}/{payroll_record.year}"
+        elements = []
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle("title", parent=styles["Heading1"], fontSize=16, textColor=colors.black, alignment=1)
+        normal_style = styles["BodyText"]
+
+        logo_path = "media/company-images/logo.png" 
+        try:
+            logo = Image(logo_path, width=100, height=40)
+            logo.hAlign = "LEFT"
+            elements.append(logo)
+        except Exception as e:
+            print("Logo not found:", str(e))
+        elements.append(Spacer(1, 10)) 
+        elements.append(Paragraph("<b>Payslip</b>", title_style))
+        elements.append(Spacer(1, 20))
+
+        # Ensure safe retrieval of values
+        basic_salary = round(float(getattr(employee.salary_details, 'basic_salary', 0) or 0), 2)
+        gross_salary = round(float(getattr(employee.salary_details, 'gross_salary', 0) or 0), 2)
+
+        unpaid_days = getattr(payroll_record, 'unpaid_days', 0) or 0
+        overtime_days = getattr(payroll_record, 'overtime_days', 0) or 0
+        normal_overtime_days = getattr(payroll_record, 'normal_overtime_days', 0) or 0
+        other_deductions = round(float(getattr(payroll_record, 'other_deductions', 0) or 0), 2)
+
+        daily_salary = round(basic_salary / 30 if basic_salary else 0, 2)
+        unpaid_leaves_amount = round(daily_salary * unpaid_days, 2)
+        holiday_overtime_amount = round(overtime_days * 1.5 * daily_salary, 2)
+        normal_overtime_amount = round(normal_overtime_days * 1.25 * daily_salary, 2)
+
+        total_earnings = round(gross_salary + holiday_overtime_amount + normal_overtime_amount, 2)
+        total_deductions = round(unpaid_leaves_amount + other_deductions, 2)
+
+        # Employee and payroll details in two columns
+        details_data = [
+            ["Date of Joining:", str(employee.joining_date), "Employee Name:", f"{employee.first_name} {employee.last_name}"],
+            ["Pay Period:", f"{payroll_record.month}/{payroll_record.year}", "Designation:", employee.designation],
+            ["Worked Days:", 30 - unpaid_days, "Department:", employee.department],
+            ["Basic Salary:", basic_salary, "Per day Salary:", daily_salary],
+        ]
+        details_table = Table(details_data, colWidths=[150, 100, 150, 100])
+        details_table.setStyle(TableStyle([
+            ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ]))
+        elements.append(details_table)
+        elements.append(Spacer(1, 20))
+
+        # Earnings and Deductions table
+        earnings_deductions_data = [
+            ["Earnings", "Amount (AED)", "Deductions", "Amount (AED)"],
+            ["Gross Salary", f"AED {gross_salary:.2f}", "Unpaid Leaves", f"AED {unpaid_leaves_amount:.2f}"],
+            ["Holiday Overtime", f"AED {holiday_overtime_amount:.2f}", "Other Deductions", f"AED {other_deductions:.2f}"],
+            ["Normal Overtime", f"AED {normal_overtime_amount:.2f}", "Loan", "-"],
+            ["Total Earnings", f"AED {total_earnings:.2f}", "Total Deductions", f"AED {total_deductions:.2f}"],
+        ]
+        earnings_deductions_table = Table(earnings_deductions_data, colWidths=[150, 100, 150, 100])
+        earnings_deductions_table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(earnings_deductions_table)
+        elements.append(Spacer(1, 20))
+
+        # Net Pay
+        net_pay = round(max(0, total_earnings - total_deductions), 2)
+        net_pay_data = [["Net Pay:", f"AED {net_pay:.2f}"]]
+        net_pay_table = Table(net_pay_data, colWidths=[150, 300])
+        net_pay_table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.beige),
+            ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
+            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+        ]))
+        elements.append(net_pay_table)
+
+        # Footer
+        elements.append(Spacer(1, 30))
+        footer = Paragraph("<font size=10><i>This is a system-generated payslip. No signature required.</i></font>", normal_style)
+        elements.append(footer)
+
+        # Generate PDF
+        pdf.build(elements)
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename=f"{employee.first_name}_{employee.last_name}_payslip_{payroll_record.month}_{payroll_record.year}.pdf")
+
     except Employee.DoesNotExist:
         return Response({"detail": "Employee details not found."}, status=status.HTTP_404_NOT_FOUND)

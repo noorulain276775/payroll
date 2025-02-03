@@ -16,6 +16,7 @@ env = environ.Env()
 environ.Env.read_env()
 from datetime import timedelta
 import os
+from django.conf import settings
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -155,6 +156,7 @@ SIMPLE_JWT = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+logo_path = os.path.join(settings.MEDIA_ROOT, "company-images/logo.png")
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

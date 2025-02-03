@@ -7,6 +7,7 @@ import {
   cilWallet,
   cilUserPlus,
   cilFile,
+  cilLockLocked,
   cilUser,
 } from '@coreui/icons';
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react';
@@ -56,6 +57,12 @@ const adminNav = [
         name: 'New Employee',
         to: '/employees/add-employee',
       },
+      {
+        component: CNavItem,
+        name: 'Change Password',
+        to: '/employee/change-password',
+        icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
+      },
     ],
   },
 ];
@@ -70,12 +77,6 @@ const employeeNav = [
   },
   {
     component: CNavItem,
-    name: 'My Payslips',
-    to: '/employee/payslips',
-    icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
     name: 'My Profile',
     to: '/employee/profile',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
@@ -84,7 +85,19 @@ const employeeNav = [
     component: CNavItem,
     name: 'My Salary details',
     to: '/employee/salary-details',
-    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'My Payslips',
+    to: '/employee/payslips',
+    icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Change Password',
+    to: '/employee/change-password',
+    icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
   },
 ];
 

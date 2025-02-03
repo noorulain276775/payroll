@@ -1,31 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { BASE_URL } from '../../../config';
 import {
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CButton,
   CCard,
   CCardBody,
   CCardHeader,
+  CForm,
   CRow,
   CCol,
-  CFormTextarea
+  CFormLabel,
+  CFormInput,
+  CAlert,
+  CButton,
+  CFormSelect
 } from '@coreui/react';
 
-const BASE_URL = 'http://127.0.0.1:8000'; // Base URL for your Django API
+// Constants for file validation
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
+const ALLOWED_PDF_TYPES = ['application/pdf'];
+
 
 const EmployeeProfile = () => {
   const [employee, setEmployee] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [emiratesIdPreview, setEmiratesIdPreview] = useState(null);
+  const [passportIdPreview, setPassportIdPreview] = useState(null);
+  const [visaPreview, setVisaPreview] = useState(null);
+  const [highestDegreeCertificatePreview, sethighestDegreeCertificatePreview] = useState(null);
+  const [insuranceCardPreview, setInsuranceCardPreview] = useState(null);
+
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
     if (!token) {
-      navigate('/');
+      window.location.href = "/";
       return;
     }
     axios
@@ -36,11 +48,31 @@ const EmployeeProfile = () => {
       })
       .then((response) => {
         setEmployee(response.data);
-        setFormData(response.data); // Set initial form data
+        setFormData(response.data);
+        if (response.data.photo) {
+          setPhotoPreview(`${BASE_URL}${response.data.photo}`);
+        }
+        if (response.data.emirates_id_image) {
+          setEmiratesIdPreview(`${BASE_URL}${response.data.emirates_id_image}`);
+        }
+        if (response.data.passport_image) {
+          setPassportIdPreview(`${BASE_URL}${response.data.passport_image}`);
+        }
+        if (response.data.visa_image) {
+          setVisaPreview(`${BASE_URL}${response.data.visa_image}`);
+        }
+        if (response.data.highest_degree_certificate) {
+          sethighestDegreeCertificatePreview(`${BASE_URL}${response.data.highest_degree_certificate}`);
+        }
+        if (response.data.insurance_card) {
+          setInsuranceCardPreview(`${BASE_URL}${response.data.insurance_card}`);
+        }
       })
       .catch((error) => {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user_type');
           window.location.reload();
           navigate('/');
         }
@@ -53,29 +85,67 @@ const EmployeeProfile = () => {
 
   const handleCancel = () => {
     setIsEditing(false);
-    setFormData(employee); // Reset to initial data
+    setFormData(employee);
+    setPhotoPreview(`${BASE_URL}${employee.photo}`);
+    setEmiratesIdPreview(`${BASE_URL}${employee.emirates_id_image}`);
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, files } = e.target;
+
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (name === 'photo') {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+          alert('Only JPG, JPEG, and PNG files are allowed for profile photo upload.');
+          return;
+        }
+      } else if (['emirates_id_image', 'passport_image', 'visa_image', 'highest_degree_certificate', 'insurance_card'].includes(name)) {
+        if (!ALLOWED_PDF_TYPES.includes(file.type)) {
+          alert(`Only PDF files are allowed for ${name.replace('_', ' ')} upload.`);
+          return;
+        }
+      }
+
+      // Generate preview for image or PDF
+      const filePreview = URL.createObjectURL(file);
+      if (name === 'photo') setPhotoPreview(filePreview);
+      if (name === 'emirates_id_image') setEmiratesIdPreview(filePreview);
+      if (name === 'passport_image') setPassportIdPreview(filePreview);
+      if (name === 'visa_image') setVisaPreview(filePreview);
+      if (name === 'highest_degree_certificate') sethighestDegreeCertificatePreview(filePreview);
+      if (name === 'insurance_card') setInsuranceCardPreview(filePreview);
+
+      setFormData({
+        ...formData,
+        [name]: file,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const data = new FormData();
+    Object.keys(formData).forEach((key) => {
+      if (formData[key]) {
+        data.append(key, formData[key]);
+      }
+    });
+
     axios
-      .put(
-        `${BASE_URL}/employee/update/`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .put(`${BASE_URL}/employee/update/`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       .then((response) => {
         setEmployee(response.data);
         setIsEditing(false);
@@ -84,29 +154,41 @@ const EmployeeProfile = () => {
         console.error(error);
       });
   };
-
-  if (!employee) {
-    return <div>Loading...</div>;
+  if (!employee || employee.length === 0) {
+    return (
+      <CRow className="justify-content-center mt-5">
+        <CCol xs={12} md={8} lg={6}>
+          <CAlert color="warning" className="text-center p-4">
+            <h5 className="fw-bold">Employee Profile Not Found</h5>
+            <p>Your employee profile has not been created by the Admin yet.</p>
+            <p>Please contact the Admin for assistance.</p>
+          </CAlert>
+        </CCol>
+      </CRow>
+    );
   }
-
   return (
     <div>
       <CCard>
         <CCardHeader>
-          <h4>Employee Personal Information</h4>
+          <h4>Employee Information</h4>
         </CCardHeader>
         <CCardBody>
           <CForm>
-            <CRow>
+            {/* Personal Information Section */}
+            <div className="section-header">
+              <h5>Personal Information</h5>
+            </div>
+            <CRow className="mt-3">
               <CCol xs={12} md={6}>
                 <CFormLabel htmlFor="first_name">First Name</CFormLabel>
                 <CFormInput
                   type="text"
                   id="first_name"
                   name="first_name"
-                  value={formData.first_name}
+                  value={formData.first_name || ''}
                   onChange={handleChange}
-                  disabled={!isEditing}
+                  disabled
                 />
               </CCol>
               <CCol xs={12} md={6}>
@@ -115,20 +197,20 @@ const EmployeeProfile = () => {
                   type="text"
                   id="last_name"
                   name="last_name"
-                  value={formData.last_name}
+                  value={formData.last_name || ''}
                   onChange={handleChange}
-                  disabled={!isEditing}
+                  disabled
                 />
               </CCol>
             </CRow>
             <CRow className="mt-3">
               <CCol xs={12} md={6}>
-                <CFormLabel htmlFor="email">Company Email</CFormLabel>
+                <CFormLabel htmlFor="personal_email">Personal Email</CFormLabel>
                 <CFormInput
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  id="personal_email"
+                  name="personal_email"
+                  value={formData.personal_email || ''}
                   onChange={handleChange}
                   disabled={!isEditing}
                 />
@@ -139,7 +221,85 @@ const EmployeeProfile = () => {
                   type="text"
                   id="phone_number"
                   name="phone_number"
-                  value={formData.phone_number}
+                  value={formData.phone_number || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="date_of_birth">Date of birth</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="date_of_birth"
+                  name="date_of_birth"
+                  value={formData.date_of_birth || ''}
+                  onChange={handleChange}
+                  disabled
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="place_of_birth">Place of Birth</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="place_of_birth"
+                  name="place_of_birth"
+                  value={formData.place_of_birth || ''}
+                  onChange={handleChange}
+                  disabled
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="nationality">Nationality</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="nationality"
+                  name="nationality"
+                  value={formData.nationality || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="address">Current Address</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="address"
+                  name="address"
+                  value={formData.address || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="marital_status">Marital Status</CFormLabel>
+                <CFormSelect
+                  id="marital_status"
+                  name="marital_status"
+                  value={formData.marital_status || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                >
+                  <option value="">Select Marital Status</option>
+                  <option value="Married">Married</option>
+                  <option value="Unmarried">Unmarried</option>
+                </CFormSelect>
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="spouse_name">Spouse Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="spouse_name"
+                  name="spouse_name"
+                  value={formData.spouse_name || ''}
                   onChange={handleChange}
                   disabled={!isEditing}
                 />
@@ -147,24 +307,144 @@ const EmployeeProfile = () => {
             </CRow>
             <CRow className="mt-3">
               <CCol xs={12} md={6}>
-                <CFormLabel htmlFor="address">Address</CFormLabel>
-                <CFormTextarea
-                  id="address"
-                  name="address"
-                  value={formData.address}
+                <CFormLabel htmlFor="gender">Gender</CFormLabel>
+                <CFormSelect
+                  id="gender"
+                  name="gender"
+                  value={formData.gender || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </CFormSelect>
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="children">Children</CFormLabel>
+                <CFormInput
+                  type="number"
+                  id="children"
+                  name="children"
+                  value={formData.children || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="father_name">Father name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="father_name"
+                  name="father_name"
+                  value={formData.father_name || ''}
+                  onChange={handleChange}
+                  disabled
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="mother_name">Mother Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="mother_name"
+                  name="mother_name"
+                  value={formData.mother_name || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="pasport_no">Passport no:</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="pasport_no"
+                  name="pasport_no"
+                  value={formData.pasport_no || ''}
                   onChange={handleChange}
                   disabled={!isEditing}
                 />
               </CCol>
               <CCol xs={12} md={6}>
-                <CFormLabel htmlFor="department">Department</CFormLabel>
+                <CFormLabel htmlFor="qualification">Highest Qualification</CFormLabel>
                 <CFormInput
                   type="text"
-                  id="department"
-                  name="department"
-                  value={formData.department}
+                  id="qualification"
+                  name="qualification"
+                  value={formData.qualification || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            {/* Photo and passport Upload Section */}
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="photo">Profile Photo</CFormLabel>
+                <CFormInput
+                  type="file"
+                  id="photo"
+                  name="photo"
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+                {photoPreview && (
+                  <div className="mt-2">
+                    <img src={photoPreview} alt="Profile" style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                  </div>
+                )}
+              </CCol>
+
+              <CCol xs={12} md={6}>
+
+                <CFormLabel htmlFor="passport_image">Passport Document (PDF)</CFormLabel>
+                <CFormInput
+                  type="file"
+                  id="passport_image"
+                  name="passport_image"
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+                {passportIdPreview && (
+                  <div className="mt-2">
+                    <a href={passportIdPreview} target="_blank" rel="noopener noreferrer">View Passport ID PDF</a>
+                  </div>
+                )}
+
+              </CCol>
+            </CRow>
+
+            {/* Company Information Section */}
+            <div className="section-header mt-4">
+              <h5>Company Information</h5>
+            </div>
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="email">Company Email</CFormLabel>
+                <CFormInput
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email || ''}
                   onChange={handleChange}
                   disabled
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="company_phone_number">Company Phone Number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="company_phone_number"
+                  name="company_phone_number"
+                  value={formData.company_phone_number || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
                 />
               </CCol>
             </CRow>
@@ -175,19 +455,260 @@ const EmployeeProfile = () => {
                   type="text"
                   id="designation"
                   name="designation"
-                  value={formData.designation}
+                  value={formData.designation || ''}
+                  onChange={handleChange}
+                  disabled
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="department">Department</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="department"
+                  name="department"
+                  value={formData.department || ''}
                   onChange={handleChange}
                   disabled
                 />
               </CCol>
             </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="joining_date">Date of Joining</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="joining_date"
+                  name="joining_date"
+                  value={formData.joining_date || ''}
+                  onChange={handleChange}
+                  disabled
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="insurance_expiry_date">Insurance Expiry Date</CFormLabel>
+                <CFormInput
+                  type="date"
+                  id="insurance_expiry_date"
+                  name="insurance_expiry_date"
+                  value={formData.insurance_expiry_date || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emirates_id">Emirates Id number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="emirates_id"
+                  name="emirates_id"
+                  value={formData.emirates_id || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emirates_id_expiry">Emirates ID Expiry Date</CFormLabel>
+                <CFormInput
+                  type="date"
+                  id="emirates_id_expiry"
+                  name="emirates_id_expiry"
+                  value={formData.emirates_id_expiry || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="visa_no">Visa number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  visa_
+                  name="visa_no"
+                  value={formData.visa_no || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="visa_expiry">Visa Expiry Date</CFormLabel>
+                <CFormInput
+                  type="date"
+                  id="visa_expiry"
+                  name="visa_expiry"
+                  value={formData.visa_expiry || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="previous_company_name">Previous Company Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="previous_company_name"
+                  name="previous_company_name"
+                  value={formData.previous_company_name || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="previous_company_designation">Previous Company Designation</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="previous_company_designation"
+                  name="previous_company_designation"
+                  value={formData.previous_company_designation || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <div className="section-header mt-4">
+              <h5>Documents Upload</h5>
+            </div>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emirates_id_image">Emirates ID Image (PDF)</CFormLabel>
+                <CFormInput
+                  type="file"
+                  id="emirates_id_image"
+                  name="emirates_id_image"
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+                {emiratesIdPreview && (
+                  <div className="mt-2">
+                    <a href={emiratesIdPreview} target="_blank" rel="noopener noreferrer">View Emirates ID</a>
+                  </div>
+                )}
+              </CCol>
+
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="visa_image">Visa Document (PDF)</CFormLabel>
+                <CFormInput
+                  type="file"
+                  id="visa_image"
+                  name="visa_image"
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+                {visaPreview && (
+                  <div className="mt-2">
+                    <a href={visaPreview} target="_blank" rel="noopener noreferrer">View Visa Document</a>
+                  </div>
+                )}
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emirates_id_image">Highest Degree Certificate (PDF)</CFormLabel>
+                <CFormInput
+                  type="file"
+                  id="highest_degree_certificate"
+                  name="highest_degree_certificate"
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+                {highestDegreeCertificatePreview && (
+                  <div className="mt-2">
+                    <a href={highestDegreeCertificatePreview} target="_blank" rel="noopener noreferrer">View Highest Degree</a>
+                  </div>
+                )}
+              </CCol>
+
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="visa_image">Insurance Card (PDF)</CFormLabel>
+                <CFormInput
+                  type="file"
+                  id="insurance_card"
+                  name="insurance_card"
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+                {insuranceCardPreview && (
+                  <div className="mt-2">
+                    <a href={insuranceCardPreview} target="_blank" rel="noopener noreferrer">View Insurance Card</a>
+                  </div>
+                )}
+              </CCol>
+            </CRow>
+
+
+            {/* Emergency Contact Section */}
+            <div className="section-header mt-4">
+              <h5>Emergency Contact Information</h5>
+            </div>
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emergency_contact_name">Emergency Contact Name</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="emergency_contact_name"
+                  name="emergency_contact_name"
+                  value={formData.emergency_contact_name || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emergency_contact_number">Emergency Contact Number</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="emergency_contact_number"
+                  name="emergency_contact_number"
+                  value={formData.emergency_contact_number || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+            </CRow>
+
+            <CRow className="mt-3">
+              <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emergency_contact_relation">Emergency Contact Relation</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="emergency_contact_relation"
+                  name="emergency_contact_relation"
+                  value={formData.emergency_contact_relation || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol>
+              {/* <CCol xs={12} md={6}>
+                <CFormLabel htmlFor="emergency_contact_number">Blood Group</CFormLabel>
+                <CFormInput
+                  type="text"
+                  id="emergency_contact_number"
+                  name="emergency_contact_number"
+                  value={formData.emergency_contact_number || ''}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                />
+              </CCol> */}
+            </CRow>
+
+
+
+            {/* Save/Cancel Button */}
             <div className="mt-4">
               {isEditing ? (
                 <CButton color="primary" onClick={handleSubmit}>
                   Save Changes
                 </CButton>
               ) : (
-                <CButton color="dark" onClick={handleEdit}>
+                <CButton color="primary" variant="outline" onClick={handleEdit}>
                   Edit Profile
                 </CButton>
               )}

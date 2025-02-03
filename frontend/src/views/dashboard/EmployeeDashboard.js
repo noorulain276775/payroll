@@ -72,7 +72,7 @@ const EmployeeDashboard = () => {
 
       {/* Newly Added Employees Table */}
       <CCard>
-        <CCardHeader>Newly Added Employees</CCardHeader>
+        <CCardHeader>Newly Added Colleagues</CCardHeader>
         <CCardBody>
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">

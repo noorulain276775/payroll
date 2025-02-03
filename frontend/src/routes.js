@@ -1,3 +1,4 @@
+import { element } from 'prop-types';
 import React from 'react';
 
 // Common Pages
@@ -33,6 +34,9 @@ const EmployeeProfile = React.lazy(() => import('./views/Profile/EmployeeProfile
 // Employee Profile
 const EmployeeSalaryDetails = React.lazy(() => import('./views/Profile/EmployeeSalaryDetails'))
 
+// Change Password
+const ChangePassword = React.lazy(() => import('./views/ChangePassword/ChangePassword'))
+
 const routes = [
   // Admin Routes
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin'] },
@@ -42,6 +46,9 @@ const routes = [
   { path: '/employees/payroll', name: 'Payroll', element: Payroll, allowedRoles: ['Admin'] },
   { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee, allowedRoles: ['Admin'] },
   { path: '/register/new-user', name: 'Add Admin', element: AddUser, allowedRoles: ['Admin'] },
+
+  // For both (Admin and Employee)
+  { path: '/employee/change-password', name: 'Change Password', element: ChangePassword, allowedRoles: ['Admin', 'Employee'] },
 
   // Employee Routes
   { path: '/employee-dashboard', name: 'Employee Dashboard', element: EmployeeDashboard, allowedRoles: ['Employee'] },
