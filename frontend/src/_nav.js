@@ -61,7 +61,6 @@ const adminNav = [
         component: CNavItem,
         name: 'Change Password',
         to: '/employee/change-password',
-        icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
       },
     ],
   },

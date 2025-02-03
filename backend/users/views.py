@@ -67,3 +67,22 @@ class UserLogoutView(APIView):
             return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': 'Invalid token or token already blacklisted'}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        
+        if not current_password or not new_password:
+            return Response({'error': 'Current password and new password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(username=user.username, password=current_password)
+        if not user:
+            return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)

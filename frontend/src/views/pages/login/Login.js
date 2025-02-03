@@ -21,6 +21,7 @@ const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate()
 
   const handleLogin = async (e) => {
@@ -74,12 +75,12 @@ const Login = () => {
                       />
                     </CInputGroup>
 
-                    <CInputGroup className="mb-4">
+                    <CInputGroup className="mb-2">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Password"
                         autoComplete="current-password"
                         value={password}
@@ -87,6 +88,17 @@ const Login = () => {
                         required
                       />
                     </CInputGroup>
+                    <CRow className="mb-4">
+                      <CCol>
+                        <label>
+                          <input
+                            type="checkbox"
+                            onChange={() => setShowPassword(!showPassword)}
+                          />{' '}
+                          Show Password
+                        </label>
+                      </CCol>
+                    </CRow>
                     {error && <p className="text-danger">{error}</p>}
 
                     <CRow>
@@ -95,11 +107,11 @@ const Login = () => {
                           Login
                         </CButton>
                       </CCol>
-                      <CCol xs={6} className="text-right">
+                      {/* <CCol xs={6} className="text-right">
                         <CButton color="link" className="px-0">
                           Forgot password?
                         </CButton>
-                      </CCol>
+                      </CCol> */}
                     </CRow>
                   </CForm>
                 </CCardBody>
