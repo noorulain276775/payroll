@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Employee, PayrollRecord, SalaryDetails
+from .models import Employee, PayrollRecord, SalaryDetails, SalaryRevision
 
 admin.site.register(Employee)
+admin.site.register(SalaryRevision)
 
 @admin.register(PayrollRecord)
 class PayrollRecordAdmin(admin.ModelAdmin):

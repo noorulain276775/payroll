@@ -141,3 +141,47 @@ class PayrollRecord(models.Model):
         return f"Payroll for {self.employee.first_name} {self.employee.last_name} ({self.month}/{self.year})"
 
 
+class SalaryRevision(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='salary_revisions')
+    revised_basic_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Basic Salary')
+    revised_housing_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Housing Allowance')
+    revised_transport_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Transport Allowance')
+    revised_other_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Other Allowance', default=0)
+    revised_gross_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Gross Salary', default=0)
+    previous_basic_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Basic Salary', default=0)
+    previous_housing_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Housing Allowance', default=0)
+    previous_transport_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Transport Allowance', default=0)
+    previous_other_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Other Allowance', default=0)
+    previous_gross_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Gross Salary', default=0)
+    revision_date = models.DateTimeField(auto_now_add=True, verbose_name='Revision Date')
+    revision_reason = models.TextField(verbose_name='Reason for Revision')
+    
+    def __str__(self):
+        return f"Salary Revision for {self.employee.first_name} {self.employee.last_name} on {self.revision_date}"
+
+    def save(self, *args, **kwargs):
+        self.revised_gross_salary = self.calculate_revised_gross_salary()
+        super().save(*args, **kwargs)
+        self.update_salary_details()
+
+    def update_salary_details(self):
+        try:
+            salary_details = self.employee.salary_details
+            salary_details.basic_salary = self.revised_basic_salary
+            salary_details.housing_allowance = self.revised_housing_allowance
+            salary_details.transport_allowance = self.revised_transport_allowance
+            salary_details.other_allowance = self.revised_other_allowance
+            salary_details.gross_salary = salary_details.calculate_gross_salary()
+            salary_details.save()
+        except SalaryDetails.DoesNotExist:
+            raise ValidationError("Salary details not found for this employee.")
+    
+    def calculate_revised_gross_salary(self):
+        try:
+            revised_gross_salary = (self.revised_basic_salary +
+                                    self.revised_housing_allowance +
+                                    self.revised_transport_allowance +
+                                    self.revised_other_allowance)
+            return revised_gross_salary
+        except AttributeError:
+            raise ValidationError("Revised salary details are not defined.")

@@ -43,6 +43,18 @@ const adminNav = [
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Salary Revision',
+    to: '/employees/salary-revision',
+    icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Leave Applications',
+    to: '/employees/leave-applications',
+    icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
+  },
+  {
     component: CNavGroup,
     name: 'Register',
     icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,

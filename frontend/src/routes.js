@@ -37,6 +37,9 @@ const EmployeeSalaryDetails = React.lazy(() => import('./views/Profile/EmployeeS
 // Change Password
 const ChangePassword = React.lazy(() => import('./views/ChangePassword/ChangePassword'))
 
+// Salary Revisions
+const SalaryRevisions = React.lazy(() => import('./views/Salary/SalaryRevisions'))
+
 const routes = [
   // Admin Routes
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin'] },
@@ -46,6 +49,7 @@ const routes = [
   { path: '/employees/payroll', name: 'Payroll', element: Payroll, allowedRoles: ['Admin'] },
   { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee, allowedRoles: ['Admin'] },
   { path: '/register/new-user', name: 'Add Admin', element: AddUser, allowedRoles: ['Admin'] },
+  { path: '/employees/salary-revision', name: 'Salary Revisions', element: SalaryRevisions, allowedRoles: ['Admin'] },
 
   // For both (Admin and Employee)
   { path: '/employee/change-password', name: 'Change Password', element: ChangePassword, allowedRoles: ['Admin', 'Employee'] },

@@ -157,14 +157,14 @@ const Employees = () => {
       navigate('/');
       return;
     }
-
+  
     const formData = new FormData();
     for (const key in editEmployee) {
       if (editEmployee[key]) {
         formData.append(key, editEmployee[key]);
       }
     }
-
+  
     axios
       .put(`http://127.0.0.1:8000/employee/${selectedemployeeid}/`, formData, {
         headers: {
@@ -173,8 +173,13 @@ const Employees = () => {
         },
       })
       .then((response) => {
+        // Update the employee list to reflect changes
+        setEmployees((prevEmployees) =>
+          prevEmployees.map((emp) =>
+            emp.id === selectedemployeeid ? { ...emp, ...response.data } : emp
+          )
+        );
         setEditModalVisible(false);
-        window.location.reload();
       })
       .catch((error) => {
         console.error('Error updating employee:', error.response?.data || error.message);
@@ -185,6 +190,7 @@ const Employees = () => {
         }
       });
   };
+  
 
   const getValue = (value) => value ? value : 'N/A'
 

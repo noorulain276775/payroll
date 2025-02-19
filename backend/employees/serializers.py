@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Employee, SalaryDetails, PayrollRecord
+from .models import Employee, SalaryDetails, PayrollRecord, SalaryRevision
+from users.serializers import CustomUserSerializer
 from decimal import Decimal
 from django.db.models import Sum, F, Count
 from django.utils import timezone
@@ -24,10 +25,10 @@ class EmployeeSerializer(serializers.ModelSerializer):
 class EmployeeUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['photo', 'spouse_name', 'children', 'company_phone_number', 'home_town_number', 'insurance_expiry_date', 'emergency_contact_name', 
+        fields = ['photo', 'first_name', 'last_name', 'email', 'spouse_name', 'children', 'company_phone_number', 'home_town_number', 'insurance_expiry_date', 'emergency_contact_name', 
                   'emergency_contact_number', 'emergency_contact_relation', 'emirates_id', 'emirates_id_expiry', 'passport_no', 'visa_no', 'visa_expiry',
                    'previous_company_name', 'previous_company_designation', 'emirates_id_image', 'passport_image', 'visa_image', 'highest_degree_certificate', 'insurance_card',
-                    'phone_number', 'address', 'nationality', 'gender', 'marital_status', 'mother_name', 'personal_email', 'qualification']
+                    'phone_number', 'address', 'nationality', 'gender', 'marital_status', 'mother_name', 'personal_email', 'qualification', 'designation', 'department', 'date_of_birth']
         read_only_fields = ['id']
 
     def validate(self, data):
@@ -42,6 +43,7 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
 
 class SalaryDetailsSerializer(serializers.ModelSerializer):
     employee_full_name = serializers.SerializerMethodField()
+    updated_at = serializers.DateTimeField(format='%d-%m-%Y')
 
     class Meta:
         model = SalaryDetails
@@ -120,13 +122,13 @@ class PayrollRecordSerializer(serializers.ModelSerializer):
 
 class EmployeeDetailsWithSalarySerializer(serializers.ModelSerializer):
     salary_details = SalaryDetailsSerializer(read_only=True)
-    payroll_records = PayrollRecordSerializer(many=True, read_only=True, source='payrollrecord_set')
+    # payroll_records = PayrollRecordSerializer(many=True, read_only=True, source='payrollrecord_set')
 
     class Meta:
         model = Employee
         fields = [
             'id', 'user', 'first_name', 'last_name', 'date_of_birth', 'designation',
-            'department', 'salary_details', 'payroll_records',
+            'department', 'salary_details',
         ]
 
 
@@ -221,3 +223,13 @@ class DashboardSerializer(serializers.Serializer):
             'total_employees': total_employees,
             'average_salary_for_month': average_salary_for_month, 
         }
+    
+
+
+
+class SalaryRevisionSerializer(serializers.ModelSerializer):
+    employee = EmployeeDetailsWithSalarySerializer()
+    revision_date = serializers.DateTimeField(format='%d-%m-%Y')
+    class Meta:
+        model = SalaryRevision
+        fields = '__all__'

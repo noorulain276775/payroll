@@ -91,69 +91,71 @@ const EmployeeProfile = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-
-    if (files && files.length > 0) {
+    const { name, value, type, files } = e.target;
+  
+    if (type === "file" && files.length > 0) {
       const file = files[0];
-      if (name === 'photo') {
-        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-          alert('Only JPG, JPEG, and PNG files are allowed for profile photo upload.');
-          return;
-        }
-      } else if (['emirates_id_image', 'passport_image', 'visa_image', 'highest_degree_certificate', 'insurance_card'].includes(name)) {
-        if (!ALLOWED_PDF_TYPES.includes(file.type)) {
-          alert(`Only PDF files are allowed for ${name.replace('_', ' ')} upload.`);
-          return;
-        }
+  
+      // Validate file type
+      if (name === "photo" && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        alert("Only JPG, JPEG, and PNG files are allowed for profile photo upload.");
+        return;
+      } else if (["emirates_id_image", "passport_image", "visa_image", "highest_degree_certificate", "insurance_card"].includes(name) &&
+                 !ALLOWED_PDF_TYPES.includes(file.type)) {
+        alert(`Only PDF files are allowed for ${name.replace("_", " ")} upload.`);
+        return;
       }
-
-      // Generate preview for image or PDF
-      const filePreview = URL.createObjectURL(file);
-      if (name === 'photo') setPhotoPreview(filePreview);
-      if (name === 'emirates_id_image') setEmiratesIdPreview(filePreview);
-      if (name === 'passport_image') setPassportIdPreview(filePreview);
-      if (name === 'visa_image') setVisaPreview(filePreview);
-      if (name === 'highest_degree_certificate') sethighestDegreeCertificatePreview(filePreview);
-      if (name === 'insurance_card') setInsuranceCardPreview(filePreview);
-
-      setFormData({
-        ...formData,
-        [name]: file,
-      });
+  
+      // Update formData with the actual file object (not URL.createObjectURL)
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: file, // Store the actual file object
+      }));
+  
+      // Update preview state (this is just for display, the file itself is used for upload)
+      setEditPreviewFiles((prev) => ({
+        ...prev,
+        [name]: file ? URL.createObjectURL(file) : null, // This is only for preview purposes
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+      // Handle text inputs correctly
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value, // Update the text field value
+      }));
     }
   };
-
-
-  const handleSubmit = (e) => {
+  
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const data = new FormData();
+  
+    // Append all the form fields and files to the FormData object
     Object.keys(formData).forEach((key) => {
       if (formData[key]) {
-        data.append(key, formData[key]);
+        data.append(key, formData[key]); // Append file objects as they are
       }
     });
-
-    axios
-      .put(`${BASE_URL}/employee/update/`, data, {
+  
+    try {
+      const response = await axios.put(`${BASE_URL}/employee/update/`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
+          // The Content-Type will be set automatically to 'multipart/form-data' by FormData
         },
-      })
-      .then((response) => {
-        setEmployee(response.data);
-        setIsEditing(false);
-      })
-      .catch((error) => {
-        console.error(error);
       });
+  
+      setEmployee(response.data);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating employee:', error.response?.data || error);
+    }
   };
+  
+  
+  
   if (!employee || employee.length === 0) {
     return (
       <CRow className="justify-content-center mt-5">

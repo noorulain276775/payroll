@@ -211,14 +211,9 @@ const Payroll = () => {
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          const errorMessage = error.response.data?.employee?.[0];
-          if (errorMessage === 'salary details with this employee already exists.') {
-            setErrorMessage('Payroll of this month for this employee already exist, Please edit the payroll if you want changes.');
-            setAlertVisible(true);
-          } else {
-            setErrorMessage('Seem like you have left one of the mandatory field empty.');
-            setAlertVisible(true);
-          }
+          const errorMessage = error.response.data?.detail;
+          setErrorMessage(errorMessage);
+          setAlertVisible(true);
         } else {
           console.error('Unexpected error:', error);
           setErrorMessage('An unexpected error occurred. Please try again.');
@@ -236,6 +231,7 @@ const Payroll = () => {
     setNormalOvertimeAmount(normal_overtime_amount);
     const unpaid_days_amount = unpaidDays * dailySalary || 0;
     setUnpaidAmount(unpaid_days_amount)
+    console.log(unpaid_days_amount)
     const other_deductions = parseFloat(otherDeduction) || 0;
     const total_salary_for_month = (gross_salary + overtime_amount + normal_overtime_amount) - (unpaid_days_amount + other_deductions)
     setCalculatedTotalSalary(total_salary_for_month);
