@@ -19,6 +19,7 @@ const SalaryRevisions = () => {
     const [transportAllowance, setTransportAllowance] = useState('');
     const [otherAllowance, setOtherAllowance] = useState('');
     const [calculatedGrossSalary, setCalculatedGrossSalary] = useState('');
+    const [newState, setNewState] = useState([]);
 
 
 
