@@ -330,29 +330,38 @@ const Payroll = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {payroll.map((s) => (
-            <CTableRow key={s.id}>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee_full_name}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{getMonthName(s.month)}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.year}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.overtime_days || 0}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.normal_overtime_days || 0}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.unpaid_days}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_deductions || 0}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>AED {s.total_salary_for_month}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                <CDropdown>
-                  <CDropdownToggle color="secondary">Actions</CDropdownToggle>
-                  <CDropdownMenu>
-                    <CDropdownItem onClick={() => handleView(s)}>View</CDropdownItem>
-                    <CDropdownItem onClick={() => handleEdit(s)}>Edit</CDropdownItem>
-                    <CDropdownItem onClick={() => handleSendSalary(s)}>Send Salary Slip</CDropdownItem>
-                  </CDropdownMenu>
-                </CDropdown>
+          {payroll.length === 0 ? (
+            <CTableRow>
+              <CTableDataCell colSpan={9} style={{ textAlign: 'center' }}>
+                No data available
               </CTableDataCell>
             </CTableRow>
-          ))}
+          ) : (
+            payroll.map((s) => (
+              <CTableRow key={s.id}>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee_full_name}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{getMonthName(s.month)}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.year}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.overtime_days || 0}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.normal_overtime_days || 0}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.unpaid_days}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_deductions || 0}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>AED {s.total_salary_for_month}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                  <CDropdown>
+                    <CDropdownToggle color="secondary">Actions</CDropdownToggle>
+                    <CDropdownMenu>
+                      <CDropdownItem onClick={() => handleView(s)}>View</CDropdownItem>
+                      <CDropdownItem onClick={() => handleEdit(s)}>Edit</CDropdownItem>
+                      <CDropdownItem onClick={() => handleSendSalary(s)}>Send Salary Slip</CDropdownItem>
+                    </CDropdownMenu>
+                  </CDropdown>
+                </CTableDataCell>
+              </CTableRow>
+            ))
+          )}
         </CTableBody>
+
       </CTable>
 
       {/* Modal for Viewing Employee Details */}

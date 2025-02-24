@@ -19,8 +19,10 @@ const SalaryRevisions = () => {
     const [transportAllowance, setTransportAllowance] = useState('');
     const [otherAllowance, setOtherAllowance] = useState('');
     const [calculatedGrossSalary, setCalculatedGrossSalary] = useState('');
-    const [newState, setNewState] = useState([]);
-
+    const [employeeSalaryDetails, setEmployeeSalaryDetails] = useState({});  // Store selected employee's salary details
+    const [selectedEmployeeData, setSelectedEmployeeData] = useState({});
+    const [reason, setReason] = useState('');
+    const token = localStorage.getItem('authToken');
 
 
     // Timer for alerts
@@ -38,43 +40,38 @@ const SalaryRevisions = () => {
             }
         };
     }, [alertVisible, successAlertVisible]);
-
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/salary-revision/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setSalaryRevisions(response.data);
+            console.log(response.data);
+            setLoading(false);
+        } catch (error) {
+            setError("There was an error fetching the data.");
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${BASE_URL}/salary-revision/`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                setSalaryRevisions(response.data);
-                console.log(response.data);
-                setLoading(false);
-            } catch (error) {
-                setError("There was an error fetching the data.");
-                setLoading(false);
-            }
-        };
-
         fetchData();
     }, []);
 
     const fetchEmployees = async () => {
-        const token = localStorage.getItem('authToken');
         try {
-            const response = await axios.get(`${BASE_URL}/view_all_employees/`, {
+            const response = await axios.get(`${BASE_URL}/employees/salaries/`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             setEmployees(response.data);
-            console.log("employeee details", response.data);
+            console.log("employeee details with salaries", response.data);
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 localStorage.removeItem('authToken');
                 window.location.reload();
-                navigate('/');
             }
         }
     };
@@ -84,7 +81,15 @@ const SalaryRevisions = () => {
     }, []);
 
     const handleEmployeeChange = (e) => {
-        setSelectedEmployee(e.target.value);
+        const employeeId = e.target.value;
+        setSelectedEmployee(employeeId);
+        const selectedEmployeeData = employees.find((emp) => emp.id === parseInt(employeeId));
+        if (selectedEmployeeData) {
+            setSelectedEmployeeData(selectedEmployeeData);
+            setEmployeeSalaryDetails(selectedEmployeeData.salary_details);
+        } else {
+            setEmployeeSalaryDetails(null);
+        }
     };
 
     const handleInputChange = (e, setter) => {
@@ -92,15 +97,59 @@ const SalaryRevisions = () => {
     };
 
     const calculateGrossSalary = () => {
-        const grossSalary = parseFloat(basicSalary) + parseFloat(housingAllowance) + parseFloat(transportAllowance) + parseFloat(otherAllowance);
+        const grossSalary =
+            (parseFloat(basicSalary) || 0) +
+            (parseFloat(housingAllowance) || 0) +
+            (parseFloat(transportAllowance) || 0) +
+            (parseFloat(otherAllowance) || 0);
+
         setCalculatedGrossSalary(grossSalary.toFixed(2));
+        console.log(grossSalary);
     };
 
-    const handleCreateRecord = () => {
-        // Logic for saving salary revision
-        setSuccessMessage('Salary revision created successfully!');
-        setSuccessAlertVisible(true);
-        setCreateModalVisible(false);
+
+    const handleCreateRecord = async () => {
+        console.log("selected employee", selectedEmployeeData);
+        const data = {
+            employee: selectedEmployeeData.id,
+            revised_basic_salary: basicSalary,
+            revised_housing_allowance: housingAllowance,
+            revised_transport_allowance: transportAllowance,
+            revised_other_allowance: otherAllowance || 0,
+            revision_reason: reason || 'Performance based compensation',
+            previous_basic_salary: employeeSalaryDetails.basic_salary,
+            previous_housing_allowance: employeeSalaryDetails.housing_allowance,
+            previous_transport_allowance: employeeSalaryDetails.transport_allowance,
+            previous_gross_salary: employeeSalaryDetails.gross_salary,
+            previous_other_allowance: employeeSalaryDetails.other_allowance,
+            revision_date: new Date().toISOString(),
+        };
+
+        try {
+            const response = await fetch(`${BASE_URL}/create-salary-revision/${selectedEmployee}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                setErrorMessage(errorData.detail || "Failed to create salary revision.");
+                setAlertVisible(true);
+            } else {
+                const successData = await response.json();
+                fetchData();
+                setSuccessMessage('Salary revision created successfully!');
+                setSuccessAlertVisible(true);
+                setCreateModalVisible(false);
+            }
+        } catch (error) {
+            setErrorMessage("An error occurred while saving the salary revision.");
+            setAlertVisible(true);
+        }
     };
 
     if (loading) {
@@ -114,7 +163,7 @@ const SalaryRevisions = () => {
     return (
         <div>
             <div className='d-flex justify-content-between align-items-end mb-4'>
-                <h4>Salary Revision</h4>
+                <h4>Latest Salary Revision</h4>
                 <CButton color="primary" onClick={() => setCreateModalVisible(true)} className="mt-4">
                     <i className="cui-plus"></i> Add New
                 </CButton>
@@ -198,10 +247,7 @@ const SalaryRevisions = () => {
                             <CRow className="mb-4">
                                 <CCol md={6} className="mb-3">
                                     <label>Employee Name <span style={{ color: 'red' }}>*</span></label>
-                                    <CFormSelect
-                                        value={selectedEmployee}
-                                        onChange={handleEmployeeChange}
-                                    >
+                                    <CFormSelect value={selectedEmployee} onChange={handleEmployeeChange}>
                                         <option value="">Select Employee</option>
                                         {employees.map((employee) => (
                                             <option key={employee.id} value={employee.id}>
@@ -211,6 +257,55 @@ const SalaryRevisions = () => {
                                     </CFormSelect>
                                 </CCol>
 
+                                {/* Render salary details of the selected employee */}
+                                {selectedEmployee && employeeSalaryDetails && (
+                                    <div>
+                                        <CRow className="mb-4">
+                                            <CCol md={6} className="mb-3">
+                                                <label>Previous Basic Salary</label>
+                                                <CFormInput
+                                                    type="number"
+                                                    value={employeeSalaryDetails?.basic_salary || 0}
+                                                    disabled
+                                                />
+                                            </CCol>
+                                            <CCol md={6} className="mb-3">
+                                                <label>Previous Housing Allowance</label>
+                                                <CFormInput
+                                                    type="number"
+                                                    value={employeeSalaryDetails?.housing_allowance || 0}
+                                                    disabled
+                                                />
+                                            </CCol>
+                                            <CCol md={6} className="mb-3">
+                                                <label>Previous Transport Allowance</label>
+                                                <CFormInput
+                                                    type="number"
+                                                    value={employeeSalaryDetails?.transport_allowance || 0}
+                                                    disabled
+                                                />
+                                            </CCol>
+                                            <CCol md={6} className="mb-3">
+                                                <label>Previous Gross Salary</label>
+                                                <CFormInput
+                                                    type="number"
+                                                    value={employeeSalaryDetails?.gross_salary || 0}
+                                                    disabled
+                                                />
+                                            </CCol>
+                                            <CCol md={6} className="mb-3">
+                                                <label>Previous Salary Updated At</label>
+                                                <CFormInput
+                                                    type="text"
+                                                    value={employeeSalaryDetails?.updated_at || ''}
+                                                    disabled
+                                                />
+                                            </CCol>
+                                        </CRow>
+                                    </div>
+                                )}
+
+                                {/* Add input fields for revised salary details */}
                                 <CCol md={6} className="mb-3">
                                     <label>Revised Basic Salary <span style={{ color: 'red' }}>*</span></label>
                                     <CFormInput
@@ -247,59 +342,24 @@ const SalaryRevisions = () => {
                                         onChange={(e) => handleInputChange(e, setOtherAllowance)}
                                     />
                                 </CCol>
+                                <CCol md={6} className="mb-3">
+                                    <label>Reason for Salary Revision <span style={{ color: 'red' }}>*</span></label>
+                                    <CFormInput
+                                        type="text"
+                                        name="reason"
+                                        value={reason}
+                                        onChange={(e) => handleInputChange(e, setReason)}
+                                    />
+                                </CCol>
 
                                 <CCol md={12} className="text-start">
                                     <CButton color="light" onClick={calculateGrossSalary} className="mt-2 mb-3" block>
                                         Click to Calculate Gross Salary
                                     </CButton>
                                     <p><strong>Gross Salary: </strong>{calculatedGrossSalary}</p>
-
                                 </CCol>
                             </CRow>
-                            {salaryRevisions.map((s) => (
-                                <CRow key={s.id}>
-                                    <CCol md={6} className="mb-3">
-                                        <label>Previous Basic Salary</label>
-                                        <CFormInput
-                                            type="number"
-                                            value={s.employee.salary_details?.basic_salary || 0}
-                                            disabled
-                                        />
-                                    </CCol>
-                                    <CCol md={6} className="mb-3">
-                                        <label>Previous Housing Allowance Salary</label>
-                                        <CFormInput
-                                            type="number"
-                                            value={s.employee.salary_details?.housing_allowance || 0}
-                                            disabled
-                                        />
-                                    </CCol>
-                                    <CCol md={6} className="mb-3">
-                                        <label>Previous Transport Allowance Salary</label>
-                                        <CFormInput
-                                            type="number"
-                                            value={s.employee.salary_details?.transport_allowance || 0}
-                                            disabled
-                                        />
-                                    </CCol>
-                                    <CCol md={6} className="mb-3">
-                                        <label>Previous Gross Salary</label>
-                                        <CFormInput
-                                            type="number"
-                                            value={s.employee.salary_details?.gross_salary || 0}
-                                            disabled
-                                        />
-                                    </CCol>
-                                    <CCol md={6} className="mb-3">
-                                        <label>Previous salary updated at</label>
-                                        <CFormInput
-                                            type="text"
-                                            value={s.employee.salary_details?.updated_at || ''}
-                                            disabled
-                                        />
-                                    </CCol>
-                                </CRow>
-                            ))}
+
                             <CRow className="mt-3">
                                 <CCol className="d-flex justify-content-start">
                                     <CButton color="primary" onClick={handleCreateRecord}>Create Salary Revision</CButton>
@@ -308,8 +368,9 @@ const SalaryRevisions = () => {
 
                         </CCardBody>
                     </CCard>
-
                 </CModalBody>
+
+
             </CModal>
         </div>
     );

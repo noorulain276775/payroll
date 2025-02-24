@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from decimal import Decimal
+import datetime
 
 class Employee(models.Model):
     DEPARTMENT_CHOICES = [
@@ -68,6 +69,9 @@ class Employee(models.Model):
     visa_image = models.FileField(upload_to='visa/', blank=True, null=True, verbose_name='Visa Image', validators=[validate_file_type])
     highest_degree_certificate = models.FileField(upload_to='degree/', blank=True, null=True, verbose_name='Highest Degree Certificate', validators=[validate_file_type])
     insurance_card = models.FileField(upload_to='insurance/', blank=True, null=True, verbose_name='Insurance Card', validators=[validate_file_type])
+    medical_conditions = models.TextField(verbose_name='Medical Conditions', blank=True, null=True)
+    blood_group = models.CharField(max_length=10, verbose_name='Blood Group', blank=True, null=True)
+    allergies = models.TextField(verbose_name='Allergies', blank=True, null=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -147,13 +151,14 @@ class SalaryRevision(models.Model):
     revised_housing_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Housing Allowance')
     revised_transport_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Transport Allowance')
     revised_other_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Other Allowance', default=0)
-    revised_gross_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Gross Salary', default=0)
-    previous_basic_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Basic Salary', default=0)
-    previous_housing_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Housing Allowance', default=0)
-    previous_transport_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Transport Allowance', default=0)
+    revised_gross_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Revised Gross Salary')
+    previous_basic_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Basic Salary')
+    previous_housing_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Housing Allowance')
+    previous_transport_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Transport Allowance')
     previous_other_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Other Allowance', default=0)
-    previous_gross_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Gross Salary', default=0)
+    previous_gross_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Gross Salary')
     revision_date = models.DateTimeField(auto_now_add=True, verbose_name='Revision Date')
+    revise_salary_effective_from = models.DateField(verbose_name='Revised Salary Effective From')
     revision_reason = models.TextField(verbose_name='Reason for Revision')
     
     def __str__(self):

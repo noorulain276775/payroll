@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Employee, PayrollRecord, SalaryDetails, SalaryRevision
-from .serializers import EmployeeSerializer, ColleagueSerializer, PayrollRecordSerializer, EmployeeUpdateSerializer, SalaryDetailsSerializer, DashboardSerializer, SalaryRevisionSerializer
+from .serializers import EmployeeSerializer, ColleagueSerializer, PayrollRecordSerializer, EmployeeUpdateSerializer, SalaryDetailsSerializer, DashboardSerializer, SalaryRevisionSerializer, EmployeeDetailsWithSalarySerializer, SalaryRevisionSerializerCreate
 from django.conf import settings
 from .utils import generate_salary_pdf
 from django.core.mail import EmailMessage
@@ -18,6 +18,7 @@ from django.http import FileResponse
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib import colors
+from django.db.models import Max
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 
@@ -39,6 +40,18 @@ def view_all_employees(request):
     
     employees = Employee.objects.all()
     serializer = EmployeeSerializer(employees, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Admin can view all employees with salary details
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_all_employees_with_salary(request):
+    print(f"Authenticated User: {request.user}")
+    if request.user.user_type != 'Admin':
+        return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
+    
+    employees = Employee.objects.all()
+    serializer = EmployeeDetailsWithSalarySerializer(employees, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -290,17 +303,18 @@ def create_salary_revision(request, employee_id):
                 return Response({"error": "Employee salary details not found."}, status=status.HTTP_400_BAD_REQUEST)
 
             data = request.data
-            serializer = SalaryRevisionSerializer(data=data)
+            serializer = SalaryRevisionSerializerCreate(data=data)
             
             if serializer.is_valid():
                 salary_revision = serializer.save(employee=employee)
                 salary_details = employee.salary_details
-                salary_details.basic_salary = salary_revision.updated_basic_salary
-                salary_details.housing_allowance = salary_revision.updated_housing_allowance
-                salary_details.transport_allowance = salary_revision.updated_transport_allowance
-                salary_details.other_allowance = salary_revision.updated_other_allowance
-                salary_details.gross_salary = salary_revision.updated_gross_salary
+                salary_details.basic_salary = salary_revision.revised_basic_salary
+                salary_details.housing_allowance = salary_revision.revised_housing_allowance
+                salary_details.transport_allowance = salary_revision.revised_transport_allowance
+                salary_details.other_allowance = salary_revision.revised_other_allowance
+                salary_details.gross_salary = salary_revision.revised_gross_salary
                 salary_details.save()
+                print(salary_details)
 
                 return Response({
                     "message": "Salary revision created successfully!",
@@ -325,18 +339,27 @@ def get_salary_revisions(request, employee_id):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-# API to retrieve all salary revisions for all employees
+# API to retrieve all salary revisions for all employees latest and one record only
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_salary_revisions(request):
     try:
         if request.user.user_type != 'Admin':
             return Response({"detail": "Only admins can see salary revisions records for all employees."}, status=status.HTTP_403_FORBIDDEN)
-        all_salary_revisions = SalaryRevision.objects.all().order_by('-revision_date')
-        serializer = SalaryRevisionSerializer(all_salary_revisions, many=True)
+        latest_salary_revisions = SalaryRevision.objects.values('employee').annotate(latest_revision_date=Max('revision_date'))
+        revisions = []
+        for revision in latest_salary_revisions:
+            salary_revision = SalaryRevision.objects.filter(
+                employee=revision['employee'],
+                revision_date=revision['latest_revision_date']
+            ).first()
+            revisions.append(salary_revision)
+        serializer = SalaryRevisionSerializer(revisions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 # API to edit an existing salary revision

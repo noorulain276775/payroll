@@ -61,7 +61,7 @@ const Salary = () => {
       navigate('/');
       return;
     }
-  
+
     // Timer for alerts
     let timer;
     if (editAlertVisible || editSuccessAlertVisible || alertVisible || successAlertVisible) {
@@ -72,7 +72,7 @@ const Salary = () => {
         setSuccessAlertVisible(false);
       }, 10000); // 10 seconds
     }
-  
+
     // Fetch Employees
     const fetchEmployees = async () => {
       try {
@@ -90,7 +90,7 @@ const Salary = () => {
         }
       }
     };
-  
+
     // Fetch Salaries
     const fetchSalaries = async () => {
       try {
@@ -108,10 +108,10 @@ const Salary = () => {
         }
       }
     };
-  
+
     fetchEmployees();
     fetchSalaries();
-  
+
     // Cleanup function
     return () => {
       if (timer) {
@@ -126,7 +126,7 @@ const Salary = () => {
     alertVisible,
     successAlertVisible,
   ]);
-  
+
 
   const handleView = (s) => {
     setSelectedEmployeeSalary(s)
@@ -144,6 +144,7 @@ const Salary = () => {
       account_no: accountNo,
       iban: iban,
       swift_code: swiftCode,
+      updated_at: new Date().toISOString(),
     }
     const resetForm = () => {
       setSelectedEmployee(null);
@@ -268,26 +269,35 @@ const Salary = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {salary.map((s) => (
-            <CTableRow key={s.id}>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee_full_name}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.basic_salary}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.housing_allowance}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.transport_allowance}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_allowance}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.gross_salary}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                <CDropdown>
-                  <CDropdownToggle color="secondary">Actions</CDropdownToggle>
-                  <CDropdownMenu>
-                    <CDropdownItem onClick={() => handleView(s)}>View</CDropdownItem>
-                    <CDropdownItem onClick={() => handleEdit(s)}>Edit</CDropdownItem>
-                  </CDropdownMenu>
-                </CDropdown>
+          {salary.length === 0 ? (  // Check salary instead of salaryRevisions
+            <CTableRow>
+              <CTableDataCell colSpan="7" style={{ textAlign: 'center' }}>
+                No data available
               </CTableDataCell>
             </CTableRow>
-          ))}
+          ) : (
+            salary.map((s) => (
+              <CTableRow key={s.id}>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee_full_name}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.basic_salary}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.housing_allowance}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.transport_allowance}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_allowance}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.gross_salary}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                  <CDropdown>
+                    <CDropdownToggle color="secondary">Actions</CDropdownToggle>
+                    <CDropdownMenu>
+                      <CDropdownItem onClick={() => handleView(s)}>View</CDropdownItem>
+                      <CDropdownItem onClick={() => handleEdit(s)}>Edit</CDropdownItem>
+                    </CDropdownMenu>
+                  </CDropdown>
+                </CTableDataCell>
+              </CTableRow>
+            ))
+          )}
         </CTableBody>
+
       </CTable>
 
       {/* Modal for Viewing Employee Details */}

@@ -9,6 +9,9 @@ import {
   cilFile,
   cilLockLocked,
   cilUser,
+  cilTask,
+  cilThumbUp,
+  cilBarChart
 } from '@coreui/icons';
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react';
 
@@ -54,6 +57,24 @@ const adminNav = [
     to: '/employees/leave-applications',
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
   },
+  // {
+  //   component: CNavItem,
+  //   name: 'Attendance',
+  //   to: '/employees/leave-applications',
+  //   icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Performance Evaluation',
+  //   to: '/employees/leave-applications',
+  //   icon: <CIcon icon={cilThumbUp} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Financial Reporting',
+  //   to: '/employees/leave-applications',
+  //   icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+  // },
   {
     component: CNavGroup,
     name: 'Register',

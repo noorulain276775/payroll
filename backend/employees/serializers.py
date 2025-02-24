@@ -227,6 +227,15 @@ class DashboardSerializer(serializers.Serializer):
 
 
 
+class SalaryRevisionSerializerCreate(serializers.ModelSerializer):
+    class Meta:
+        model = SalaryRevision
+        fields = ['revised_basic_salary', 'revised_housing_allowance', 'revised_transport_allowance',
+                  'revised_other_allowance', 'revision_reason', 'previous_basic_salary',
+                  'previous_housing_allowance', 'previous_transport_allowance', 'previous_gross_salary',
+                  'previous_other_allowance', 'revision_date', 'employee']
+        
+
 class SalaryRevisionSerializer(serializers.ModelSerializer):
     employee = EmployeeDetailsWithSalarySerializer()
     revision_date = serializers.DateTimeField(format='%d-%m-%Y')

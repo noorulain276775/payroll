@@ -157,14 +157,14 @@ const Employees = () => {
       navigate('/');
       return;
     }
-  
+
     const formData = new FormData();
     for (const key in editEmployee) {
       if (editEmployee[key]) {
         formData.append(key, editEmployee[key]);
       }
     }
-  
+
     axios
       .put(`http://127.0.0.1:8000/employee/${selectedemployeeid}/`, formData, {
         headers: {
@@ -190,7 +190,7 @@ const Employees = () => {
         }
       });
   };
-  
+
 
   const getValue = (value) => value ? value : 'N/A'
 
@@ -211,31 +211,47 @@ const Employees = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {employees.map((employee) => (
-            <CTableRow key={employee.id}>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.id}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                {employee.photo ?
-                  <img src={`${BASE_URL}${employee.photo}`} alt="Employee Photo" style={{ width: '100px', height: '100px', borderRadius: '50%' }} /> : 'N/A'}
-              </CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.first_name}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.last_name}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.email}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.phone_number}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.nationality}</CTableDataCell>
-              <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                <CDropdown>
-                  <CDropdownToggle color="secondary">Actions</CDropdownToggle>
-                  <CDropdownMenu>
-                    <CDropdownItem onClick={() => handleView(employee)}>View</CDropdownItem>
-                    <CDropdownItem onClick={() => handleEdit(employee)}>Edit</CDropdownItem>
-                    {/* <CDropdownItem onClick={() => handleDelete(employee.id)}>Delete</CDropdownItem> */}
-                  </CDropdownMenu>
-                </CDropdown>
+          {employees.length === 0 ? ( // Check if the employees array is empty
+            <CTableRow>
+              <CTableDataCell colSpan="8" style={{ textAlign: 'center' }}>
+                No employee data available
               </CTableDataCell>
             </CTableRow>
-          ))}
+          ) : (
+            employees.map((employee) => (
+              <CTableRow key={employee.id}>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.id}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                  {employee.photo ? (
+                    <img
+                      src={`${BASE_URL}${employee.photo}`}
+                      alt="Employee Photo"
+                      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                    />
+                  ) : (
+                    'N/A'
+                  )}
+                </CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.first_name}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.last_name}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.email}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.phone_number}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{employee.nationality}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                  <CDropdown>
+                    <CDropdownToggle color="secondary">Actions</CDropdownToggle>
+                    <CDropdownMenu>
+                      <CDropdownItem onClick={() => handleView(employee)}>View</CDropdownItem>
+                      <CDropdownItem onClick={() => handleEdit(employee)}>Edit</CDropdownItem>
+                      {/* <CDropdownItem onClick={() => handleDelete(employee.id)}>Delete</CDropdownItem> */}
+                    </CDropdownMenu>
+                  </CDropdown>
+                </CTableDataCell>
+              </CTableRow>
+            ))
+          )}
         </CTableBody>
+
       </CTable>
 
       {/* Edit Modal */}
