@@ -49,6 +49,10 @@ const Payroll = () => {
   const [calculatedTotalSalary, setCalculatedTotalSalary] = useState(null)
   const [grossSalary, setGrossSalary] = useState(0)
   const [basicSalary, setBasicSalary] = useState(0)
+  const [currentBasicSalary, setCurrentBasicSalary] = useState(0)
+  const [currentGrossSalary, setCurrentGrossSalary] = useState(0)
+  const [currentDailySalary, setCurrentDailySalary] = useState(0)
+  const [totalWorkableDays, setTotalWorkableDays] = useState(30)
   const [dailySalary, setdailySalary] = useState(0)
   const [modalVisible, setModalVisible] = useState(false)
   const [createModalVisible, setCreateModalVisible] = useState(false)
@@ -65,6 +69,7 @@ const Payroll = () => {
   const [editAlertVisible, setEditAlertVisible] = useState(false);
   const [editSuccessAlertVisible, setEditSuccessAlertVisible] = useState(false);
   const token = localStorage.getItem('authToken')
+
 
 
   useEffect(() => {
@@ -93,6 +98,7 @@ const Payroll = () => {
           },
         });
         setPayroll(response.data);
+        console.log(response.data)
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
@@ -141,6 +147,7 @@ const Payroll = () => {
 
   const handleView = (s) => {
     setSelectedEmployeePayroll(s)
+    console.log(s)
     setModalVisible(true)
   }
 
@@ -172,9 +179,16 @@ const Payroll = () => {
       month: month,
       year: year,
       overtime_days: overtimeDays,
+      overtime_amount: overtimeAmount,
+      normal_overtime_amount: normalOvertimeAmount,
+      unpaid_amount: UnpaidAmount,
       normal_overtime_days: normalOvertimeDays,
       unpaid_days: unpaidDays,
       other_deduction: otherDeduction,
+      total_workable_days: totalWorkableDays,
+      current_basic_salary: currentBasicSalary,
+      current_daily_salary: currentDailySalary,
+      current_gross_salary: currentGrossSalary,
       remarks: remarks
     }
     const resetForm = () => {
@@ -191,7 +205,12 @@ const Payroll = () => {
       setGrossSalary(0);
       setdailySalary(0);
       setBasicSalary(0);
+      setCurrentBasicSalary(0);
+      setCurrentGrossSalary(0);
+      setCurrentDailySalary(0);
       setOtherDeduction(0);
+      setTotalWorkableDays(30);
+      setRemarks('');
       setCalculatedTotalSalary(null);
     };
 
@@ -224,7 +243,11 @@ const Payroll = () => {
   }
 
   const calculateTotalSalary = () => {
+    // Calculating gorss salary as per working days
     const gross_salary = parseFloat(grossSalary) || 0;
+    const dailySalaryInTermsOfGross = gross_salary / 30;
+    const workingDays = parseFloat(totalWorkableDays) || 30;
+
     const overtime_amount = overtimeDays * (dailySalary * 1.5) || 0;
     setOvertimeAmount(overtime_amount);
     const normal_overtime_amount = normalOvertimeDays * (dailySalary * 1.25) || 0;
@@ -233,7 +256,7 @@ const Payroll = () => {
     setUnpaidAmount(unpaid_days_amount)
     console.log(unpaid_days_amount)
     const other_deductions = parseFloat(otherDeduction) || 0;
-    const total_salary_for_month = (gross_salary + overtime_amount + normal_overtime_amount) - (unpaid_days_amount + other_deductions)
+    const total_salary_for_month = ((workingDays*dailySalaryInTermsOfGross) + overtime_amount + normal_overtime_amount) - (unpaid_days_amount + other_deductions)
     setCalculatedTotalSalary(total_salary_for_month);
   };
 
@@ -256,11 +279,15 @@ const Payroll = () => {
         const salaryDetails = response.data;
 
         const basicSalaryValue = salaryDetails.basic_salary; // Extract basic salary
-        const dailySalaryValue = basicSalaryValue / 30; // Calculate daily salary
+        const dailySalaryValue = (basicSalaryValue / 30).toFixed(2); // Calculate daily salary
+        const grossDailySalary = (salaryDetails.gross_salary / 30).toFixed(2); // Calculate daily gross salary
 
         setBasicSalary(basicSalaryValue); // Update basic salary state
         setGrossSalary(salaryDetails.gross_salary); // Update gross salary state
         setdailySalary(dailySalaryValue); // Use the calculated daily salary directly
+        setCurrentDailySalary(grossDailySalary); // Update daily gross salary state
+        setCurrentBasicSalary(basicSalaryValue); // Update basic salary state
+        setCurrentGrossSalary(salaryDetails.gross_salary); // Update gross salary state
       })
       .catch((error) => {
         console.error('Error fetching salary details:', error);
@@ -270,14 +297,21 @@ const Payroll = () => {
 
   const handleEdit = (record) => {
     setSelectedRecord(record)
+    console.log(record)
     setEditModalVisible(true)
   }
 
   const handleUpdateRecord = () => {
     const { id, employee, ...updatedFields } = selectedRecord;
+  
+    let payload = { ...updatedFields, employee };
+    console.log("Before Edit",payload)
+    payload.overtime_amount = payload.overtime_days * (payload.daily_salary * 1.5) || 0;
+    payload.normal_overtime_amount = payload.normal_overtime_days * (payload.daily_salary * 1.25) || 0;
+    payload.unpaid_amount = payload.unpaid_days * payload.daily_salary || 0;
 
-    const payload = { ...updatedFields, employee };
-
+    console.log("After Edit",payload)
+  
     axios
       .put(`http://127.0.0.1:8000/update-payroll-record/${id}/`, payload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -293,10 +327,11 @@ const Payroll = () => {
       })
       .catch((error) => {
         console.error(error);
-        setEditErrorMessage(error.response.data.detail);
+        setEditErrorMessage(error.response?.data?.detail || "An error occurred");
         setEditAlertVisible(true);
       });
   };
+  
   const handleInputEditChange = (e, field) => {
     setSelectedRecord({ ...selectedRecord, [field]: e.target.value })
   }
@@ -383,28 +418,30 @@ const Payroll = () => {
               <CCardBody>
                 <CRow>
                   <CCol md={12}>
-                    <p><strong style={{ marginRight: '10px' }}>Employee Full Name:</strong> {selectedEmployeePayroll.employee_full_name}</p>
-                    <p><strong style={{ marginRight: '10px' }}>Gross Salary:</strong> {selectedEmployeePayroll.gross_salary}</p>
-                    <p><strong style={{ marginRight: '10px' }}>One day salary:</strong> {selectedEmployeePayroll.daily_salary}</p>
+                    <p><strong style={{ marginRight: '10px' }}>Employee Full Name:</strong>{selectedEmployeePayroll.employee_full_name}</p>
+                    <p><strong style={{ marginRight: '10px' }}>Gross Salary:</strong>AED {selectedEmployeePayroll.current_gross_salary}</p>
+                    <p><strong style={{ marginRight: '10px' }}>Basic Salary:</strong>AED {selectedEmployeePayroll.current_basic_salary}</p>
+                    <p><strong style={{ marginRight: '10px' }}>Per day salary:</strong>AED {selectedEmployeePayroll.current_daily_salary}</p>
                   </CCol>
                 </CRow>
                 <CRow>
                   <CCol md={12}>
                     <hr />
+                    <p><strong style={{ marginRight: '10px' }}>Total Workable Days:</strong> {selectedEmployeePayroll.total_workable_days || 30}</p>
                     <p><strong style={{ marginRight: '10px' }}>Holiday Overtime Days:</strong> {selectedEmployeePayroll.overtime_days}</p>
                     <p>
                       <strong style={{ marginRight: '10px' }}>Holiday Overtime Amount:</strong>
-                      AED {((selectedEmployeePayroll?.daily_salary || 0) * 1.5 * (selectedEmployeePayroll?.overtime_days || 0)).toFixed(2)}
+                      AED {selectedEmployeePayroll.overtime_amount}
                     </p>
                     <p><strong style={{ marginRight: '10px' }}>Normal Overtime Days:</strong> {selectedEmployeePayroll.normal_overtime_days || 0}</p>
                     <p>
                       <strong style={{ marginRight: '10px' }}>Normal Overtime Amount:</strong>
-                      AED {((selectedEmployeePayroll?.daily_salary || 0) * 1.25 * (selectedEmployeePayroll?.normal_overtime_days || 0)).toFixed(2)}
+                      AED {selectedEmployeePayroll.normal_overtime_amount}
                     </p>
                     <p><strong style={{ marginRight: '10px' }}>Unpaid Days:</strong>{selectedEmployeePayroll.unpaid_days}</p>
                     <p>
                       <strong style={{ marginRight: '10px' }}>Total Unpaid Deduction:</strong>
-                      AED {((selectedEmployeePayroll?.daily_salary || 0) * (selectedEmployeePayroll?.unpaid_days || 0)).toFixed(2)}
+                      AED {selectedEmployeePayroll.unpaid_amount}
                     </p>
                   </CCol>
                 </CRow>
@@ -508,6 +545,14 @@ const Payroll = () => {
                     }}
                   />
                 </CCol>
+                <CCol md={6} className="mb-3">
+                  <label>Total Working Days <span style={{ color: 'red' }}>*</span></label>
+                  <CFormInput
+                    type="number"
+                    value={totalWorkableDays}
+                    onChange={(e) => handleInputChange(e, setTotalWorkableDays)}
+                  />
+                </CCol>
 
 
                 <CCol md={6} className="mb-3">
@@ -559,9 +604,8 @@ const Payroll = () => {
                   <p><strong>Holiday overtime amount: </strong>{(overtimeAmount || 0).toFixed(2)}</p>
                   <p><strong>Normal overtime amount: </strong>{(normalOvertimeAmount || 0).toFixed(2)}</p>
                   <p><strong>Unpaid leaves amount: </strong>{(UnpaidAmount || 0).toFixed(2)}</p>
+                  <p><strong>Total Salary with workable days</strong> {(totalWorkableDays || 30)}</p>
                   <p><strong>Total Salary for the month Salary: </strong>{(calculatedTotalSalary || 0).toFixed(2)}</p>
-
-
                 </CCol>
               </CRow>
               <CButton color="primary" onClick={handleCreateRecord} className="mt-3" block>

@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
-import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CDropdown, CDropdownToggle, CDropdownMenu, CDropdownItem, CButton, CModal, CModalHeader, CModalBody, CCard, CCardHeader, CCardBody, CAlert, CRow, CCol, CFormSelect, CFormInput, CModalTitle } from '@coreui/react'; // assuming CoreUI is installed
+
+import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CDropdown, CDropdownToggle, CDropdownMenu, CDropdownItem, CButton, CModal, CModalHeader, CModalBody, CCard, CCardHeader, CCardBody, CAlert, CRow, CCol, CFormSelect, CFormInput, CModalTitle, CModalFooter } from '@coreui/react'; // assuming CoreUI is installed
 
 const SalaryRevisions = () => {
     const [salaryRevisions, setSalaryRevisions] = useState([]);
+    const [salaryRevisionsEmployee, setSalaryRevisionsEmployee] = useState([]);
     const [alertVisible, setAlertVisible] = useState(false);
     const [successAlertVisible, setSuccessAlertVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [createModalVisible, setCreateModalVisible] = useState(false);
+    const [ViewModalVisible, setViewModalVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [employees, setEmployees] = useState([]);
@@ -22,6 +25,7 @@ const SalaryRevisions = () => {
     const [employeeSalaryDetails, setEmployeeSalaryDetails] = useState({});  // Store selected employee's salary details
     const [selectedEmployeeData, setSelectedEmployeeData] = useState({});
     const [reason, setReason] = useState('');
+    const [effectiveOn, setEffectiveOn] = useState('');
     const token = localStorage.getItem('authToken');
 
 
@@ -48,7 +52,6 @@ const SalaryRevisions = () => {
                 },
             });
             setSalaryRevisions(response.data);
-            console.log(response.data);
             setLoading(false);
         } catch (error) {
             setError("There was an error fetching the data.");
@@ -67,7 +70,6 @@ const SalaryRevisions = () => {
                 },
             });
             setEmployees(response.data);
-            console.log("employeee details with salaries", response.data);
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 localStorage.removeItem('authToken');
@@ -104,12 +106,28 @@ const SalaryRevisions = () => {
             (parseFloat(otherAllowance) || 0);
 
         setCalculatedGrossSalary(grossSalary.toFixed(2));
-        console.log(grossSalary);
     };
+
+    const fetchSalaryRevisions = async (id) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/get-salary-revisions/${id}/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setSalaryRevisionsEmployee(response.data);
+            console.log("employee salary revisions", response.data);
+        } catch (error) {
+            console.error("Error fetching salary revisions:", error);
+        }
+    };
+    const handleView = (revision) => {
+        fetchSalaryRevisions(revision.employee.id);
+        setViewModalVisible(true);
+    }
 
 
     const handleCreateRecord = async () => {
-        console.log("selected employee", selectedEmployeeData);
         const data = {
             employee: selectedEmployeeData.id,
             revised_basic_salary: basicSalary,
@@ -123,6 +141,7 @@ const SalaryRevisions = () => {
             previous_gross_salary: employeeSalaryDetails.gross_salary,
             previous_other_allowance: employeeSalaryDetails.other_allowance,
             revision_date: new Date().toISOString(),
+            revised_salary_effective_from: effectiveOn
         };
 
         try {
@@ -176,7 +195,7 @@ const SalaryRevisions = () => {
                         <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Department</CTableHeaderCell>
                         <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Previous Gross Salary</CTableHeaderCell>
                         <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Revised Gross Salary</CTableHeaderCell>
-                        <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Revision Date</CTableHeaderCell>
+                        <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Effective On</CTableHeaderCell>
                         <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -206,7 +225,7 @@ const SalaryRevisions = () => {
                                     {revision.revised_gross_salary}
                                 </CTableDataCell>
                                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                                    {revision.revision_date}
+                                    {revision.revised_salary_effective_from}
                                 </CTableDataCell>
                                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                                     <CDropdown>
@@ -223,7 +242,7 @@ const SalaryRevisions = () => {
                 </CTableBody>
             </CTable>
 
-            <CModal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} size="lg" centered>
+            <CModal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} size="lg" centered={true}>
                 <CModalHeader>
                     <CModalTitle>Create Salary Revision</CModalTitle>
                 </CModalHeader>
@@ -343,7 +362,15 @@ const SalaryRevisions = () => {
                                     />
                                 </CCol>
                                 <CCol md={6} className="mb-3">
-                                    <label>Reason for Salary Revision <span style={{ color: 'red' }}>*</span></label>
+                                    <label>Effective on <span style={{ color: 'red' }}>*</span></label>
+                                    <CFormInput
+                                        type="date"
+                                        value={effectiveOn}
+                                        onChange={(e) => handleInputChange(e, setEffectiveOn)}
+                                    />
+                                </CCol>
+                                <CCol md={6} className="mb-3">
+                                    <label>Reason for Salary Revision</label>
                                     <CFormInput
                                         type="text"
                                         name="reason"
@@ -372,6 +399,73 @@ const SalaryRevisions = () => {
 
 
             </CModal>
+
+            <CModal visible={ViewModalVisible} onClose={() => setViewModalVisible(false)} size="lg" centered>
+                <CModalHeader className="bg-primary text-white">
+                    <CModalTitle>Salary Revision Timeline</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    <CCard className="shadow-sm">
+                        <CCardHeader className="bg-light text-dark">
+                            <strong>Salary History</strong>
+                        </CCardHeader>
+                        <CCardBody>
+                            {salaryRevisionsEmployee.length > 0 ? (
+                                <div style={{
+                                    position: 'relative',
+                                    padding: '20px',
+                                    borderLeft: '4px solid #007bff',
+                                    marginLeft: '15px'
+                                }}>
+                                    {salaryRevisionsEmployee.map((revision, index) => (
+                                        <div key={revision.id} style={{
+                                            marginBottom: '25px',
+                                            paddingLeft: '25px',
+                                            position: 'relative'
+                                        }}>
+                                            {/* Timeline Dot */}
+                                            <div style={{
+                                                position: 'absolute',
+                                                left: '-14px',
+                                                top: '8px',
+                                                width: '14px',
+                                                height: '14px',
+                                                background: '#007bff',
+                                                borderRadius: '50%',
+                                                border: '3px solid white',
+                                                boxShadow: '0 0 5px rgba(0,0,0,0.2)'
+                                            }}></div>
+
+                                            {/* Revision Card */}
+                                            <div style={{
+                                                background: '#f8f9fa',
+                                                padding: '15px',
+                                                borderRadius: '10px',
+                                                boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                                            }}>
+                                                <p><strong>Basic Salary:</strong> {revision.revised_basic_salary}</p>
+                                                <p><strong>Gross Salary:</strong> {revision.revised_gross_salary}</p>
+                                                <p><strong>Reason:</strong> {revision.revision_reason}</p>
+                                                <p><strong>Revised On:</strong> {revision.revision_date}</p>
+                                                <p><strong>Effective From:</strong> {revision.revised_salary_effective_from}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p style={{ textAlign: 'center', color: 'gray', fontSize: '16px' }}>
+                                    No salary revisions available.
+                                </p>
+                            )}
+                        </CCardBody>
+                    </CCard>
+                </CModalBody>
+                <CModalFooter>
+                    <CButton color="secondary" onClick={() => setViewModalVisible(false)}>Close</CButton>
+                </CModalFooter>
+            </CModal>
+
+
         </div>
     );
 };

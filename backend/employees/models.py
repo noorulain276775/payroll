@@ -115,10 +115,23 @@ class PayrollRecord(models.Model):
     total_salary_for_month = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Total Salary for Month")
     overtime_days = models.PositiveIntegerField(default=0, verbose_name="Holiday Overtime Days")
+    overtime_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Overtime Amount")
     normal_overtime_days = models.PositiveIntegerField(default=0, verbose_name="Normal Overtime Days")
+    normal_overtime_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Normal Overtime Amount")
     unpaid_days = models.PositiveIntegerField(default=0, verbose_name="Unpaid Days")
+    unpaid_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Unpaid Amount")
+    total_workable_days = models.PositiveIntegerField(default=30, verbose_name="Total Workable Days")
     other_deductions = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Other Deductions")
+    current_daily_salary = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Daily Salary")
+    current_gross_salary = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Gross Salary")
+    current_basic_salary = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Basic Salary")
     remarks = models.TextField(blank=True, null=True, verbose_name="Remarks")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -127,13 +140,20 @@ class PayrollRecord(models.Model):
 
     def calculate_salary(self):
         try:
-            salary_details = self.employee.salary_details
-            basic_salary = Decimal(salary_details.basic_salary)
-            daily_salary = basic_salary / Decimal(30)
-            overtime = self.overtime_days * (daily_salary * Decimal(1.5))
-            normal_overtime = self.normal_overtime_days * (daily_salary * Decimal(1.25))
-            unpaid_deduction = self.unpaid_days * daily_salary
-            return (Decimal(salary_details.gross_salary) + overtime + normal_overtime) - (unpaid_deduction + self.other_deductions)
+            if self.total_workable_days == 30:
+                salary_details = self.employee.salary_details
+                basic_salary = Decimal(salary_details.basic_salary)
+                daily_salary = basic_salary / Decimal(30)
+                overtime = self.overtime_days * (daily_salary * Decimal(1.5))
+                normal_overtime = self.normal_overtime_days * (daily_salary * Decimal(1.25))
+                unpaid_deduction = self.unpaid_days * daily_salary
+                return (Decimal(salary_details.gross_salary) + overtime + normal_overtime) - (unpaid_deduction + self.other_deductions)
+            if self.total_workable_days < 30:
+                salary_details = self.employee.salary_details
+                daily_salary_gross = Decimal(salary_details.gross_salary) / Decimal(30) # Daily salary in terms of Gross
+                daily_salary_basic = Decimal(salary_details.basic_salary) / Decimal(30) # Daily salary in terms of Basic
+                salary_of_month = Decimal(daily_salary_gross) * Decimal(self.total_workable_days)
+                return (Decimal(salary_of_month) + (Decimal(self.overtime_days) * (daily_salary_basic * Decimal(1.5))) + (Decimal(self.normal_overtime_days) * (daily_salary_basic * Decimal(1.25)))) - (Decimal(self.unpaid_days) * daily_salary_basic + self.other_deductions)
         except AttributeError:
             raise ValidationError("Salary details for this employee are not defined.")
 
@@ -158,7 +178,7 @@ class SalaryRevision(models.Model):
     previous_other_allowance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Other Allowance', default=0)
     previous_gross_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Previous Gross Salary')
     revision_date = models.DateTimeField(auto_now_add=True, verbose_name='Revision Date')
-    revise_salary_effective_from = models.DateField(verbose_name='Revised Salary Effective From')
+    revised_salary_effective_from = models.DateField(verbose_name='Revised Salary Effective From')
     revision_reason = models.TextField(verbose_name='Reason for Revision')
     
     def __str__(self):

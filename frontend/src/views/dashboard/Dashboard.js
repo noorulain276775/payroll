@@ -30,7 +30,7 @@ const Dashboard = () => {
         });
         setDashboardData(response.data);
       } catch (error) {
-        if (error.response && error.response.status === 401) {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           localStorage.removeItem('authToken');
           window.location.reload();
           navigate('/');
@@ -47,7 +47,7 @@ const Dashboard = () => {
         });
         setNewEmployees(response.data);
       } catch (error) {
-        if (error.response && error.response.status === 401) {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           localStorage.removeItem('authToken');
           window.location.reload();
           navigate('/');
@@ -60,6 +60,7 @@ const Dashboard = () => {
     fetchDashboardData();
     fetchNewEmployees();
   }, [navigate]);
+
 
   if (!dashboardData) {
     return <div>Loading...</div>; // Show a loading state if data is not yet loaded
@@ -109,7 +110,7 @@ const Dashboard = () => {
               {newEmployees.map((item, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="text-center">
-                    <img height={50} width={50} style={{borderRadius: '50px'}} size="md" src={`${BASE_URL}${item.photo}`} />
+                    <img height={50} width={50} style={{ borderRadius: '50px' }} size="md" src={`${BASE_URL}${item.photo}`} />
                   </CTableDataCell>
                   <CTableDataCell>{item.first_name} {item.last_name}</CTableDataCell>
                   <CTableDataCell>{item.designation}</CTableDataCell>

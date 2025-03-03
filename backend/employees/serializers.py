@@ -79,8 +79,9 @@ class PayrollRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = PayrollRecord
         fields = [
-            'id', 'employee', 'employee_full_name', 'month', 'year', 'total_salary_for_month', 'overtime_days',
-            'unpaid_days', 'other_deductions', 'remarks', 'created_at', 'daily_salary', 'gross_salary', 'normal_overtime_days'
+            'id', 'employee', 'employee_full_name', 'month', 'year', 'total_salary_for_month', 'overtime_days', 'current_basic_salary',
+            'unpaid_days', 'other_deductions', 'remarks', 'created_at', 'current_daily_salary', 'current_gross_salary', 'normal_overtime_days', 'total_workable_days',
+            'overtime_amount', 'normal_overtime_amount', 'unpaid_amount', 'daily_salary', 'gross_salary'
         ]
         read_only_fields = ['id', 'total_salary_for_month', 'created_at']
 
@@ -230,15 +231,16 @@ class DashboardSerializer(serializers.Serializer):
 class SalaryRevisionSerializerCreate(serializers.ModelSerializer):
     class Meta:
         model = SalaryRevision
-        fields = ['revised_basic_salary', 'revised_housing_allowance', 'revised_transport_allowance',
+        fields = ['revised_basic_salary', 'revised_housing_allowance', 'revised_transport_allowance', 'revised_gross_salary',
                   'revised_other_allowance', 'revision_reason', 'previous_basic_salary',
                   'previous_housing_allowance', 'previous_transport_allowance', 'previous_gross_salary',
-                  'previous_other_allowance', 'revision_date', 'employee']
+                  'previous_other_allowance', 'revision_date', 'employee', 'revised_salary_effective_from']
         
 
 class SalaryRevisionSerializer(serializers.ModelSerializer):
     employee = EmployeeDetailsWithSalarySerializer()
     revision_date = serializers.DateTimeField(format='%d-%m-%Y')
+    revised_salary_effective_from = serializers.DateField(format='%d-%m-%Y')
     class Meta:
         model = SalaryRevision
         fields = '__all__'
