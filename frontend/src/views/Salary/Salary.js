@@ -198,10 +198,10 @@ const Salary = () => {
   }
 
   const handleUpdateRecord = () => {
-    const { id, employee, ...updatedFields } = selectedRecord;
-
+    const { id, employee, updated_at, ...updatedFields } = selectedRecord; // Exclude updated_at
+  
     const payload = { ...updatedFields, employee };
-
+  
     axios
       .put(`http://127.0.0.1:8000/update-salary-details/${id}/`, payload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -221,6 +221,7 @@ const Salary = () => {
         setEditAlertVisible(true);
       });
   };
+  
   const handleInputEditChange = (e, field) => {
     setSelectedRecord({ ...selectedRecord, [field]: e.target.value })
   }

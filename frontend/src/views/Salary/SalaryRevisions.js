@@ -128,6 +128,11 @@ const SalaryRevisions = () => {
 
 
     const handleCreateRecord = async () => {
+        const revisedGrossSalary =
+            (parseFloat(basicSalary) || 0) +
+            (parseFloat(housingAllowance) || 0) +
+            (parseFloat(transportAllowance) || 0) +
+            (parseFloat(otherAllowance) || 0);
         const data = {
             employee: selectedEmployeeData.id,
             revised_basic_salary: basicSalary,
@@ -141,6 +146,7 @@ const SalaryRevisions = () => {
             previous_gross_salary: employeeSalaryDetails.gross_salary,
             previous_other_allowance: employeeSalaryDetails.other_allowance,
             revision_date: new Date().toISOString(),
+            revised_gross_salary: revisedGrossSalary,
             revised_salary_effective_from: effectiveOn
         };
 
@@ -164,6 +170,15 @@ const SalaryRevisions = () => {
                 setSuccessMessage('Salary revision created successfully!');
                 setSuccessAlertVisible(true);
                 setCreateModalVisible(false);
+                // Reset form fields
+                selectedEmployeeData(null);
+                setBasicSalary('');
+                setHousingAllowance('');
+                setTransportAllowance('');
+                setOtherAllowance('');
+                setReason('');
+                setEffectiveOn('');
+                setSelectedEmployeeData(null);
             }
         } catch (error) {
             setErrorMessage("An error occurred while saving the salary revision.");
@@ -418,38 +433,86 @@ const SalaryRevisions = () => {
                                     marginLeft: '15px'
                                 }}>
                                     {salaryRevisionsEmployee.map((revision, index) => (
-                                        <div key={revision.id} style={{
-                                            marginBottom: '25px',
-                                            paddingLeft: '25px',
-                                            position: 'relative'
-                                        }}>
-                                            {/* Timeline Dot */}
-                                            <div style={{
-                                                position: 'absolute',
-                                                left: '-14px',
-                                                top: '8px',
-                                                width: '14px',
-                                                height: '14px',
-                                                background: '#007bff',
-                                                borderRadius: '50%',
-                                                border: '3px solid white',
-                                                boxShadow: '0 0 5px rgba(0,0,0,0.2)'
-                                            }}></div>
+                                        <React.Fragment key={revision.id}>
+                                            {/* First Salary Card (Separate from the first revision) */}
+                                            {index === 0 && (
+                                                <div style={{
+                                                    marginBottom: '25px',
+                                                    paddingLeft: '25px',
+                                                    position: 'relative'
+                                                }}>
+                                                    {/* Timeline Dot */}
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        left: '-14px',
+                                                        top: '8px',
+                                                        width: '14px',
+                                                        height: '14px',
+                                                        background: '#007bff',
+                                                        borderRadius: '50%',
+                                                        border: '3px solid white',
+                                                        boxShadow: '0 0 5px rgba(0,0,0,0.2)'
+                                                    }}></div>
 
-                                            {/* Revision Card */}
+                                                    {/* First Salary Card */}
+                                                    <div style={{
+                                                        background: '#f8f9fa',
+                                                        padding: '15px',
+                                                        borderRadius: '10px',
+                                                        boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                                                    }}>
+                                                        <h6 style={{ fontWeight: 'bold', color: '#007bff' }}>
+                                                            First Salary
+                                                        </h6>
+                                                        <p><strong>Basic Salary:</strong> {revision.previous_basic_salary}</p>
+                                                        <p><strong>Housing Allowance:</strong> {revision.previous_housing_allowance}</p>
+                                                        <p><strong>Transport Allowance:</strong> {revision.previous_transport_allowance}</p>
+                                                        <p><strong>Other Allowance:</strong> {revision.previous_other_allowance}</p>
+                                                        <p><strong>Gross Salary:</strong> {revision.previous_gross_salary}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Salary Revision Cards */}
                                             <div style={{
-                                                background: '#f8f9fa',
-                                                padding: '15px',
-                                                borderRadius: '10px',
-                                                boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                                                marginBottom: '25px',
+                                                paddingLeft: '25px',
+                                                position: 'relative'
                                             }}>
-                                                <p><strong>Basic Salary:</strong> {revision.revised_basic_salary}</p>
-                                                <p><strong>Gross Salary:</strong> {revision.revised_gross_salary}</p>
-                                                <p><strong>Reason:</strong> {revision.revision_reason}</p>
-                                                <p><strong>Revised On:</strong> {revision.revision_date}</p>
-                                                <p><strong>Effective From:</strong> {revision.revised_salary_effective_from}</p>
+                                                {/* Timeline Dot */}
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    left: '-14px',
+                                                    top: '8px',
+                                                    width: '14px',
+                                                    height: '14px',
+                                                    background: '#007bff',
+                                                    borderRadius: '50%',
+                                                    border: '3px solid white',
+                                                    boxShadow: '0 0 5px rgba(0,0,0,0.2)'
+                                                }}></div>
+
+                                                {/* Salary Revision Card */}
+                                                <div style={{
+                                                    background: '#f8f9fa',
+                                                    padding: '15px',
+                                                    borderRadius: '10px',
+                                                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                                                }}>
+                                                    <h6 style={{ fontWeight: 'bold', color: '#007bff' }}>
+                                                        {index === 0 ? "Revision 1" : `Revision ${index + 1}`}
+                                                    </h6>
+                                                    <p><strong>Basic Salary:</strong> {revision.revised_basic_salary}</p>
+                                                    <p><strong>Housing Allowance:</strong> {revision.revised_housing_allowance}</p>
+                                                    <p><strong>Transport Allowance:</strong> {revision.revised_transport_allowance}</p>
+                                                    <p><strong>Other Allowance:</strong> {revision.revised_other_allowance}</p>
+                                                    <p><strong>Gross Salary:</strong> {revision.revised_gross_salary}</p>
+                                                    <p><strong>Reason:</strong> {revision.revision_reason}</p>
+                                                    <p><strong>Revised On:</strong> {revision.revision_date}</p>
+                                                    <p><strong>Effective From:</strong> {revision.revised_salary_effective_from}</p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </React.Fragment>
                                     ))}
                                 </div>
                             ) : (

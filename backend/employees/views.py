@@ -132,10 +132,15 @@ def update_salary_record(request, employee_id):
         salary_details = SalaryDetails.objects.get(id=employee_id)
     except SalaryDetails.DoesNotExist:
         return Response({"detail": "Salary record not found."}, status=status.HTTP_404_NOT_FOUND)
+
     serializer = SalaryDetailsSerializer(salary_details, data=request.data, partial=True)
+    
     if serializer.is_valid():
-        serializer.save()
+        salary_instance = serializer.save()
+        salary_instance.updated_at = timezone.now()  # Set updated_at separately
+        salary_instance.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -324,6 +329,9 @@ def create_salary_revision(request, employee_id):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+    
 
 # API to retrieve all salary revisions for an employee
 @api_view(['GET'])
@@ -333,12 +341,15 @@ def get_salary_revisions(request, employee_id):
         if request.user.user_type != 'Admin':
             return Response({"detail": "Only admins can see salary revisions records for an employee."}, status=status.HTTP_403_FORBIDDEN)
         employee = get_object_or_404(Employee, id=employee_id)
-        salary_revisions = SalaryRevision.objects.filter(employee=employee).order_by('-revision_date')
+        salary_revisions = SalaryRevision.objects.filter(employee=employee)
         serializer = SalaryRevisionSerializerCreate(salary_revisions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+
+
+
 # API to retrieve all salary revisions for all employees latest and one record only
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
