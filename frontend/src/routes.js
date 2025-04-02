@@ -39,6 +39,11 @@ const ChangePassword = React.lazy(() => import('./views/ChangePassword/ChangePas
 
 // Salary Revisions
 const SalaryRevisions = React.lazy(() => import('./views/Salary/SalaryRevisions'))
+// Admin View Annual Leaves
+const EmployeeAnnualLeaves = React.lazy(() => import('./views/AnnualLeaves/AdminAnnualLeaves'))
+
+// Employee Annual Leaves
+const AdminAnnualLeaves = React.lazy(() => import('./views/AnnualLeaves/EmployeeAnnualLeaves'))
 
 const routes = [
   // Admin Routes
@@ -50,6 +55,7 @@ const routes = [
   { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee, allowedRoles: ['Admin'] },
   { path: '/register/new-user', name: 'Add Admin', element: AddUser, allowedRoles: ['Admin'] },
   { path: '/employees/salary-revision', name: 'Salary Revisions', element: SalaryRevisions, allowedRoles: ['Admin'] },
+  { path: '/employees/leave-applications', name: 'Employees Annual Leaves', element: AdminAnnualLeaves, allowedRoles: ['Admin'] },
 
   // For both (Admin and Employee)
   { path: '/employee/change-password', name: 'Change Password', element: ChangePassword, allowedRoles: ['Admin', 'Employee'] },
@@ -59,6 +65,7 @@ const routes = [
   { path: '/employee/payslips', name: 'Employee Payslip', element: EmployeePayslips, allowedRoles: ['Employee'] },
   { path: '/employee/profile', name: 'Employee Profile', element: EmployeeProfile, allowedRoles: ['Employee'] },
   { path: '/employee/salary-details', name: 'Employee Salary', element: EmployeeSalaryDetails, allowedRoles: ['Employee'] },
+  { path: '/employee/annual-leaves', name: 'Employee Annual Leaves', element: EmployeeAnnualLeaves, allowedRoles: ['Employee'] },
 ];
 
 export default routes;

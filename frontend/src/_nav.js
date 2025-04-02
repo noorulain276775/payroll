@@ -7,6 +7,7 @@ import {
   cilWallet,
   cilUserPlus,
   cilFile,
+  cilCalendar,
   cilLockLocked,
   cilUser,
   cilTask,
@@ -57,24 +58,7 @@ const adminNav = [
     to: '/employees/leave-applications',
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
   },
-  // {
-  //   component: CNavItem,
-  //   name: 'Attendance',
-  //   to: '/employees/leave-applications',
-  //   icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
-  // },
-  // {
-  //   component: CNavItem,
-  //   name: 'Performance Evaluation',
-  //   to: '/employees/leave-applications',
-  //   icon: <CIcon icon={cilThumbUp} customClassName="nav-icon" />,
-  // },
-  // {
-  //   component: CNavItem,
-  //   name: 'Financial Reporting',
-  //   to: '/employees/leave-applications',
-  //   icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
-  // },
+
   {
     component: CNavGroup,
     name: 'Register',
@@ -96,6 +80,12 @@ const adminNav = [
         to: '/employee/change-password',
       },
     ],
+  },
+  {
+    component: CNavItem,
+    name: 'Annual Leaves',
+    to: '/employees/annual-leaves',
+    icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
   },
 ];
 

@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'employees',
+    'leaves',
+     'django_celery_beat',
     'rest_framework_simplejwt.token_blacklist',
 ]
 
@@ -181,4 +183,21 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
+}
+
+CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+
+# settings.py
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'update-leave-balance-every-month': {
+        'task': 'leaves.tasks.accrue_monthly_leave',
+        'schedule': crontab(minute=0, hour=0, day_of_month=1),
+    },
 }

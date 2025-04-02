@@ -418,8 +418,8 @@ def edit_salary_revision(request, revision_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_new_employees(request):
-    print(f"Authenticated User: {request.user}")
-    employees = Employee.objects.all().order_by('-created_at')[:3]
+    print(f"Authenticated User: {request.user.id}")
+    employees = Employee.objects.exclude(user=request.user.id).order_by('-created_at')[:3]
     serializer = EmployeeSerializer(employees, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
