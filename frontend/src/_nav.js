@@ -58,6 +58,13 @@ const adminNav = [
     to: '/employees/leave-applications',
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
   },
+  {
+
+    component: CNavItem,
+    name: 'Leave Balances',
+    to: '/employees/leave-balances',
+    icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
+  },
 
   {
     component: CNavGroup,
@@ -80,12 +87,6 @@ const adminNav = [
         to: '/employee/change-password',
       },
     ],
-  },
-  {
-    component: CNavItem,
-    name: 'Annual Leaves',
-    to: '/employees/annual-leaves',
-    icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
   },
 ];
 
@@ -114,6 +115,18 @@ const employeeNav = [
     name: 'My Payslips',
     to: '/employee/payslips',
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Apply Leaves',
+    to: '/employee/leave-applications',
+    icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Leave Applications',
+    to: '/employee/leave-applications/history',
+    icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
