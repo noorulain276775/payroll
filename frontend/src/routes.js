@@ -40,10 +40,16 @@ const SalaryRevisions = React.lazy(() => import('./views/Salary/SalaryRevisions'
 const EmployeeAnnualLeaves = React.lazy(() => import('./views/AnnualLeaves/EmployeeAnnualLeaves'))
 
 // Employee Annual Leaves
-const AdminAnnualLeaves = React.lazy(() => import('./views/AnnualLeaves/adminAnnualLeaves'))
+const AdminAnnualLeaves = React.lazy(() => import('./views/AnnualLeaves/AdminAnnualLeaves'))
 
 // Employee Leave Balances Creation for each leave type
 const AdminCreatingLeaveBalances = React.lazy(() => import('./views/AnnualLeaves/EmployeeLeaveBalances'))
+
+// Employee Leave Request History
+const EmployeeLeavesRequests = React.lazy(() => import('./views/AnnualLeaves/EmployeeLeavesRequests'))
+
+// Employee Salary Revisions
+const EmployeeSalaryRevisions = React.lazy(() => import('./views/Salary/EmployeeSalaryRevisions'))
 
 const routes = [
   // Admin Routes
@@ -67,6 +73,8 @@ const routes = [
   { path: '/employee/profile', name: 'Employee Profile', element: EmployeeProfile, allowedRoles: ['Employee'] },
   { path: '/employee/salary-details', name: 'Employee Salary', element: EmployeeSalaryDetails, allowedRoles: ['Employee'] },
   { path: '/employee/leave-applications', name: 'Employee Annual Leaves', element: EmployeeAnnualLeaves, allowedRoles: ['Employee'] },
+  { path: '/employee/leave-applications/history', name: 'Leave Requests', element: EmployeeLeavesRequests, allowedRoles: ['Employee'] },
+  { path: '/employee/salary-revision', name: 'Employee Salary Revisions', element: EmployeeSalaryRevisions, allowedRoles: ['Employee'] },
 ];
 
 export default routes;

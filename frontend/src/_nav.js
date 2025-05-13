@@ -42,7 +42,7 @@ const adminNav = [
   },
   {
     component: CNavItem,
-    name: 'Payroll',
+    name: 'Payrolls',
     to: '/employees/payroll',
     icon: <CIcon icon={cilWallet} customClassName="nav-icon" />,
   },
@@ -54,21 +54,21 @@ const adminNav = [
   },
   {
     component: CNavItem,
-    name: 'Leave Applications',
+    name: 'Leave Requests',
     to: '/employees/leave-applications',
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
   },
   {
 
     component: CNavItem,
-    name: 'Leave Balances',
+    name: 'Employees Leave Balances',
     to: '/employees/leave-balances',
     icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
   },
 
   {
     component: CNavGroup,
-    name: 'Register',
+    name: 'Accounts',
     icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
     items: [
       {
@@ -124,9 +124,15 @@ const employeeNav = [
   },
   {
     component: CNavItem,
-    name: 'Leave Applications',
+    name: 'Leave Requests',
     to: '/employee/leave-applications/history',
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Salary Revisions',
+    to: '/employee/salary-revision',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,

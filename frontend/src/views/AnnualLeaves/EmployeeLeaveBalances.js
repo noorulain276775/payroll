@@ -24,7 +24,6 @@ import {
     CModalTitle
 } from '@coreui/react';
 
-
 const LeaveBalanceManager = () => {
     const [leaveBalances, setLeaveBalances] = useState([]);
     const [employees, setEmployees] = useState([]);
@@ -124,23 +123,21 @@ const LeaveBalanceManager = () => {
             console.error("Update failed", error);
         }
     };
-
-
     return (
-        <div className="container mt-4" style={{ width: '100%' }}>
-            <div className="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <div className="d-flex justify-content-between align-items-end mb-4">
                 <h4>Employee Leave Balances</h4>
-                <CButton variant="primary" onClick={() => setShowModal(true)}>
-                    + Add Leave Balance
+                <CButton color="primary" onClick={() => setShowModal(true)} className="mt-4">
+                    <i className="cui-plus"></i> Add Leave Balance
                 </CButton>
             </div>
-
             {loading ? (
                 <p>Loading...</p>
             ) : leaveBalances.length === 0 ? (
                 <p>No leave balances found.</p>
             ) : (
-                <CTable style={{ width: '100%' }} bordered>
+
+                <CTable bordered>
                     <CTableHead>
                         <CTableRow>
                             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Employee</CTableHeaderCell>
@@ -358,7 +355,7 @@ const LeaveBalanceManager = () => {
                 </CModal>
             )}
         </div>
-    );
-};
+    )
+}
 
-export default LeaveBalanceManager;
+export default LeaveBalanceManager

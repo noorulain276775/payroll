@@ -7,6 +7,7 @@ from .serializers import LeaveSerializer, LeaveBalanceSerializer, LeaveAccrualSe
 from employees.models import Employee
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.db.models import Case, When, Value, IntegerField
 
 # List and create leave
 class LeaveListCreateAPIView(generics.ListCreateAPIView):
@@ -14,8 +15,26 @@ class LeaveListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return Leave.objects.annotate(
+                custom_order=Case(
+                    When(status='Pending', then=Value(0)),
+                    When(status='Approved', then=Value(1)),
+                    When(status='Rejected', then=Value(2)),
+                    default=Value(3),
+                    output_field=IntegerField()
+                )
+            ).order_by('custom_order', '-applied_on')
         employee = get_object_or_404(Employee, user=self.request.user)
-        return Leave.objects.filter(employee=employee)
+        return Leave.objects.filter(employee=employee).annotate(
+            custom_order=Case(
+                When(status='Pending', then=Value(0)),
+                When(status='Approved', then=Value(1)),
+                When(status='Rejected', then=Value(2)),
+                default=Value(3),
+                output_field=IntegerField()
+            )
+        ).order_by('custom_order', '-applied_on')
 
     def perform_create(self, serializer):
         employee = get_object_or_404(Employee, user=self.request.user)
@@ -29,6 +48,43 @@ class LeaveDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         employee = get_object_or_404(Employee, user=self.request.user)
         return Leave.objects.filter(employee=employee)
+    
+class LeaveApproveAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        leave = get_object_or_404(Leave, pk=pk)
+        leave.approve_leave(approver=request.user)
+        serializer = LeaveSerializer(leave)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LeaveRejectAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        leave = get_object_or_404(Leave, pk=pk)
+        leave.reject_leave(approver=request.user)
+        serializer = LeaveSerializer(leave)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Leave balance for logged-in user
 class LeaveBalanceAPIView(APIView):

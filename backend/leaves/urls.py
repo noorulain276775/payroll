@@ -8,11 +8,15 @@ from .views import (
     RejectLeaveAPIView, 
     LeaveBalanceListCreateAPIView,
     LeaveBalanceUpdateAPIView,
+    LeaveApproveAPIView,
+    LeaveRejectAPIView,
 )
 
 urlpatterns = [
     path('leaves/', LeaveListCreateAPIView.as_view(), name='leave_list_create'),
     path('leaves/<int:pk>/', LeaveDetailAPIView.as_view(), name='leave_detail'),
+    path('leaves/<int:pk>/approve/', LeaveApproveAPIView.as_view(), name='leave-approve'),
+    path('leaves/<int:pk>/reject/', LeaveRejectAPIView.as_view(), name='leave-reject'),
     path('leave-balance/', LeaveBalanceAPIView.as_view(), name='leave_balance'),
     path('leave-balances/', LeaveBalanceListCreateAPIView.as_view(), name='leave-balance-list-create'),
     path('leave-balances/<int:pk>/', LeaveBalanceUpdateAPIView.as_view(), name='leave-balance-update'),

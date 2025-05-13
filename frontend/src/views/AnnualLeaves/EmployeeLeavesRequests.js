@@ -15,7 +15,7 @@ import {
   CButton,
 } from '@coreui/react'
 
-const AdminAnnualLeaves = () => {
+const EmployeeLeavesRequests = () => {
   const [leaves, setLeaves] = useState([])
 
   const token = localStorage.getItem('authToken')
@@ -93,17 +93,15 @@ const AdminAnnualLeaves = () => {
       <CTable bordered>
         <CTableHead>
           <CTableRow>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Employee Name</CTableHeaderCell>
+            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Applied On</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Leave Type</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Start Date</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>End Date</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Days Taken</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Reason</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Applied On</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Status</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Reviewed on</CTableHeaderCell>
             <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Approved by</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Change Status</CTableHeaderCell>
           </CTableRow>
         </CTableHead>
         <CTableBody>
@@ -116,13 +114,13 @@ const AdminAnnualLeaves = () => {
           ) : (
             leaves.map((s) => (
               <CTableRow key={s.id}>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee.first_name} {s.employee.last_name}</CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.applied_on}</CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.leave_type}</CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.start_date}</CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.end_date}</CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.days_taken}</CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.reason}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.applied_on}</CTableDataCell>
+                
                 <CTableDataCell
                   style={{
                     textAlign: 'center',
@@ -140,21 +138,6 @@ const AdminAnnualLeaves = () => {
                 </CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.approved_on}</CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.approved_by ? `${s.approved_by.first_name} ${s.approved_by.last_name}` : '—'}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  <CDropdown>
-                    <CDropdownToggle color="secondary" disabled={s.status !== 'Pending'}>
-                      Actions
-                    </CDropdownToggle>
-                    <CDropdownMenu>
-                      <CDropdownItem key={`reject-${s.id}`} onClick={() => handleReject(s.id)}>
-                        Reject
-                      </CDropdownItem>
-                      <CDropdownItem key={`approve-${s.id}`} onClick={() => handleApprove(s.id)}>
-                        Approve
-                      </CDropdownItem>
-                    </CDropdownMenu>
-                  </CDropdown>
-                </CTableDataCell>
               </CTableRow>
             ))
           )}
@@ -164,4 +147,4 @@ const AdminAnnualLeaves = () => {
   )
 }
 
-export default AdminAnnualLeaves
+export default EmployeeLeavesRequests
