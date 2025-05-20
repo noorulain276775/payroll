@@ -16,6 +16,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import { BASE_URL } from '../../../../config';
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -28,7 +29,7 @@ const Login = () => {
     e.preventDefault()
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/users/login/', {
+      const response = await axios.post(`${BASE_URL}/users/login/`, {
         username,
         password,
       })

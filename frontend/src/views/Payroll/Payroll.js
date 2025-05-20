@@ -29,6 +29,7 @@ import {
 } from '@coreui/react'
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { BASE_URL } from '../../../config';
 
 const Payroll = () => {
   const [makePayroll, setMakePayroll] = useState([]) // creating payroll and setting data here
@@ -92,7 +93,7 @@ const Payroll = () => {
     // Fetch Payrolls
     const fetchPayrolls = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/view_all_payroll/', {
+        const response = await axios.get(`${BASE_URL}/view_all_payroll/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -111,7 +112,7 @@ const Payroll = () => {
     // Fetch Employees
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/view_all_employees/', {
+        const response = await axios.get(`${BASE_URL}/view_all_employees/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -153,7 +154,7 @@ const Payroll = () => {
 
   const handleSendSalary = (s) => {
     axios
-      .get(`http://127.0.0.1:8000/send_salary_slip/${s.id}/`, {
+      .get(`${BASE_URL}/send_salary_slip/${s.id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -215,7 +216,7 @@ const Payroll = () => {
     };
 
     axios
-      .post('http://127.0.0.1:8000/create_payroll/', data, {
+      .post(`${BASE_URL}/create_payroll/`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -270,7 +271,7 @@ const Payroll = () => {
     const employeeId = e.target.value;
     setSelectedEmployee(employeeId);
 
-    axios.get(`http://127.0.0.1:8000/salary-details/${employeeId}/`, {
+    axios.get(`${BASE_URL}/salary-details/${employeeId}/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -313,7 +314,7 @@ const Payroll = () => {
     console.log("After Edit",payload)
   
     axios
-      .put(`http://127.0.0.1:8000/update-payroll-record/${id}/`, payload, {
+      .put(`${BASE_URL}/update-payroll-record/${id}/`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

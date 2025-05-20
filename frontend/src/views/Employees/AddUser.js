@@ -14,6 +14,7 @@ import {
   CAlert,
 } from '@coreui/react';
 import axios from 'axios';
+import { BASE_URL } from '../../../config';
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ const AddUser = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/users/register/',
+        `${BASE_URL}/users/register/`,
         formData,
         {
           headers: {

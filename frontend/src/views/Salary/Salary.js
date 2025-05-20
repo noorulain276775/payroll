@@ -26,6 +26,7 @@ import {
   CFormSelect,
   CAlert
 } from '@coreui/react'
+import { BASE_URL } from '../../../config';
 
 const Salary = () => {
   const [salary, setSalary] = useState([])
@@ -76,7 +77,7 @@ const Salary = () => {
     // Fetch Employees
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/view_all_employees/', {
+        const response = await axios.get(`${BASE_URL}/view_all_employees/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -94,7 +95,7 @@ const Salary = () => {
     // Fetch Salaries
     const fetchSalaries = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/salaries/', {
+        const response = await axios.get(`${BASE_URL}/salaries/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -160,7 +161,7 @@ const Salary = () => {
     };
 
     axios
-      .post('http://127.0.0.1:8000/create-salary-details/', data, {
+      .post(`${BASE_URL}/create-salary-details/`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -203,7 +204,7 @@ const Salary = () => {
     const payload = { ...updatedFields, employee };
   
     axios
-      .put(`http://127.0.0.1:8000/update-salary-details/${id}/`, payload, {
+      .put(`${BASE_URL}/update-salary-details/${id}/`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
