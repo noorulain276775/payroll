@@ -32,7 +32,7 @@ const Salary = () => {
   const [salary, setSalary] = useState([])
   const [selectedEmployeeSalary, setSelectedEmployeeSalary] = useState(null)
   const [employees, setEmployees] = useState([])
-  const [selectedEmployee, setSelectedEmployee] = useState(null)
+  const [selectedEmployee, setSelectedEmployee] = useState('')
   const [basicSalary, setBasicSalary] = useState('')
   const [housingAllowance, setHousingAllowance] = useState('')
   const [transportAllowance, setTransportAllowance] = useState('')
@@ -87,7 +87,6 @@ const Salary = () => {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
           window.location.reload();
-          navigate('/');
         }
       }
     };
@@ -105,13 +104,17 @@ const Salary = () => {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
           window.location.reload();
-          navigate('/');
         }
       }
     };
 
     fetchEmployees();
     fetchSalaries();
+    const basic = parseFloat(basicSalary) || 0;
+    const housing = parseFloat(housingAllowance) || 0;
+    const transport = parseFloat(transportAllowance) || 0;
+    const other = parseFloat(otherAllowance) || 0;
+    setCalculatedGrossSalary(basic + housing + transport + other);
 
     // Cleanup function
     return () => {
@@ -126,6 +129,10 @@ const Salary = () => {
     editSuccessAlertVisible,
     alertVisible,
     successAlertVisible,
+    basicSalary,
+    housingAllowance,
+    transportAllowance,
+    otherAllowance
   ]);
 
 
@@ -135,6 +142,11 @@ const Salary = () => {
   }
 
   const handleCreateRecord = () => {
+    if (!selectedEmployee || !basicSalary || !housingAllowance || !transportAllowance) {
+      setErrorMessage("Please fill all required fields.");
+      setAlertVisible(true);
+      return;
+    }
     const data = {
       employee: selectedEmployee,
       basic_salary: basicSalary,
@@ -148,11 +160,11 @@ const Salary = () => {
       updated_at: new Date().toISOString(),
     }
     const resetForm = () => {
-      setSelectedEmployee(null);
+      setSelectedEmployee('');
       setBasicSalary('');
       setHousingAllowance('');
       setTransportAllowance('');
-      setOtherAllowance('');
+      setOtherAllowance(0);
       setBankName('');
       setAccountNo('');
       setIban('');
@@ -171,12 +183,14 @@ const Salary = () => {
         setErrorMessage(null);
         setSuccessMessage('Salary details created successfully.');
         setSuccessAlertVisible(true);
+        setCreateModalVisible(false);
         resetForm();
 
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           const errorMessage = error.response.data?.employee?.[0];
+          console.log('Error message:', errorMessage);
           if (errorMessage === 'salary details with this employee already exists.') {
             setErrorMessage('Salary details for this employee already exist. Please edit the existing record.');
             setAlertVisible(true);
@@ -200,9 +214,9 @@ const Salary = () => {
 
   const handleUpdateRecord = () => {
     const { id, employee, updated_at, ...updatedFields } = selectedRecord; // Exclude updated_at
-  
+
     const payload = { ...updatedFields, employee };
-  
+
     axios
       .put(`${BASE_URL}/update-salary-details/${id}/`, payload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -222,7 +236,7 @@ const Salary = () => {
         setEditAlertVisible(true);
       });
   };
-  
+
   const handleInputEditChange = (e, field) => {
     setSelectedRecord({ ...selectedRecord, [field]: e.target.value })
   }
@@ -235,16 +249,6 @@ const Salary = () => {
   const handleInputChange = (e, setter) => {
     setter(e.target.value)
   }
-
-  const calculateGrossSalary = () => {
-    const basic = parseFloat(basicSalary) || 0;
-    const housing = parseFloat(housingAllowance) || 0;
-    const transport = parseFloat(transportAllowance) || 0;
-    const other = parseFloat(otherAllowance) || 0;
-
-    const gross = basic + housing + transport + other;
-    setCalculatedGrossSalary(gross);
-  };
 
   const getValue = (value) => value ? value : 'N/A'
 
@@ -295,6 +299,7 @@ const Salary = () => {
                     </CDropdownMenu>
                   </CDropdown>
                 </CTableDataCell>
+
               </CTableRow>
             ))
           )}
@@ -426,9 +431,6 @@ const Salary = () => {
                 </CCol>
 
                 <CCol md={12} className="text-start">
-                  <CButton color="light" onClick={calculateGrossSalary} className="mt-2 mb-3" block>
-                    Click to Calculate Gross Salary
-                  </CButton>
                   <p><strong>Gross Salary: </strong>{calculatedGrossSalary}</p>
 
                 </CCol>
@@ -463,7 +465,7 @@ const Salary = () => {
                   />
                 </CCol>
               </CRow>
-              <CButton color="primary" onClick={handleCreateRecord} className="mt-3" block>
+              <CButton color="primary" onClick={handleCreateRecord} className="mt-3" disabled={!selectedEmployee} block>
                 Save Salary Record
               </CButton>
             </CCardBody>
@@ -497,7 +499,7 @@ const Salary = () => {
                   onChange={(e) => handleInputEditChange(e, 'housing_allowance')}
                 />
               </CCol>
-              <CCol md={6}>
+              <CCol md={6} style={{ marginTop: '10px' }}>
                 <CFormInput
                   label="Transport Allowance"
                   type="number"
@@ -505,7 +507,7 @@ const Salary = () => {
                   onChange={(e) => handleInputEditChange(e, 'transport_allowance')}
                 />
               </CCol>
-              <CCol md={6}>
+              <CCol md={6} style={{ marginTop: '10px' }}>
                 <CFormInput
                   label="Other Allowance"
                   type="number"
@@ -513,28 +515,28 @@ const Salary = () => {
                   onChange={(e) => handleInputEditChange(e, 'other_allowance')}
                 />
               </CCol>
-              <CCol md={6}>
+              <CCol md={6} style={{ marginTop: '10px' }}>
                 <CFormInput
                   label="Bank Name"
                   value={selectedRecord.bank_name}
                   onChange={(e) => handleInputEditChange(e, 'bank_name')}
                 />
               </CCol>
-              <CCol md={6}>
+              <CCol md={6} style={{ marginTop: '10px' }}>
                 <CFormInput
                   label="Account No"
                   value={selectedRecord.account_no}
                   onChange={(e) => handleInputEditChange(e, 'account_no')}
                 />
               </CCol>
-              <CCol md={6}>
+              <CCol md={6} style={{ marginTop: '10px' }}>
                 <CFormInput
                   label="IBAN"
                   value={selectedRecord.iban}
                   onChange={(e) => handleInputEditChange(e, 'iban')}
                 />
               </CCol>
-              <CCol md={6}>
+              <CCol md={6} style={{ marginTop: '10px' }}>
                 <CFormInput
                   label="Swift Code"
                   value={selectedRecord.swift_code}

@@ -39,7 +39,8 @@ class LeaveSerializer(serializers.ModelSerializer):
 
 
 class LeaveBalanceSerializer(serializers.ModelSerializer):
-    employee = EmployeeSerializer(read_only=True)
+    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
+    employee_details = EmployeeSerializer(source='employee', read_only=True)
 
     class Meta:
         model = LeaveBalance

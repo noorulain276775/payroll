@@ -346,11 +346,13 @@ const AddEmployee = () => {
                 },
             })
             .then((response) => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
                 setAlertMessage('Employee added successfully!');
                 setAlertColor('success');
-                resetForm();
                 setAlertVisible(true);
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                setTimeout(() => {
+                    resetForm();
+                }, 200);
             })
             .catch((error) => {
                 setAlertMessage(`Error: ${error.response.data.error}`);
@@ -360,7 +362,7 @@ const AddEmployee = () => {
     };
 
     const resetForm = () => {
-        selectedEmployee(null);
+        setSelectedEmployee(null);
         setFirstName('');
         setLastName('');
         setCompanyEmail('');

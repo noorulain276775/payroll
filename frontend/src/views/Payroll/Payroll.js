@@ -32,11 +32,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import { BASE_URL } from '../../../config';
 
 const Payroll = () => {
-  const [makePayroll, setMakePayroll] = useState([]) // creating payroll and setting data here
-  const [selectedEmployeePayroll, setSelectedEmployeePayroll] = useState(null) // selected employee for viewing his specific payroll for view Modal
-  const [employees, setEmployees] = useState([]) // fetching employeees on useState to show on Add new payroll
-  const [payroll, setPayroll] = useState([]) // fetching payroll on useState
-  const [selectedEmployee, setSelectedEmployee] = useState(null) // while creatingpayroll record when a employee selected
+  const [makePayroll, setMakePayroll] = useState([])
+  const [selectedEmployeePayroll, setSelectedEmployeePayroll] = useState('')
+  const [employees, setEmployees] = useState([])
+  const [payroll, setPayroll] = useState([])
+  const [selectedEmployee, setSelectedEmployee] = useState('')
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [overtimeDays, setOverTimeDays] = useState(0)
@@ -129,6 +129,8 @@ const Payroll = () => {
 
     fetchEmployees();
     fetchPayrolls();
+    calculateTotalSalary();
+
 
     // Cleanup function
     return () => {
@@ -143,6 +145,13 @@ const Payroll = () => {
     editSuccessAlertVisible,
     alertVisible,
     successAlertVisible,
+    grossSalary,
+    totalWorkableDays,
+    overtimeDays,
+    normalOvertimeDays,
+    unpaidDays,
+    dailySalary,
+    otherDeduction,
   ]);
 
 
@@ -193,7 +202,7 @@ const Payroll = () => {
       remarks: remarks
     }
     const resetForm = () => {
-      setSelectedEmployee(null);
+      setSelectedEmployee('');
       setMonth(null);
       setYear(null);
       setOverTimeDays(0);
@@ -257,7 +266,7 @@ const Payroll = () => {
     setUnpaidAmount(unpaid_days_amount)
     console.log(unpaid_days_amount)
     const other_deductions = parseFloat(otherDeduction) || 0;
-    const total_salary_for_month = ((workingDays*dailySalaryInTermsOfGross) + overtime_amount + normal_overtime_amount) - (unpaid_days_amount + other_deductions)
+    const total_salary_for_month = ((workingDays * dailySalaryInTermsOfGross) + overtime_amount + normal_overtime_amount) - (unpaid_days_amount + other_deductions)
     setCalculatedTotalSalary(total_salary_for_month);
   };
 
@@ -304,15 +313,15 @@ const Payroll = () => {
 
   const handleUpdateRecord = () => {
     const { id, employee, ...updatedFields } = selectedRecord;
-  
+
     let payload = { ...updatedFields, employee };
-    console.log("Before Edit",payload)
+    console.log("Before Edit", payload)
     payload.overtime_amount = payload.overtime_days * (payload.daily_salary * 1.5) || 0;
     payload.normal_overtime_amount = payload.normal_overtime_days * (payload.daily_salary * 1.25) || 0;
     payload.unpaid_amount = payload.unpaid_days * payload.daily_salary || 0;
 
-    console.log("After Edit",payload)
-  
+    console.log("After Edit", payload)
+
     axios
       .put(`${BASE_URL}/update-payroll-record/${id}/`, payload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -332,7 +341,7 @@ const Payroll = () => {
         setEditAlertVisible(true);
       });
   };
-  
+
   const handleInputEditChange = (e, field) => {
     setSelectedRecord({ ...selectedRecord, [field]: e.target.value })
   }
@@ -599,9 +608,6 @@ const Payroll = () => {
                 </CCol>
 
                 <CCol md={12} className="text-start">
-                  <CButton color="light" onClick={calculateTotalSalary} className="mt-2 mb-3" block>
-                    Click to Calculate
-                  </CButton>
                   <p><strong>Holiday overtime amount: </strong>{(overtimeAmount || 0).toFixed(2)}</p>
                   <p><strong>Normal overtime amount: </strong>{(normalOvertimeAmount || 0).toFixed(2)}</p>
                   <p><strong>Unpaid leaves amount: </strong>{(UnpaidAmount || 0).toFixed(2)}</p>
@@ -609,7 +615,7 @@ const Payroll = () => {
                   <p><strong>Total Salary for the month Salary: </strong>{(calculatedTotalSalary || 0).toFixed(2)}</p>
                 </CCol>
               </CRow>
-              <CButton color="primary" onClick={handleCreateRecord} className="mt-3" block>
+              <CButton color="primary" onClick={handleCreateRecord} disabled={!selectedEmployee} className="mt-3" block>
                 Save Payroll Record
               </CButton>
             </CCardBody>

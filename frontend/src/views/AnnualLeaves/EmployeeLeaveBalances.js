@@ -156,7 +156,7 @@ const LeaveBalanceManager = () => {
                     <CTableBody>
                         {leaveBalances.map((balance) => (
                             <CTableRow key={balance.id}>
-                                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{balance.employee.first_name} {balance.employee.last_name}</CTableDataCell>
+                                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{balance.employee_details.first_name} {balance.employee_details.last_name}</CTableDataCell>
                                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{balance.annual_leave_balance}</CTableDataCell>
                                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{balance.sick_leave_balance}</CTableDataCell>
                                 <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{balance.maternity_leave_balance}</CTableDataCell>
@@ -322,7 +322,7 @@ const LeaveBalanceManager = () => {
                     <CButton color="secondary" onClick={() => setShowModal(false)}>
                         Cancel
                     </CButton>
-                    <CButton color="primary" onClick={handleSubmit}>
+                    <CButton color="primary" onClick={handleSubmit} disabled={!formData.employee} >
                         Save
                     </CButton>
                 </CModalFooter>
@@ -335,17 +335,26 @@ const LeaveBalanceManager = () => {
                     </CModalHeader>
                     <CModalBody>
                         <CForm>
-                            {['annual_leave_balance', 'sick_leave_balance', 'maternity_leave_balance', 'paternity_leave_balance', 'compassionate_leave_balance', 'unpaid_leave_balance', 'personal_leave_balance', 'emergency_leave_balance', 'other_leave_balance'].map((field) => (
-                                <CFormInput
-                                    key={field}
-                                    label={field.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())}
-                                    type="number"
-                                    step="0.01"
-                                    value={selectedBalance[field]}
-                                    onChange={(e) => setSelectedBalance({ ...selectedBalance, [field]: e.target.value })}
-                                    className="mb-2"
-                                />
+                            {['annual_leave_balance', 'sick_leave_balance', 'maternity_leave_balance', 'paternity_leave_balance', 'compassionate_leave_balance', 'unpaid_leave_balance', 'personal_leave_balance', 'emergency_leave_balance', 'others_leave_balance'].map((field) => (
+                                <div key={field} className="mb-3">
+                                    <CFormLabel htmlFor={field}>
+                                        {field.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())}
+                                    </CFormLabel>
+                                    <CFormInput
+                                        type="number"
+                                        id={field}
+                                        name={field}
+                                        value={selectedBalance[field] ?? ''}
+                                        onChange={(e) =>
+                                            setSelectedBalance(prev => ({
+                                                ...prev,
+                                                [field]: e.target.value
+                                            }))
+                                        }
+                                    />
+                                </div>
                             ))}
+
                         </CForm>
                     </CModalBody>
                     <CModalFooter>

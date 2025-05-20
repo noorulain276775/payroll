@@ -93,7 +93,7 @@ class SalaryDetails(models.Model):
 
     def calculate_gross_salary(self):
         try:
-            gross_Salary = self.basic_salary + self.housing_allowance + self.transport_allowance + self.other_allowance
+            gross_Salary = self.basic_salary + self.housing_allowance + self.transport_allowance + self.other_allowance or Decimal(0)
             return gross_Salary
         except AttributeError:
             raise ValidationError("Salary details for this employee are not defined.")

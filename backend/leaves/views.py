@@ -69,23 +69,7 @@ class LeaveRejectAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"""Leave balance and accrual management"""
 # Leave balance for logged-in user
 class LeaveBalanceAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -100,6 +84,13 @@ class LeaveBalanceListCreateAPIView(generics.ListCreateAPIView):
     queryset = LeaveBalance.objects.select_related('employee').all()
     serializer_class = LeaveBalanceSerializer
     permission_classes = [IsAdminUser]
+
+    def perform_create(self, serializer):
+        employee = serializer.validated_data['employee']
+        leave_balance, created = LeaveBalance.objects.update_or_create(
+            employee=employee,
+            defaults=serializer.validated_data
+        )
 
 class LeaveBalanceUpdateAPIView(generics.RetrieveUpdateAPIView):
     queryset = LeaveBalance.objects.all()

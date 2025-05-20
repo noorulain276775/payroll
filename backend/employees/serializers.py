@@ -229,6 +229,12 @@ class DashboardSerializer(serializers.Serializer):
 
 
 class SalaryRevisionSerializerCreate(serializers.ModelSerializer):
+    revision_date = serializers.DateTimeField(
+        format='%d-%m-%Y', input_formats=['%d-%m-%Y', '%Y-%m-%dT%H:%M:%S.%f%z', '%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%d']
+    )
+    revised_salary_effective_from = serializers.DateField(
+        format='%d-%m-%Y', input_formats=['%d-%m-%Y', '%Y-%m-%d']
+    )
     class Meta:
         model = SalaryRevision
         fields = ['revised_basic_salary', 'revised_housing_allowance', 'revised_transport_allowance', 'revised_gross_salary',
@@ -239,8 +245,13 @@ class SalaryRevisionSerializerCreate(serializers.ModelSerializer):
 
 class SalaryRevisionSerializer(serializers.ModelSerializer):
     employee = EmployeeDetailsWithSalarySerializer()
-    revision_date = serializers.DateTimeField(format='%d-%m-%Y')
-    revised_salary_effective_from = serializers.DateField(format='%d-%m-%Y')
+    revision_date = serializers.DateTimeField(
+        format='%d-%m-%Y', input_formats=['%d-%m-%Y', '%Y-%m-%dT%H:%M:%S.%f%z', '%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%d']
+    )
+    revised_salary_effective_from = serializers.DateField(
+        format='%d-%m-%Y', input_formats=['%d-%m-%Y', '%Y-%m-%d']
+    )
+
     class Meta:
         model = SalaryRevision
         fields = '__all__'

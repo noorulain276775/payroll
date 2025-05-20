@@ -20,7 +20,7 @@ const SalaryRevisions = () => {
     const [basicSalary, setBasicSalary] = useState('');
     const [housingAllowance, setHousingAllowance] = useState('');
     const [transportAllowance, setTransportAllowance] = useState('');
-    const [otherAllowance, setOtherAllowance] = useState('');
+    const [otherAllowance, setOtherAllowance] = useState(0);
     const [calculatedGrossSalary, setCalculatedGrossSalary] = useState('');
     const [employeeSalaryDetails, setEmployeeSalaryDetails] = useState({});  // Store selected employee's salary details
     const [selectedEmployeeData, setSelectedEmployeeData] = useState({});
@@ -60,7 +60,8 @@ const SalaryRevisions = () => {
     };
     useEffect(() => {
         fetchData();
-    }, []);
+        calculateGrossSalary();
+    }, [basicSalary, housingAllowance, transportAllowance, otherAllowance]);
 
     const fetchEmployees = async () => {
         try {
@@ -170,12 +171,10 @@ const SalaryRevisions = () => {
                 setSuccessMessage('Salary revision created successfully!');
                 setSuccessAlertVisible(true);
                 setCreateModalVisible(false);
-                // Reset form fields
-                selectedEmployeeData(null);
                 setBasicSalary('');
                 setHousingAllowance('');
                 setTransportAllowance('');
-                setOtherAllowance('');
+                setOtherAllowance(0);
                 setReason('');
                 setEffectiveOn('');
                 setSelectedEmployeeData(null);
@@ -395,16 +394,13 @@ const SalaryRevisions = () => {
                                 </CCol>
 
                                 <CCol md={12} className="text-start">
-                                    <CButton color="light" onClick={calculateGrossSalary} className="mt-2 mb-3" block>
-                                        Click to Calculate Gross Salary
-                                    </CButton>
-                                    <p><strong>Gross Salary: </strong>{calculatedGrossSalary}</p>
+                                    <p><strong>New Gross Salary: </strong>{calculatedGrossSalary}</p>
                                 </CCol>
                             </CRow>
 
                             <CRow className="mt-3">
                                 <CCol className="d-flex justify-content-start">
-                                    <CButton color="primary" onClick={handleCreateRecord}>Create Salary Revision</CButton>
+                                    <CButton color="primary" onClick={handleCreateRecord} disabled={!selectedEmployee}>Create Salary Revision</CButton>
                                 </CCol>
                             </CRow>
 
