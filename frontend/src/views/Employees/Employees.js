@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-const BASE_URL = 'http://127.0.0.1:8000'; // Base URL for your Django API
+import { BASE_URL } from '../../../config';
 import {
   CTable,
   CTableBody,
@@ -83,7 +83,7 @@ const Employees = () => {
       return
     }
     axios
-      .get('http://127.0.0.1:8000/view_all_employees/', {
+      .get(`${BASE_URL}/view_all_employees/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -166,7 +166,7 @@ const Employees = () => {
     }
 
     axios
-      .put(`http://127.0.0.1:8000/employee/${selectedemployeeid}/`, formData, {
+      .put(`${BASE_URL}/employee/${selectedemployeeid}/`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

@@ -10,6 +10,7 @@ import { cilAccountLogout } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { BASE_URL } from '../../../config';
 
 import avatar8 from './../../assets/images/avatars/8.jpg';
 
@@ -22,7 +23,7 @@ const AppHeaderDropdown = () => {
       const refreshToken = localStorage.getItem('refreshToken');
       console
       await axios.post(
-        'http://127.0.0.1:8000/users/logout/',
+        `${BASE_URL}/users/logout/`,
         { refresh_token: refreshToken },
         {
           headers: {
