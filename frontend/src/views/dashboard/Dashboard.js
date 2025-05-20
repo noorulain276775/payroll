@@ -17,7 +17,6 @@ const Dashboard = () => {
     const authToken = localStorage.getItem('authToken');
     if (!authToken) {
       window.location.reload();
-      navigate('/');
     }
   }, [navigate]);
 
@@ -33,7 +32,6 @@ const Dashboard = () => {
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           localStorage.removeItem('authToken');
           window.location.reload();
-          navigate('/');
         } else {
           console.error('Error fetching dashboard data:', error);
         }
@@ -50,7 +48,6 @@ const Dashboard = () => {
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           localStorage.removeItem('authToken');
           window.location.reload();
-          navigate('/');
         } else {
           console.error('Error fetching new employees:', error);
         }

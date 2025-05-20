@@ -3,13 +3,13 @@ import axios from 'axios';
 import { CAvatar, CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilPeople } from '@coreui/icons';
-import MainChart from './MainChart';
-import { DashboardWidgets } from '../../components/DashboardWidgets';
+// import MainChart from './MainChart';
+// import { DashboardWidgets } from '../../components/DashboardWidgets';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../../config';
 
 const EmployeeDashboard = () => {
-  const [dashboardData, setDashboardData] = useState(null);
+  // const [dashboardData, setDashboardData] = useState(null);
   const [newEmployees, setNewEmployees] = useState([]);
   const navigate = useNavigate();
 
