@@ -16,7 +16,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { BASE_URL } from '../../../config';
+import { BASE_URL } from '../../../../config';
 
 const Login = () => {
   const [username, setUsername] = useState('')
