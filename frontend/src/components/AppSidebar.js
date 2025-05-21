@@ -15,14 +15,13 @@ import { AppSidebarNav } from './AppSidebarNav';
 import getNavigation from '../_nav';
 
 import logo from 'src/assets/brand/logo.png';
-import { sygnet } from 'src/assets/brand/sygnet';
 
 const AppSidebar = () => {
   const dispatch = useDispatch();
   const unfoldable = useSelector((state) => state.sidebarUnfoldable);
   const sidebarShow = useSelector((state) => state.sidebarShow);
 
-  const navigation = getNavigation(); 
+  const navigation = getNavigation();
 
   return (
     <CSidebar
@@ -36,9 +35,21 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom">
-        <CSidebarBrand to="/">
-          <img src={logo} alt="Logo" className="sidebar-brand-full" height={50} />
-          <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
+        <CSidebarBrand
+          to="/"
+          className="d-flex align-items-center justify-content-center w-100"
+          style={{ height: '100px' }}
+        >
+          <img
+            src={logo}
+            alt="Logo"
+            style={{
+              height: '200px',
+              width: 'auto',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"
