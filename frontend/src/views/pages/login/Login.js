@@ -79,7 +79,7 @@ const Login = () => {
                     <img
                       src={logo}
                       alt="Logo"
-                      style={{ width: '150px', height: 'auto', objectFit: 'contain' }}
+                      style={{ width: '200px', height: 'auto', objectFit: 'contain' }}
                     />
                   </div>
 

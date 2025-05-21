@@ -44,7 +44,7 @@ const AppSidebar = () => {
             src={logo}
             alt="Logo"
             style={{
-              height: '200px',
+              height: '60px',
               width: 'auto',
               objectFit: 'contain',
               display: 'block',
