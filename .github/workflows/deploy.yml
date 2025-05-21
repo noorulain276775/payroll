@@ -22,4 +22,4 @@ jobs:
 
     - name: Deploy to Server
       run: |
-        ssh Administrator@5.30.204.180 'powershell -File C:\deploy\deploy.ps1'
+        run: ssh -i ~/.ssh/id_rsa Administrator@5.30.204.180 'powershell -File C:\deploy\deploy.ps1'
