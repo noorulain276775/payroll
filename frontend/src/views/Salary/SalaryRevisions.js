@@ -2,7 +2,33 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../../config';
 
-import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CDropdown, CDropdownToggle, CDropdownMenu, CDropdownItem, CButton, CModal, CModalHeader, CModalBody, CCard, CCardHeader, CCardBody, CAlert, CRow, CCol, CFormSelect, CFormInput, CModalTitle, CModalFooter } from '@coreui/react'; // assuming CoreUI is installed
+import {
+    CTable,
+    CTableHead,
+    CTableRow,
+    CTableHeaderCell,
+    CTableBody,
+    CTableDataCell,
+    CDropdown,
+    CDropdownToggle,
+    CDropdownMenu,
+    CDropdownItem,
+    CButton,
+    CModal,
+    CModalHeader,
+    CModalBody,
+    CCard,
+    CCardHeader,
+    CCardBody,
+    CAlert,
+    CRow,
+    CCol,
+    CFormSelect,
+    CFormInput,
+    CModalTitle,
+    CModalFooter,
+    CForm
+} from '@coreui/react';
 
 const SalaryRevisions = () => {
     const [salaryRevisions, setSalaryRevisions] = useState([]);
@@ -13,6 +39,7 @@ const SalaryRevisions = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [ViewModalVisible, setViewModalVisible] = useState(false);
+    const [EditModalVisible, setEditModalVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [employees, setEmployees] = useState([]);
@@ -22,11 +49,13 @@ const SalaryRevisions = () => {
     const [transportAllowance, setTransportAllowance] = useState('');
     const [otherAllowance, setOtherAllowance] = useState(0);
     const [calculatedGrossSalary, setCalculatedGrossSalary] = useState('');
-    const [employeeSalaryDetails, setEmployeeSalaryDetails] = useState({});  // Store selected employee's salary details
+    const [employeeSalaryDetails, setEmployeeSalaryDetails] = useState({});
     const [selectedEmployeeData, setSelectedEmployeeData] = useState({});
     const [reason, setReason] = useState('');
     const [effectiveOn, setEffectiveOn] = useState('');
     const token = localStorage.getItem('authToken');
+    const [selectedRevision, setSelectedRevision] = useState(null);
+    const [editingRevision, setEditingRevision] = useState(null);
 
 
     // Timer for alerts
@@ -126,7 +155,10 @@ const SalaryRevisions = () => {
         fetchSalaryRevisions(revision.employee.id);
         setViewModalVisible(true);
     }
-
+    const handleEdit = (revision) => {
+        setEditingRevision(revision);
+        setEditModalVisible(true);
+    };
 
     const handleCreateRecord = async () => {
         const revisedGrossSalary =
@@ -134,6 +166,7 @@ const SalaryRevisions = () => {
             (parseFloat(housingAllowance) || 0) +
             (parseFloat(transportAllowance) || 0) +
             (parseFloat(otherAllowance) || 0);
+
         const data = {
             employee: selectedEmployeeData.id,
             revised_basic_salary: basicSalary,
@@ -152,38 +185,87 @@ const SalaryRevisions = () => {
         };
 
         try {
-            const response = await fetch(`${BASE_URL}/create-salary-revision/${selectedEmployee}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(data),
-            });
+            const response = await axios.post(
+                `${BASE_URL}/create-salary-revision/${selectedEmployee}/`,
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+            );
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                setErrorMessage(errorData.detail || "Failed to create salary revision.");
-                setAlertVisible(true);
-            } else {
-                const successData = await response.json();
-                fetchData();
-                setSuccessMessage('Salary revision created successfully!');
-                setSuccessAlertVisible(true);
-                setCreateModalVisible(false);
-                setBasicSalary('');
-                setHousingAllowance('');
-                setTransportAllowance('');
-                setOtherAllowance(0);
-                setReason('');
-                setEffectiveOn('');
-                setSelectedEmployeeData(null);
-            }
+            fetchData();
+            setSuccessMessage('Salary revision created successfully!');
+            setSuccessAlertVisible(true);
+            setCreateModalVisible(false);
+            setBasicSalary('');
+            setHousingAllowance('');
+            setTransportAllowance('');
+            setOtherAllowance(0);
+            setReason('');
+            setEffectiveOn('');
+            setSelectedEmployeeData(null);
         } catch (error) {
-            setErrorMessage("An error occurred while saving the salary revision.");
+            const msg = error?.response?.data?.detail || "Failed to create salary revision.";
+            setErrorMessage(msg);
             setAlertVisible(true);
         }
     };
+
+    const handleUpdateRevision = async (revisionId) => {
+        console.log("editingRevision", editingRevision);
+        const revisedGrossSalary =
+            (parseFloat(editingRevision.revised_basic_salary) || 0) +
+            (parseFloat(editingRevision.revised_housing_allowance) || 0) +
+            (parseFloat(editingRevision.revised_transport_allowance) || 0) +
+            (parseFloat(editingRevision.revised_other_allowance) || 0);
+        const payload = {
+            employee: editingRevision.employee.id, 
+            previous_basic_salary: editingRevision.previous_basic_salary,
+            previous_housing_allowance: editingRevision.previous_housing_allowance,
+            previous_transport_allowance: editingRevision.previous_transport_allowance,
+            previous_other_allowance: editingRevision.previous_other_allowance,
+            previous_gross_salary: editingRevision.previous_gross_salary,
+            revised_salary_effective_from: editingRevision.revised_salary_effective_from,
+            revised_basic_salary: editingRevision.revised_basic_salary,
+            revised_housing_allowance: editingRevision.revised_housing_allowance,
+            revised_transport_allowance: editingRevision.revised_transport_allowance,
+            revised_other_allowance: editingRevision.revised_other_allowance,
+            revision_reason: editingRevision.revision_reason,
+            revised_gross_salary: revisedGrossSalary,
+            revision_date: new Date().toISOString(),
+        };
+
+        try {
+            const response = await axios.put(
+                `${BASE_URL}/salary-revision/edit/${revisionId}/`,
+                payload,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+            );
+
+            fetchData();
+            fetchSalaryRevisions();
+            setSuccessMessage('Salary revision updated successfully!');
+            setSuccessAlertVisible(true);
+            setEditModalVisible(false);
+            setEditingRevision(null);
+            console.log("success data", response.data);
+        } catch (error) {
+            const msg = error?.response?.data?.detail || "Failed to update salary revision.";
+            setErrorMessage(msg);
+            setAlertVisible(true);
+            console.error(error);
+        }
+    };
+
+
 
     if (loading) {
         return <div>Loading...</div>;
@@ -523,6 +605,118 @@ const SalaryRevisions = () => {
                     <CButton color="secondary" onClick={() => setViewModalVisible(false)}>Close</CButton>
                 </CModalFooter>
             </CModal>
+
+            <CModal visible={!!editingRevision} onClose={() => setEditingRevision(null)} size="lg" centered>
+                <CModalHeader className="bg-primary text-white">
+                    <CModalTitle>Edit Salary Revision</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    {editingRevision && (
+                        <CForm
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleUpdateRevision(editingRevision.id);
+                            }}
+                        >
+                            <CRow className="mb-4">
+                                <CCol md={6} className="mb-3">
+                                    <label>Current Basic Salary</label>
+                                    <CFormInput
+                                        className="mt-2"
+                                        type="number"
+                                        value={editingRevision.revised_basic_salary}
+                                        onChange={(e) =>
+                                            setEditingRevision({
+                                                ...editingRevision,
+                                                revised_basic_salary: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Basic Salary"
+                                        required
+                                    />
+                                </CCol>
+
+                                <CCol md={6} className="mb-3">
+                                    <label>Current Housing Allowance</label>
+                                    <CFormInput
+                                        className="mt-2"
+                                        type="number"
+                                        value={editingRevision.revised_housing_allowance}
+                                        onChange={(e) =>
+                                            setEditingRevision({
+                                                ...editingRevision,
+                                                revised_housing_allowance: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Housing Allowance"
+                                        required
+                                    />
+                                </CCol>
+
+                                <CCol md={6} className="mb-3">
+                                    <label>Current Transport Allowance</label>
+                                    <CFormInput
+                                        className="mt-2"
+                                        type="number"
+                                        value={editingRevision.revised_transport_allowance}
+                                        onChange={(e) =>
+                                            setEditingRevision({
+                                                ...editingRevision,
+                                                revised_transport_allowance: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Transport Allowance"
+                                        required
+                                    />
+                                </CCol>
+
+                                <CCol md={6} className="mb-3">
+                                    <label>Current Other Allowance</label>
+                                    <CFormInput
+                                        className="mt-2"
+                                        type="number"
+                                        value={editingRevision.revised_other_allowance}
+                                        onChange={(e) =>
+                                            setEditingRevision({
+                                                ...editingRevision,
+                                                revised_other_allowance: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Other Allowance"
+                                        required
+                                    />
+                                </CCol>
+
+                                <CCol md={6} className="mb-3">
+                                    <label>Revision Reason</label>
+                                    <CFormInput
+                                        className="mt-2"
+                                        value={editingRevision.revision_reason}
+                                        onChange={(e) =>
+                                            setEditingRevision({
+                                                ...editingRevision,
+                                                revision_reason: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Revision Reason"
+                                    />
+                                </CCol>
+                            </CRow>
+
+                            <div className="d-flex justify-content-end gap-2">
+                                <CButton type="submit" color="primary">
+                                    Save
+                                </CButton>
+                                <CButton type="button" color="secondary" onClick={() => setEditingRevision(null)}>
+                                    Cancel
+                                </CButton>
+                            </div>
+                        </CForm>
+                    )}
+                </CModalBody>
+            </CModal>
+
+
 
 
         </div>

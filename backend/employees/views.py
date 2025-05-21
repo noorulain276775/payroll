@@ -388,10 +388,10 @@ def edit_salary_revision(request, revision_id):
                 updated_revision = serializer.save()
                 employee = salary_revision.employee
                 salary_details = employee.salary_details
-                salary_details.basic_salary = updated_revision.updated_basic_salary
-                salary_details.housing_allowance = updated_revision.updated_housing_allowance
-                salary_details.transport_allowance = updated_revision.updated_transport_allowance
-                salary_details.other_allowance = updated_revision.updated_other_allowance
+                salary_details.basic_salary = updated_revision.revised_basic_salary
+                salary_details.housing_allowance = updated_revision.revised_housing_allowance
+                salary_details.transport_allowance = updated_revision.revised_transport_allowance
+                salary_details.other_allowance = updated_revision.revised_other_allowance
 
                 # Recalculate the gross salary based on updated details
                 salary_details.gross_salary = salary_details.calculate_gross_salary()

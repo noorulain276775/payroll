@@ -71,9 +71,9 @@ const Login = () => {
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
-                      alignItems: 'center',  // vertically center the image
-                      height: '30px',        // fixed height to reduce extra space
-                      marginBottom: '0.5rem' // less bottom margin
+                      alignItems: 'center', 
+                      height: '30px',
+                      marginBottom: '0.5rem'
                     }}
                   >
                     <img

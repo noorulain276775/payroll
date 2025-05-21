@@ -244,7 +244,7 @@ class SalaryRevisionSerializerCreate(serializers.ModelSerializer):
         
 
 class SalaryRevisionSerializer(serializers.ModelSerializer):
-    employee = EmployeeDetailsWithSalarySerializer()
+    employee = EmployeeDetailsWithSalarySerializer(read_only=True)
     revision_date = serializers.DateTimeField(
         format='%d-%m-%Y', input_formats=['%d-%m-%Y', '%Y-%m-%dT%H:%M:%S.%f%z', '%Y-%m-%dT%H:%M:%S.%f', '%Y-%m-%d']
     )
