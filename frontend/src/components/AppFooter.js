@@ -6,7 +6,7 @@ const AppFooter = () => {
     <CFooter className="px-4">
       <div>
         <a href="https://coreui.io" target="_blank" rel="noopener noreferrer">
-          Liya Trading
+          WorkSphere
         </a>
         <span className="ms-1">&copy; 2025</span>
       </div>
