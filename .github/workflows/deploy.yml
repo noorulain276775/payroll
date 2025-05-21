@@ -1,4 +1,4 @@
-# .github/workflows/deploy.yml
+# .github/workflows/deploy.yml Working
 name: CI/CD Deployment
 
 on:
@@ -21,5 +21,4 @@ jobs:
         ssh-keyscan -H 5.30.204.180 >> ~/.ssh/known_hosts
 
     - name: Deploy to Server
-      run: |
-        ssh -i ~/.ssh/id_rsa Administrator@5.30.204.180 'powershell -File C:\deploy\deploy.ps1'
+      run: ssh -i ~/.ssh/id_rsa Administrator@5.30.204.180 'powershell -File C:\deploy\deploy.ps1'
