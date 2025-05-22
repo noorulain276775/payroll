@@ -60,7 +60,7 @@ const Login = () => {
 
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md={8}>
+          <CCol md={6}>
             <CCardGroup>
               <CCard
                 className="p-4 shadow-lg"
@@ -72,7 +72,7 @@ const Login = () => {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center', 
-                      height: '30px',
+                      height: '50px',
                       marginBottom: '0.5rem'
                     }}
                   >

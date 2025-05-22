@@ -4,7 +4,7 @@ import AppFooter from './AppFooter'
 import AppHeader from './AppHeader'
 import AppHeaderDropdown from './header/AppHeaderDropdown'
 import AppSidebar from './AppSidebar'
-import Login from './Login'
+
 
 export {
   AppBreadcrumb,
@@ -13,5 +13,5 @@ export {
   AppHeader,
   AppHeaderDropdown,
   AppSidebar,
-  Login
+
 }
