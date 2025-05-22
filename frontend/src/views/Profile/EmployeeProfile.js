@@ -23,6 +23,9 @@ const ALLOWED_PDF_TYPES = ['application/pdf'];
 
 const EmployeeProfile = () => {
   const [employee, setEmployee] = useState(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertColor, setAlertColor] = useState('success');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -48,7 +51,25 @@ const EmployeeProfile = () => {
       })
       .then((response) => {
         setEmployee(response.data);
-        setFormData(response.data);
+        const {
+          first_name, last_name, date_of_birth, place_of_birth, nationality,
+          gender, marital_status, spouse_name, father_name, mother_name,
+          phone_number, company_phone_number, home_town_number,
+          email, personal_email, joining_date, address,
+          emergency_contact_name, emergency_contact_number, emergency_contact_relation,
+          emirates_id, passport_no, qualification, visa_no,
+          designation, department, previous_company_name, previous_company_designation
+        } = response.data;
+
+        setFormData({
+          first_name, last_name, date_of_birth, place_of_birth, nationality,
+          gender, marital_status, spouse_name, father_name, mother_name,
+          phone_number, company_phone_number, home_town_number,
+          email, personal_email, joining_date, address,
+          emergency_contact_name, emergency_contact_number, emergency_contact_relation,
+          emirates_id, passport_no, qualification, visa_no,
+          designation, department, previous_company_name, previous_company_designation
+        });
         if (response.data.photo) {
           setPhotoPreview(`${BASE_URL}${response.data.photo}`);
         }
@@ -92,70 +113,123 @@ const EmployeeProfile = () => {
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-  
+
     if (type === "file" && files.length > 0) {
       const file = files[0];
-  
-      // Validate file type
-      if (name === "photo" && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        alert("Only JPG, JPEG, and PNG files are allowed for profile photo upload.");
-        return;
-      } else if (["emirates_id_image", "passport_image", "visa_image", "highest_degree_certificate", "insurance_card"].includes(name) &&
-                 !ALLOWED_PDF_TYPES.includes(file.type)) {
-        alert(`Only PDF files are allowed for ${name.replace("_", " ")} upload.`);
+      const maxSizeInMB = 5;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+      if (file.size > maxSizeInBytes) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setAlertVisible(true);
+        setAlertMessage(`${name.replace(/_/g, ' ')} is too large. Max allowed size is ${maxSizeInMB}MB.`);
+        setAlertColor('danger');
+        setTimeout(() => {
+          setAlertVisible(false);
+        }, 5000);
+        e.target.value = null;
         return;
       }
-  
-      // Update formData with the actual file object (not URL.createObjectURL)
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: file, // Store the actual file object
-      }));
-  
-      // Update preview state (this is just for display, the file itself is used for upload)
-      setEditPreviewFiles((prev) => ({
+
+      // Validate file types
+      if (name === "photo" && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        alert("Only JPG, JPEG, and PNG files are allowed for profile photo.");
+        return;
+      } else if (
+        ["emirates_id_image", "passport_image", "visa_image", "highest_degree_certificate", "insurance_card"].includes(name) &&
+        !ALLOWED_PDF_TYPES.includes(file.type)
+      ) {
+        alert(`Only PDF files are allowed for ${name.replaceAll("_", " ")}.`);
+        return;
+      }
+
+      // Set actual File object in formData
+      setFormData((prev) => ({
         ...prev,
-        [name]: file ? URL.createObjectURL(file) : null, // This is only for preview purposes
+        [name]: file,
       }));
+
+      // Update preview
+      const previewUrl = URL.createObjectURL(file);
+      switch (name) {
+        case "photo":
+          setPhotoPreview(previewUrl);
+          break;
+        case "emirates_id_image":
+          setEmiratesIdPreview(previewUrl);
+          break;
+        case "passport_image":
+          setPassportIdPreview(previewUrl);
+          break;
+        case "visa_image":
+          setVisaPreview(previewUrl);
+          break;
+        case "highest_degree_certificate":
+          sethighestDegreeCertificatePreview(previewUrl);
+          break;
+        case "insurance_card":
+          setInsuranceCardPreview(previewUrl);
+          break;
+        default:
+          break;
+      }
     } else {
-      // Handle text inputs correctly
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value, // Update the text field value
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
       }));
     }
   };
-  
-  
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const data = new FormData();
-  
-    // Append all the form fields and files to the FormData object
-    Object.keys(formData).forEach((key) => {
-      if (formData[key]) {
-        data.append(key, formData[key]); // Append file objects as they are
+
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value instanceof File || typeof value === "string") {
+        data.append(key, value);
       }
     });
-  
+
     try {
       const response = await axios.put(`${BASE_URL}/employee/update/`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
-          // The Content-Type will be set automatically to 'multipart/form-data' by FormData
         },
       });
-  
+
       setEmployee(response.data);
       setIsEditing(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setAlertVisible(true);
+      setAlertMessage("Profile updated successfully!");
+      setAlertColor('success');
+      setTimeout(() => {
+        setAlertVisible(false);
+      }, 5000);
     } catch (error) {
-      console.error('Error updating employee:', error.response?.data || error);
+      console.error("Error updating employee:", error.response?.data || error);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setAlertVisible(true);
+      setAlertMessage("Error updating profile. Please try again.");
+      setAlertColor('danger');
+      setTimeout(() => {
+        setAlertVisible(false);
+      }, 5000);
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user_type');
+        window.location.reload();
+      }
     }
   };
-  
-  
-  
+
+
+
   if (!employee || employee.length === 0) {
     return (
       <CRow className="justify-content-center mt-5">
@@ -177,6 +251,13 @@ const EmployeeProfile = () => {
         </CCardHeader>
         <CCardBody>
           <CForm>
+            <div className="mt-3">
+              {alertVisible && (
+                <CAlert color={alertColor} onClose={() => setAlertVisible(false)} dismissible>
+                  {alertMessage}
+                </CAlert>
+              )}
+            </div>
             {/* Personal Information Section */}
             <div className="section-header">
               <h5>Personal Information</h5>

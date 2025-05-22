@@ -106,7 +106,7 @@ const EmployeePayslips = () => {
         </div>
       </CCardHeader>
       <CCardBody>
-        <CTable hover responsive>
+        <CTable bordered>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell width="10%">Month</CTableHeaderCell>

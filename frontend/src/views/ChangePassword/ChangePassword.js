@@ -73,10 +73,10 @@ const ChangePassword = () => {
 
   return (
     <div className="bg-light min-vh-100">
-      <CContainer className="py-4">
+      <CContainer>
         <CCard className="shadow-sm">
-          <CCardHeader className="text-center bg-light text-black">
-            <h2>Change Password</h2>
+          <CCardHeader className="bg-light text-black">
+            <h4>Change Password</h4>
           </CCardHeader>
           <CCardBody>
             {alert.visible && (

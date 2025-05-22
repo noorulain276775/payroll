@@ -8,6 +8,9 @@ import {
   CTableDataCell,
   CTableHeaderCell,
   CTableHead,
+  CCard,
+  CCardHeader,
+  CCardBody,
   CDropdown,
   CDropdownToggle,
   CDropdownMenu,
@@ -35,7 +38,6 @@ const EmployeeLeavesRequests = () => {
           },
         })
         setLeaves(response.data)
-        console.log(response.data)
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
@@ -82,68 +84,69 @@ const EmployeeLeavesRequests = () => {
   }
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-end mb-4">
-        <h4>Leave Request</h4>
-        {/* <CButton color="primary" onClick={() => setCreateModalVisible(true)} className="mt-4">
-          <i className="cui-plus"></i> Add New
-        </CButton> */}
-      </div>
+    <CCard>
+      <div>
+        <CCardHeader>
+          <h4 className="d-inline">My Leaves</h4>
+        </CCardHeader>
+        <CCardBody>
 
-      <CTable bordered>
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Applied On</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Leave Type</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Start Date</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>End Date</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Days Taken</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Reason</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Status</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Reviewed on</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Approved by</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {leaves.length === 0 ? (
-            <CTableRow>
-              <CTableDataCell colSpan="10" style={{ textAlign: 'center' }}>
-                No data available
-              </CTableDataCell>
-            </CTableRow>
-          ) : (
-            leaves.map((s) => (
-              <CTableRow key={s.id}>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.applied_on}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.leave_type}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.start_date}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.end_date}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.days_taken}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.reason}</CTableDataCell>
-                
-                <CTableDataCell
-                  style={{
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    color:
-                      s.status === 'Approved'
-                        ? 'green'
-                        : s.status === 'Rejected'
-                          ? 'red'
-                          : 'blue',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {s.status}
-                </CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.approved_on}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.approved_by ? `${s.approved_by.first_name} ${s.approved_by.last_name}` : '—'}</CTableDataCell>
+          <CTable bordered>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Applied On</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Leave Type</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Start Date</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>End Date</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Days Taken</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Reason</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Status</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Reviewed on</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Approved by</CTableHeaderCell>
               </CTableRow>
-            ))
-          )}
-        </CTableBody>
-      </CTable>
-    </div>
+            </CTableHead>
+            <CTableBody>
+              {leaves.length === 0 ? (
+                <CTableRow>
+                  <CTableDataCell colSpan="10" style={{ textAlign: 'center' }}>
+                    No data available
+                  </CTableDataCell>
+                </CTableRow>
+              ) : (
+                leaves.map((s) => (
+                  <CTableRow key={s.id}>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.applied_on}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.leave_type}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.start_date}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.end_date}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.days_taken}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.reason}</CTableDataCell>
+
+                    <CTableDataCell
+                      style={{
+                        textAlign: 'center',
+                        verticalAlign: 'middle',
+                        color:
+                          s.status === 'Approved'
+                            ? 'green'
+                            : s.status === 'Rejected'
+                              ? 'red'
+                              : 'blue',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {s.status}
+                    </CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.approved_on}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.approved_by ? `${s.approved_by.first_name} ${s.approved_by.last_name}` : '—'}</CTableDataCell>
+                  </CTableRow>
+                ))
+              )}
+            </CTableBody>
+          </CTable>
+        </CCardBody>
+      </div>
+    </CCard>
   )
 }
 
