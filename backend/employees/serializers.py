@@ -159,8 +159,6 @@ class DashboardSerializer(serializers.Serializer):
         # Get the current year and month
         today = timezone.now()
         current_month = today.month
-        print(today)
-        print(current_month)
         current_year = today.year
         previous_month = current_month - 1 if current_month > 1 else 12
         previous_month_year = current_year if current_month > 1 else current_year - 1

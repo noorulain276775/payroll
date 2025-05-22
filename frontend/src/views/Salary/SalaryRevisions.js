@@ -146,7 +146,6 @@ const SalaryRevisions = () => {
                 },
             });
             setSalaryRevisionsEmployee(response.data);
-            console.log("employee salary revisions", response.data);
         } catch (error) {
             console.error("Error fetching salary revisions:", error);
         }
@@ -215,7 +214,6 @@ const SalaryRevisions = () => {
     };
 
     const handleUpdateRevision = async (revisionId) => {
-        console.log("editingRevision", editingRevision);
         const revisedGrossSalary =
             (parseFloat(editingRevision.revised_basic_salary) || 0) +
             (parseFloat(editingRevision.revised_housing_allowance) || 0) +
@@ -256,7 +254,6 @@ const SalaryRevisions = () => {
             setSuccessAlertVisible(true);
             setEditModalVisible(false);
             setEditingRevision(null);
-            console.log("success data", response.data);
         } catch (error) {
             const msg = error?.response?.data?.detail || "Failed to update salary revision.";
             setErrorMessage(msg);

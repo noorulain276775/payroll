@@ -190,7 +190,6 @@ const Salary = () => {
       .catch((error) => {
         if (error.response && error.response.status === 400) {
           const errorMessage = error.response.data?.employee?.[0];
-          console.log('Error message:', errorMessage);
           if (errorMessage === 'salary details with this employee already exists.') {
             setErrorMessage('Salary details for this employee already exist. Please edit the existing record.');
             setAlertVisible(true);

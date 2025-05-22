@@ -34,7 +34,6 @@ EMPLOYEES PERSONAL AND WORK INFORMATION
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_all_employees(request):
-    print(f"Authenticated User: {request.user}")
     if request.user.user_type != 'Admin':
         return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -46,7 +45,6 @@ def view_all_employees(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_all_employees_with_salary(request):
-    print(f"Authenticated User: {request.user}")
     if request.user.user_type != 'Admin':
         return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -77,7 +75,6 @@ def update_employee(request, employee_id):
     try:
         employee = Employee.objects.get(id=employee_id)
         serializer = EmployeeUpdateSerializer(employee, data=request.data, partial=True)
-        print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -107,7 +104,6 @@ SALARIES
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_salary_details(request):
-    print(f"Authenticated User: {request.user}")
     if request.user.user_type != 'Admin':
         return Response({"detail": "Only admins can create salary details."}, status=status.HTTP_403_FORBIDDEN)
     serializer = SalaryDetailsSerializer(data=request.data)
@@ -148,7 +144,6 @@ def update_salary_record(request, employee_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_all_employees_salaries(request):
-    print(f"Authenticated User: {request.user}")
     if request.user.user_type != 'Admin':
         return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -319,7 +314,6 @@ def create_salary_revision(request, employee_id):
                 salary_details.other_allowance = salary_revision.revised_other_allowance
                 salary_details.gross_salary = salary_revision.revised_gross_salary
                 salary_details.save()
-                print(salary_details)
 
                 return Response({
                     "message": "Salary revision created successfully!",
@@ -418,7 +412,6 @@ def edit_salary_revision(request, revision_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_new_employees(request):
-    print(f"Authenticated User: {request.user.id}")
     employees = Employee.objects.exclude(user=request.user.id).order_by('-created_at')[:3]
     serializer = EmployeeSerializer(employees, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -519,7 +512,6 @@ def update_own_details(request):
     try:
         employee = Employee.objects.get(user=request.user)
         serializer = EmployeeUpdateSerializer(employee, data=request.data, partial=True)
-        print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

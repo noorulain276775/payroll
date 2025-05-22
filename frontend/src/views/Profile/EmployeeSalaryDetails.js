@@ -29,7 +29,6 @@ const EmployeeSalaryDetails = () => {
         },
       })
       .then((response) => {
-        console.log(response.data);
         setEmployee(response.data);
       })
       .catch((error) => {

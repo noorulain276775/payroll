@@ -99,7 +99,6 @@ const Payroll = () => {
           },
         });
         setPayroll(response.data);
-        console.log(response.data)
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
@@ -157,7 +156,6 @@ const Payroll = () => {
 
   const handleView = (s) => {
     setSelectedEmployeePayroll(s)
-    console.log(s)
     setModalVisible(true)
   }
 
@@ -264,7 +262,6 @@ const Payroll = () => {
     setNormalOvertimeAmount(normal_overtime_amount);
     const unpaid_days_amount = unpaidDays * dailySalary || 0;
     setUnpaidAmount(unpaid_days_amount)
-    console.log(unpaid_days_amount)
     const other_deductions = parseFloat(otherDeduction) || 0;
     const total_salary_for_month = ((workingDays * dailySalaryInTermsOfGross) + overtime_amount + normal_overtime_amount) - (unpaid_days_amount + other_deductions)
     setCalculatedTotalSalary(total_salary_for_month);
@@ -307,7 +304,6 @@ const Payroll = () => {
 
   const handleEdit = (record) => {
     setSelectedRecord(record)
-    console.log(record)
     setEditModalVisible(true)
   }
 
@@ -315,12 +311,10 @@ const Payroll = () => {
     const { id, employee, ...updatedFields } = selectedRecord;
 
     let payload = { ...updatedFields, employee };
-    console.log("Before Edit", payload)
     payload.overtime_amount = payload.overtime_days * (payload.daily_salary * 1.5) || 0;
     payload.normal_overtime_amount = payload.normal_overtime_days * (payload.daily_salary * 1.25) || 0;
     payload.unpaid_amount = payload.unpaid_days * payload.daily_salary || 0;
 
-    console.log("After Edit", payload)
 
     axios
       .put(`${BASE_URL}/update-payroll-record/${id}/`, payload, {
