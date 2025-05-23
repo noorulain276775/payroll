@@ -38,6 +38,7 @@ const EmployeeLeavesRequests = () => {
           },
         })
         setLeaves(response.data)
+        console.log(response.data)
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
@@ -48,40 +49,6 @@ const EmployeeLeavesRequests = () => {
 
     fetchLeaves()
   }, [token])
-
-  const handleReject = (id) => {
-    const confirmReject = window.confirm(
-      'Do you want to reject this leave?\n\nThis action cannot be undone. Please make sure you want to do it.'
-    )
-    if (!confirmReject) return
-    axios
-      .put(`${BASE_URL}/leaves/${id}/reject/`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setLeaves(leaves.map((leave) => (leave.id === id ? response.data : leave)))
-      })
-      .catch((error) => {
-        console.error('Error rejecting leave:', error)
-      })
-  }
-
-  const handleApprove = (id) => {
-    const confirmApprove = window.confirm(
-      'Do you want to approve this leave?\n\nThis action cannot be undone. Please make sure you want to do it.'
-    )
-    if (!confirmApprove) return
-    axios
-      .put(`${BASE_URL}/leaves/${id}/approve/`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setLeaves(leaves.map((leave) => (leave.id === id ? response.data : leave)))
-      })
-      .catch((error) => {
-        console.error('Error approving leave:', error)
-      })
-  }
 
   return (
     <CCard>

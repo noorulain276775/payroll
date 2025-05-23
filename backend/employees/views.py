@@ -340,6 +340,33 @@ def get_salary_revisions(request, employee_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_own_salary_revisions(request):
+    try:
+        if request.user.user_type != 'Employee':
+            return Response({"detail": "Only employees can access their own salary records."}, status=status.HTTP_403_FORBIDDEN)
+
+        user_id = request.query_params.get('user')
+
+        if not user_id:
+            return Response({"detail": "User ID is required as a query parameter."}, status=status.HTTP_400_BAD_REQUEST)
+        employee_id = Employee.objects.get(user=user_id).id
+        logged_in_userId = Employee.objects.get(user=request.user).id
+
+
+        if logged_in_userId != int(employee_id):
+            return Response({"detail": "You are not authorized to view another employee's salary records."}, status=status.HTTP_403_FORBIDDEN)
+
+        employee = get_object_or_404(Employee, id=employee_id)
+        salary_revisions = SalaryRevision.objects.filter(employee=employee)
+        serializer = SalaryRevisionSerializerCreate(salary_revisions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 
@@ -587,8 +614,8 @@ def download_payroll_pdf(request, payroll_id):
         elements.append(Paragraph("<b>Payslip</b>", title_style))
         elements.append(Spacer(1, 20))
 
-        basic_salary = round(float(getattr(employee.salary_details, 'basic_salary', 0) or 0), 2)
-        gross_salary = round(float(getattr(employee.salary_details, 'gross_salary', 0) or 0), 2)
+        basic_salary = round(float(getattr(payroll_record, 'current_basic_salary', 0) or 0), 2)
+        gross_salary = round(float(getattr(payroll_record, 'current_gross_salary', 0) or 0), 2)
         total_salary_for_month = round(float(getattr(payroll_record, 'total_salary_for_month', 0) or 0), 2)
 
         unpaid_days = getattr(payroll_record, 'unpaid_days', 0) or 0

@@ -38,6 +38,7 @@ const Login = () => {
         localStorage.setItem('refreshToken', response.data.refresh)
         localStorage.setItem('user_type', response.data.user_type)
         localStorage.setItem('logged_in_status', JSON.stringify(true))
+        localStorage.setItem('user_id', response.data.user_id)
         if (response.data.user_type === 'Admin') {
           window.location.href = '/dashboard'
         } else {

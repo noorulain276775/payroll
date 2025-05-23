@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import view_employee, update_employee, create_payroll_record, view_all_payroll, view_own_payroll, send_salary_slip, update_own_details, create_employee, view_all_employees, view_all_employees_salaries, create_salary_details, update_salary_record, admin_view_single_employee_salary, update_payroll_record, view_new_employees, dashboard_summary, view_own_salary_details, download_payroll_pdf, create_salary_revision, edit_salary_revision, get_all_salary_revisions, view_all_employees_with_salary, get_all_salary_revisions, get_salary_revisions
+from .views import view_employee, update_employee, create_payroll_record, view_all_payroll, view_own_payroll, send_salary_slip, update_own_details, create_employee, view_all_employees, view_all_employees_salaries, create_salary_details, update_salary_record, admin_view_single_employee_salary, update_payroll_record, view_new_employees, dashboard_summary, view_own_salary_details, download_payroll_pdf, create_salary_revision, edit_salary_revision, get_all_salary_revisions, view_all_employees_with_salary, get_all_salary_revisions, get_salary_revisions, get_own_salary_revisions
 
 urlpatterns = [
     # For Admin ------------- employee endpoints
@@ -32,5 +32,6 @@ urlpatterns = [
     path('employee/salary-details/', view_own_salary_details, name='view_own_salary_details'),
     path('employee/payroll/', view_own_payroll, name='view_own_payroll'),
     path('employee/payroll/download/<int:payroll_id>/', download_payroll_pdf, name='download-payroll-pdf'),
+    path('salary-revisions/', get_own_salary_revisions, name='get_own_salary_revisions'),
     #path('employee/colleagues/', ColleaguesView.as_view(), name='colleagues'),  # View colleagues' list
 ]

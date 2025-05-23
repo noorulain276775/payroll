@@ -25,6 +25,7 @@ class UserLoginView(APIView):
                 'username': user.username,
                 'user_type': user.user_type,
                 'last_login': user.last_login,
+                'user_id': user.id,
             })
         
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)

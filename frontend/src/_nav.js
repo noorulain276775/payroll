@@ -124,9 +124,15 @@ const employeeNav = [
   },
   {
     component: CNavItem,
-    name: 'Leave Requests',
+    name: 'My Leave Requests',
     to: '/employee/leave-applications/history',
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'My Leave Balances',
+    to: '/employee/leave-balances',
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,

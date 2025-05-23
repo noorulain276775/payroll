@@ -51,6 +51,8 @@ const EmployeeLeavesRequests = React.lazy(() => import('./views/AnnualLeaves/Emp
 // Employee Salary Revisions
 const EmployeeSalaryRevisions = React.lazy(() => import('./views/Salary/EmployeeSalaryRevisions'))
 
+const EmployeeOwnLeaveBalance = React.lazy(() => import('./views/AnnualLeaves/EmployeeOwnLeaveBalance'))
+
 const routes = [
   // Admin Routes
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin'] },
@@ -75,6 +77,7 @@ const routes = [
   { path: '/employee/leave-applications', name: 'Employee Annual Leaves', element: EmployeeAnnualLeaves, allowedRoles: ['Employee'] },
   { path: '/employee/leave-applications/history', name: 'Leave Requests', element: EmployeeLeavesRequests, allowedRoles: ['Employee'] },
   { path: '/employee/salary-revision', name: 'Employee Salary Revisions', element: EmployeeSalaryRevisions, allowedRoles: ['Employee'] },
+  { path: '/employee/leave-balances', name: 'My Leave Balances', element: EmployeeOwnLeaveBalance, allowedRoles: ['Employee'] },
 ];
 
 export default routes;
