@@ -115,7 +115,7 @@ const AdminAnnualLeaves = () => {
             <CTableBody>
               {leaves.length === 0 ? (
                 <CTableRow>
-                  <CTableDataCell colSpan="10" style={{ textAlign: 'center' }}>
+                  <CTableDataCell colSpan="11" style={{ textAlign: 'center' }}>
                     No data available
                   </CTableDataCell>
                 </CTableRow>

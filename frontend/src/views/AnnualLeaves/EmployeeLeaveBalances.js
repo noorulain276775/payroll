@@ -165,7 +165,7 @@ const LeaveBalanceManager = () => {
                     <div className="d-flex justify-content-between align-items-end mb-2 mt-2">
                         <h4>Employee Leave Balances</h4>
                         <CButton color="primary" onClick={() => setShowModal(true)}>
-                            <i className="cui-plus"></i> Add Leave Balance
+                            <i className="cui-plus"></i> Add New
                         </CButton>
                     </div>
                 </CCardHeader>
