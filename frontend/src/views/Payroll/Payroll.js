@@ -346,482 +346,487 @@ const Payroll = () => {
 
 
   return (
-    <div>
-      <div className='d-flex justify-content-between align-items-end mb-4'>
-        <h4>Payrolls</h4>
-        <CButton color="primary" onClick={() => setCreateModalVisible(true)} className="mt-4">
-          <i className="cui-plus"></i> Add New
-        </CButton>
-      </div>
-
-      <CTable bordered>
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Employee Name</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Month</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Year</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Holiday Overtime Days</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Normal Overtime Days</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Unpaid Days</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Other Deductions</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Total Salary</CTableHeaderCell>
-            <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Action</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {payroll.length === 0 ? (
-            <CTableRow>
-              <CTableDataCell colSpan={9} style={{ textAlign: 'center' }}>
-                No data available
-              </CTableDataCell>
-            </CTableRow>
-          ) : (
-            payroll.map((s) => (
-              <CTableRow key={s.id}>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee_full_name}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{getMonthName(s.month)}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.year}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.overtime_days || 0}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.normal_overtime_days || 0}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.unpaid_days}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_deductions || 0}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>AED {s.total_salary_for_month}</CTableDataCell>
-                <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  <CDropdown>
-                    <CDropdownToggle color="secondary">Actions</CDropdownToggle>
-                    <CDropdownMenu>
-                      <CDropdownItem onClick={() => handleView(s)}>View</CDropdownItem>
-                      <CDropdownItem onClick={() => handleEdit(s)}>Edit</CDropdownItem>
-                      <CDropdownItem onClick={() => handleSendSalary(s)}>Send Salary Slip</CDropdownItem>
-                    </CDropdownMenu>
-                  </CDropdown>
-                </CTableDataCell>
+    <CCard>
+      <div>
+        <CCardHeader>
+          <div className='d-flex justify-content-between align-items-end mt-2 mb-2'>
+            <h4>Payrolls</h4>
+            <CButton color="primary" onClick={() => setCreateModalVisible(true)}>
+              <i className="cui-plus"></i> Add New
+            </CButton>
+          </div>
+        </CCardHeader>
+        <CCardBody>
+          <CTable bordered>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Employee Name</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Month</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Year</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Holiday Overtime Days</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Normal Overtime Days</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Unpaid Days</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Other Deductions</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Total Salary</CTableHeaderCell>
+                <CTableHeaderCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>Action</CTableHeaderCell>
               </CTableRow>
-            ))
-          )}
-        </CTableBody>
+            </CTableHead>
+            <CTableBody>
+              {payroll.length === 0 ? (
+                <CTableRow>
+                  <CTableDataCell colSpan={9} style={{ textAlign: 'center' }}>
+                    No data available
+                  </CTableDataCell>
+                </CTableRow>
+              ) : (
+                payroll.map((s) => (
+                  <CTableRow key={s.id}>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.employee_full_name}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{getMonthName(s.month)}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.year}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.overtime_days || 0}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.normal_overtime_days || 0}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.unpaid_days}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>{s.other_deductions || 0}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>AED {s.total_salary_for_month}</CTableDataCell>
+                    <CTableDataCell style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                      <CDropdown>
+                        <CDropdownToggle color="secondary">Actions</CDropdownToggle>
+                        <CDropdownMenu>
+                          <CDropdownItem onClick={() => handleView(s)}>View</CDropdownItem>
+                          <CDropdownItem onClick={() => handleEdit(s)}>Edit</CDropdownItem>
+                          <CDropdownItem onClick={() => handleSendSalary(s)}>Send Salary Slip</CDropdownItem>
+                        </CDropdownMenu>
+                      </CDropdown>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))
+              )}
+            </CTableBody>
 
-      </CTable>
+          </CTable>
+        </CCardBody>
 
-      {/* Modal for Viewing Employee Details */}
-      <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg" centered>
-        <CModalHeader style={{ backgroundColor: '#f8f9fa' }}>
-          <CModalTitle className="text-center" style={{ fontWeight: 'bold', color: '#4e73df' }}>
-            Employee Payroll Slip
-          </CModalTitle>
-        </CModalHeader>
-        <CModalBody style={{ backgroundColor: '#f0f3f5' }}>
-          {selectedEmployeePayroll && (
-            <CCard className="border-0 shadow-sm">
-              <CCardHeader className="text-center" style={{ backgroundColor: '#4e73df', color: 'white' }}>
-                <strong>Payroll Slip</strong> <br />
-                <small>
-                  {getMonthName(selectedEmployeePayroll.month)} {selectedEmployeePayroll.year} - {selectedEmployeePayroll.employee_full_name}
-                </small>
+        {/* Modal for Viewing Employee Details */}
+        <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg" centered>
+          <CModalHeader style={{ backgroundColor: '#f8f9fa' }}>
+            <CModalTitle className="text-center" style={{ fontWeight: 'bold', color: '#4e73df' }}>
+              Employee Payroll Slip
+            </CModalTitle>
+          </CModalHeader>
+          <CModalBody style={{ backgroundColor: '#f0f3f5' }}>
+            {selectedEmployeePayroll && (
+              <CCard className="border-0 shadow-sm">
+                <CCardHeader className="text-center" style={{ backgroundColor: '#4e73df', color: 'white' }}>
+                  <strong>Payroll Slip</strong> <br />
+                  <small>
+                    {getMonthName(selectedEmployeePayroll.month)} {selectedEmployeePayroll.year} - {selectedEmployeePayroll.employee_full_name}
+                  </small>
+                </CCardHeader>
+                <CCardBody>
+                  <CRow>
+                    <CCol md={12}>
+                      <p><strong style={{ marginRight: '10px' }}>Employee Full Name:</strong>{selectedEmployeePayroll.employee_full_name}</p>
+                      <p><strong style={{ marginRight: '10px' }}>Gross Salary:</strong>AED {selectedEmployeePayroll.current_gross_salary}</p>
+                      <p><strong style={{ marginRight: '10px' }}>Basic Salary:</strong>AED {selectedEmployeePayroll.current_basic_salary}</p>
+                      <p><strong style={{ marginRight: '10px' }}>Per day salary:</strong>AED {selectedEmployeePayroll.current_daily_salary}</p>
+                    </CCol>
+                  </CRow>
+                  <CRow>
+                    <CCol md={12}>
+                      <hr />
+                      <p><strong style={{ marginRight: '10px' }}>Total Workable Days:</strong> {selectedEmployeePayroll.total_workable_days || 30}</p>
+                      <p><strong style={{ marginRight: '10px' }}>Holiday Overtime Days:</strong> {selectedEmployeePayroll.overtime_days}</p>
+                      <p>
+                        <strong style={{ marginRight: '10px' }}>Holiday Overtime Amount:</strong>
+                        AED {selectedEmployeePayroll.overtime_amount}
+                      </p>
+                      <p><strong style={{ marginRight: '10px' }}>Normal Overtime Days:</strong> {selectedEmployeePayroll.normal_overtime_days || 0}</p>
+                      <p>
+                        <strong style={{ marginRight: '10px' }}>Normal Overtime Amount:</strong>
+                        AED {selectedEmployeePayroll.normal_overtime_amount}
+                      </p>
+                      <p><strong style={{ marginRight: '10px' }}>Unpaid Days:</strong>{selectedEmployeePayroll.unpaid_days}</p>
+                      <p>
+                        <strong style={{ marginRight: '10px' }}>Total Unpaid Deduction:</strong>
+                        AED {selectedEmployeePayroll.unpaid_amount}
+                      </p>
+                    </CCol>
+                  </CRow>
+                  <CRow>
+                    <CCol md={12}>
+                      <hr />
+                      <p><strong style={{ marginRight: '10px' }}>Other Deductions:</strong>AED {selectedEmployeePayroll.other_deductions || 0}</p>
+                      <p><strong style={{ marginRight: '10px' }}>Remarks:</strong> {selectedEmployeePayroll.remarks || "N/A"}</p>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          padding: '10px',
+                          backgroundColor: '#d4edda', // light green background
+                          border: '2px solidrgb(34, 155, 62)', // dark green border
+                          borderRadius: '12px', // rounded corners
+                          color: '#155724', // dark green text color
+                        }}
+                      >
+                        <p style={{
+                          padding: 0, margin: 0
+                        }}><strong style={{ marginRight: '10px' }}>Total Salary for the Month:</strong>AED {selectedEmployeePayroll.total_salary_for_month}</p>
+                      </div>
+                    </CCol>
+                  </CRow>
+                </CCardBody>
+                <CCardFooter className="text-center" style={{ backgroundColor: '#f8f9fa' }}>
+                  <p style={{ fontStyle: 'italic', color: '#6c757d' }}>
+                    Please check all the information before sending the salary slip to employees
+                  </p>
+                </CCardFooter>
+              </CCard>
+            )}
+          </CModalBody>
+        </CModal>
+
+        {/* Modal for Creating Salary Details */}
+        <CModal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} size="lg" centered>
+          <CModalHeader>
+            <CModalTitle>Create Payroll</CModalTitle>
+          </CModalHeader>
+          <CModalBody>
+            <CCard>
+              <CCardHeader className="bg-light text-black">
+                <strong>Monthly Salary Breakdown</strong>
               </CCardHeader>
               <CCardBody>
-                <CRow>
-                  <CCol md={12}>
-                    <p><strong style={{ marginRight: '10px' }}>Employee Full Name:</strong>{selectedEmployeePayroll.employee_full_name}</p>
-                    <p><strong style={{ marginRight: '10px' }}>Gross Salary:</strong>AED {selectedEmployeePayroll.current_gross_salary}</p>
-                    <p><strong style={{ marginRight: '10px' }}>Basic Salary:</strong>AED {selectedEmployeePayroll.current_basic_salary}</p>
-                    <p><strong style={{ marginRight: '10px' }}>Per day salary:</strong>AED {selectedEmployeePayroll.current_daily_salary}</p>
-                  </CCol>
-                </CRow>
-                <CRow>
-                  <CCol md={12}>
-                    <hr />
-                    <p><strong style={{ marginRight: '10px' }}>Total Workable Days:</strong> {selectedEmployeePayroll.total_workable_days || 30}</p>
-                    <p><strong style={{ marginRight: '10px' }}>Holiday Overtime Days:</strong> {selectedEmployeePayroll.overtime_days}</p>
-                    <p>
-                      <strong style={{ marginRight: '10px' }}>Holiday Overtime Amount:</strong>
-                      AED {selectedEmployeePayroll.overtime_amount}
-                    </p>
-                    <p><strong style={{ marginRight: '10px' }}>Normal Overtime Days:</strong> {selectedEmployeePayroll.normal_overtime_days || 0}</p>
-                    <p>
-                      <strong style={{ marginRight: '10px' }}>Normal Overtime Amount:</strong>
-                      AED {selectedEmployeePayroll.normal_overtime_amount}
-                    </p>
-                    <p><strong style={{ marginRight: '10px' }}>Unpaid Days:</strong>{selectedEmployeePayroll.unpaid_days}</p>
-                    <p>
-                      <strong style={{ marginRight: '10px' }}>Total Unpaid Deduction:</strong>
-                      AED {selectedEmployeePayroll.unpaid_amount}
-                    </p>
-                  </CCol>
-                </CRow>
-                <CRow>
-                  <CCol md={12}>
-                    <hr />
-                    <p><strong style={{ marginRight: '10px' }}>Other Deductions:</strong>AED {selectedEmployeePayroll.other_deductions || 0}</p>
-                    <p><strong style={{ marginRight: '10px' }}>Remarks:</strong> {selectedEmployeePayroll.remarks || "N/A"}</p>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        padding: '10px',
-                        backgroundColor: '#d4edda', // light green background
-                        border: '2px solidrgb(34, 155, 62)', // dark green border
-                        borderRadius: '12px', // rounded corners
-                        color: '#155724', // dark green text color
-                      }}
+                {alertVisible && (
+                  <CAlert color="danger" onClose={() => setAlertVisible(false)} dismissible>
+                    {errorMessage}
+                  </CAlert>
+                )}
+                {successAlertVisible && (
+                  <CAlert color="success" onClose={() => setSuccessAlertVisible(false)} dismissible>
+                    {successMessage}
+                  </CAlert>
+                )}
+
+                <CRow className="mb-4">
+                  <CCol md={6} className="mb-3">
+                    <label>Employee Name <span style={{ color: 'red' }}>*</span></label>
+                    <CFormSelect
+                      value={selectedEmployee}
+                      onChange={handleEmployeeChange}
                     >
-                      <p style={{
-                        padding: 0, margin: 0
-                      }}><strong style={{ marginRight: '10px' }}>Total Salary for the Month:</strong>AED {selectedEmployeePayroll.total_salary_for_month}</p>
-                    </div>
+                      <option value="">Select Employee</option>
+                      {employees.map((employee) => (
+                        <option key={employee.id} value={employee.id}>
+                          {employee.first_name} {employee.last_name}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+
+                  <CCol md={6} className="mb-3">
+                    <label>Select Month and Year <span style={{ color: 'red' }}>*</span></label>
+                    <DatePicker
+                      selected={month && year ? new Date(year, month - 1) : null}
+                      onChange={handleDateChange}
+                      dateFormat="MM/yyyy"
+                      showMonthYearPicker
+                      placeholderText="Select month and year"
+                      className="form-control"
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        fontSize: '1rem',
+                        border: '1px solid #ced4da',
+                        borderRadius: '4px',
+                        backgroundColor: '#fff',
+                        transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                      }}
+                      calendarClassName="custom-datepicker"
+                      popperStyle={{
+                        fontFamily: 'Arial, sans-serif',
+                        fontSize: '14px',
+                        border: '1px solid #e3e3e3',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                      }}
+                    />
+                  </CCol>
+                  <CCol md={6} className="mb-3">
+                    <label>Total Working Days <span style={{ color: 'red' }}>*</span></label>
+                    <CFormInput
+                      type="number"
+                      value={totalWorkableDays}
+                      onChange={(e) => handleInputChange(e, setTotalWorkableDays)}
+                    />
+                  </CCol>
+
+
+                  <CCol md={6} className="mb-3">
+                    <label>Holiday Overtime Days <span style={{ color: 'red' }}>*</span></label>
+                    <CFormInput
+                      type="number"
+                      value={overtimeDays}
+                      onChange={(e) => handleInputChange(e, setOverTimeDays)}
+                    />
+                  </CCol>
+                  <CCol md={6} className="mb-3">
+                    <label>Normal Overtime Days <span style={{ color: 'red' }}>*</span></label>
+                    <CFormInput
+                      type="number"
+                      value={normalOvertimeDays}
+                      onChange={(e) => handleInputChange(e, setNormalOvertimeDays)}
+                    />
+                  </CCol>
+
+                  <CCol md={6} className="mb-3">
+                    <label>Unpaid Leaves <span style={{ color: 'red' }}>*</span></label>
+                    <CFormInput
+                      type="number"
+                      value={unpaidDays}
+                      onChange={(e) => handleInputChange(e, setUnpaidDays)}
+                    />
+                  </CCol>
+
+                  <CCol md={6} className="mb-3">
+                    <label>Other Deductions</label>
+                    <CFormInput
+                      type="number"
+                      value={otherDeduction}
+                      onChange={(e) => handleInputChange(e, setOtherDeduction)}
+                    />
+                  </CCol>
+                  <CCol md={6} className="mb-3">
+                    <label>Remarks</label>
+                    <CFormInput
+                      value={remarks}
+                      onChange={(e) => handleInputChange(e, setRemarks)}
+                    />
+                  </CCol>
+
+                  <CCol md={12} className="text-start">
+                    <p><strong>Holiday overtime amount: </strong>{(overtimeAmount || 0).toFixed(2)}</p>
+                    <p><strong>Normal overtime amount: </strong>{(normalOvertimeAmount || 0).toFixed(2)}</p>
+                    <p><strong>Unpaid leaves amount: </strong>{(UnpaidAmount || 0).toFixed(2)}</p>
+                    <p><strong>Total Salary with workable days</strong> {(totalWorkableDays || 30)}</p>
+                    <p><strong>Total Salary for the month Salary: </strong>{(calculatedTotalSalary || 0).toFixed(2)}</p>
                   </CCol>
                 </CRow>
+                <CButton color="primary" onClick={handleCreateRecord} disabled={!selectedEmployee} className="mt-3" block>
+                  Save Payroll Record
+                </CButton>
               </CCardBody>
-              <CCardFooter className="text-center" style={{ backgroundColor: '#f8f9fa' }}>
-                <p style={{ fontStyle: 'italic', color: '#6c757d' }}>
-                  Please check all the information before sending the salary slip to employees
-                </p>
-              </CCardFooter>
             </CCard>
-          )}
-        </CModalBody>
-      </CModal>
+          </CModalBody>
+        </CModal>
 
-      {/* Modal for Creating Salary Details */}
-      <CModal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} size="lg" centered>
-        <CModalHeader>
-          <CModalTitle>Create Payroll</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CCard>
-            <CCardHeader className="bg-light text-black">
-              <strong>Monthly Salary Breakdown</strong>
-            </CCardHeader>
-            <CCardBody>
-              {alertVisible && (
-                <CAlert color="danger" onClose={() => setAlertVisible(false)} dismissible>
-                  {errorMessage}
+        {selectedRecord && (
+          <CModal visible={editModalVisible} onClose={() => setEditModalVisible(false)} size="lg" centered>
+            <CModalHeader>
+              <CModalTitle>Edit Salary Record</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+              {/* Alerts */}
+              {editAlertVisible && (
+                <CAlert color="danger" onClose={() => setEditAlertVisible(false)} dismissible>
+                  {editErrorMessage}
                 </CAlert>
               )}
-              {successAlertVisible && (
-                <CAlert color="success" onClose={() => setSuccessAlertVisible(false)} dismissible>
-                  {successMessage}
+              {editSuccessAlertVisible && (
+                <CAlert color="success" onClose={() => setEditSuccessAlertVisible(false)} dismissible>
+                  {editSuccessMessage}
                 </CAlert>
               )}
-
-              <CRow className="mb-4">
-                <CCol md={6} className="mb-3">
-                  <label>Employee Name <span style={{ color: 'red' }}>*</span></label>
-                  <CFormSelect
-                    value={selectedEmployee}
-                    onChange={handleEmployeeChange}
+              <CRow>
+                {/* Month Picker */}
+                <CCol md={6} style={{ marginBottom: '15px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      display: 'block',
+                    }}
                   >
-                    <option value="">Select Employee</option>
-                    {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                        {employee.first_name} {employee.last_name}
+                    Month
+                  </label>
+                  <CFormSelect
+                    value={selectedRecord.month}
+                    onChange={(e) => handleInputEditChange({ target: { value: parseInt(e.target.value) } }, 'month')}
+                    style={{
+                      padding: '10px',
+                      borderRadius: '5px',
+                      border: '1px solid #ccc',
+                      fontSize: '14px',
+                      width: '100%',
+                    }}
+                  >
+                    <option value="">Select Month</option>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {new Date(0, i).toLocaleString('default', { month: 'long' })}
                       </option>
                     ))}
                   </CFormSelect>
                 </CCol>
 
-                <CCol md={6} className="mb-3">
-                  <label>Select Month and Year <span style={{ color: 'red' }}>*</span></label>
+                {/* Year Picker */}
+                <CCol md={6} style={{ marginBottom: '15px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      display: 'block',
+                    }}
+                  >
+                    Year
+                  </label>
                   <DatePicker
-                    selected={month && year ? new Date(year, month - 1) : null}
-                    onChange={handleDateChange}
-                    dateFormat="MM/yyyy"
-                    showMonthYearPicker
-                    placeholderText="Select month and year"
-                    className="form-control"
+                    selected={new Date(selectedRecord.year, 0)} // Selects only the year
+                    onChange={(date) =>
+                      handleInputEditChange({ target: { value: date.getFullYear() } }, 'year')
+                    }
+                    dateFormat="yyyy" // Year only
+                    showYearPicker // Enables year picker
+                    placeholderText="Select Year"
+                    className="form-control" // To match Bootstrap's input styling
                     style={{
                       width: '100%',
                       padding: '10px',
-                      fontSize: '1rem',
-                      border: '1px solid #ced4da',
-                      borderRadius: '4px',
-                      backgroundColor: '#fff',
-                      transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                    }}
-                    calendarClassName="custom-datepicker"
-                    popperStyle={{
-                      fontFamily: 'Arial, sans-serif',
                       fontSize: '14px',
-                      border: '1px solid #e3e3e3',
-                      borderRadius: '4px',
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                      border: '1px solid #ccc',
+                      borderRadius: '5px',
+                      backgroundColor: '#fff',
                     }}
                   />
                 </CCol>
-                <CCol md={6} className="mb-3">
-                  <label>Total Working Days <span style={{ color: 'red' }}>*</span></label>
+
+                {/* Other Fields */}
+                <CCol md={6} style={{ marginBottom: '15px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      display: 'block',
+                    }}
+                  >
+                    Overtime Days
+                  </label>
                   <CFormInput
                     type="number"
-                    value={totalWorkableDays}
-                    onChange={(e) => handleInputChange(e, setTotalWorkableDays)}
+                    value={selectedRecord.overtime_days}
+                    onChange={(e) => handleInputEditChange(e, 'overtime_days')}
+                    style={{
+                      padding: '10px',
+                      fontSize: '14px',
+                      borderRadius: '5px',
+                      border: '1px solid #ccc',
+                      width: '100%',
+                    }}
                   />
                 </CCol>
-
-
-                <CCol md={6} className="mb-3">
-                  <label>Holiday Overtime Days <span style={{ color: 'red' }}>*</span></label>
+                <CCol md={6} style={{ marginBottom: '15px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      display: 'block',
+                    }}
+                  >
+                    Normal Overtime Days
+                  </label>
                   <CFormInput
                     type="number"
-                    value={overtimeDays}
-                    onChange={(e) => handleInputChange(e, setOverTimeDays)}
+                    value={selectedRecord.normal_overtime_days}
+                    onChange={(e) => handleInputEditChange(e, 'normal_overtime_days')}
+                    style={{
+                      padding: '10px',
+                      fontSize: '14px',
+                      borderRadius: '5px',
+                      border: '1px solid #ccc',
+                      width: '100%',
+                    }}
                   />
                 </CCol>
-                <CCol md={6} className="mb-3">
-                  <label>Normal Overtime Days <span style={{ color: 'red' }}>*</span></label>
+                <CCol md={6} style={{ marginBottom: '15px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      display: 'block',
+                    }}
+                  >
+                    Unpaid Leaves
+                  </label>
                   <CFormInput
                     type="number"
-                    value={normalOvertimeDays}
-                    onChange={(e) => handleInputChange(e, setNormalOvertimeDays)}
+                    value={selectedRecord.unpaid_days}
+                    onChange={(e) => handleInputEditChange(e, 'unpaid_days')}
+                    style={{
+                      padding: '10px',
+                      fontSize: '14px',
+                      borderRadius: '5px',
+                      border: '1px solid #ccc',
+                      width: '100%',
+                    }}
                   />
                 </CCol>
-
-                <CCol md={6} className="mb-3">
-                  <label>Unpaid Leaves <span style={{ color: 'red' }}>*</span></label>
+                <CCol md={6} style={{ marginBottom: '15px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      display: 'block',
+                    }}
+                  >
+                    Other Deduction in AED
+                  </label>
                   <CFormInput
                     type="number"
-                    value={unpaidDays}
-                    onChange={(e) => handleInputChange(e, setUnpaidDays)}
+                    value={selectedRecord.other_deductions}
+                    onChange={(e) => handleInputEditChange(e, 'other_deductions')}
+                    style={{
+                      padding: '10px',
+                      fontSize: '14px',
+                      borderRadius: '5px',
+                      border: '1px solid #ccc',
+                      width: '100%',
+                    }}
                   />
                 </CCol>
-
-                <CCol md={6} className="mb-3">
-                  <label>Other Deductions</label>
+                <CCol md={6} style={{ marginBottom: '15px' }}>
+                  <label
+                    style={{
+                      fontWeight: 'bold',
+                      marginBottom: '5px',
+                      display: 'block',
+                    }}
+                  >
+                    Remarks
+                  </label>
                   <CFormInput
-                    type="number"
-                    value={otherDeduction}
-                    onChange={(e) => handleInputChange(e, setOtherDeduction)}
+                    type="text"
+                    value={selectedRecord.remarks}
+                    onChange={(e) => handleInputEditChange(e, 'remarks')}
+                    style={{
+                      padding: '10px',
+                      fontSize: '14px',
+                      borderRadius: '5px',
+                      border: '1px solid #ccc',
+                      width: '100%',
+                    }}
                   />
-                </CCol>
-                <CCol md={6} className="mb-3">
-                  <label>Remarks</label>
-                  <CFormInput
-                    value={remarks}
-                    onChange={(e) => handleInputChange(e, setRemarks)}
-                  />
-                </CCol>
-
-                <CCol md={12} className="text-start">
-                  <p><strong>Holiday overtime amount: </strong>{(overtimeAmount || 0).toFixed(2)}</p>
-                  <p><strong>Normal overtime amount: </strong>{(normalOvertimeAmount || 0).toFixed(2)}</p>
-                  <p><strong>Unpaid leaves amount: </strong>{(UnpaidAmount || 0).toFixed(2)}</p>
-                  <p><strong>Total Salary with workable days</strong> {(totalWorkableDays || 30)}</p>
-                  <p><strong>Total Salary for the month Salary: </strong>{(calculatedTotalSalary || 0).toFixed(2)}</p>
                 </CCol>
               </CRow>
-              <CButton color="primary" onClick={handleCreateRecord} disabled={!selectedEmployee} className="mt-3" block>
-                Save Payroll Record
+              <CButton color="primary" onClick={handleUpdateRecord} style={{ marginTop: '15px', padding: '10px 20px' }}>
+                Save Changes
               </CButton>
-            </CCardBody>
-          </CCard>
-        </CModalBody>
-      </CModal>
+            </CModalBody>
+          </CModal>
+        )}
 
-      {selectedRecord && (
-        <CModal visible={editModalVisible} onClose={() => setEditModalVisible(false)} size="lg" centered>
-          <CModalHeader>
-            <CModalTitle>Edit Salary Record</CModalTitle>
-          </CModalHeader>
-          <CModalBody>
-            {/* Alerts */}
-            {editAlertVisible && (
-              <CAlert color="danger" onClose={() => setEditAlertVisible(false)} dismissible>
-                {editErrorMessage}
-              </CAlert>
-            )}
-            {editSuccessAlertVisible && (
-              <CAlert color="success" onClose={() => setEditSuccessAlertVisible(false)} dismissible>
-                {editSuccessMessage}
-              </CAlert>
-            )}
-            <CRow>
-              {/* Month Picker */}
-              <CCol md={6} style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    display: 'block',
-                  }}
-                >
-                  Month
-                </label>
-                <CFormSelect
-                  value={selectedRecord.month}
-                  onChange={(e) => handleInputEditChange({ target: { value: parseInt(e.target.value) } }, 'month')}
-                  style={{
-                    padding: '10px',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    fontSize: '14px',
-                    width: '100%',
-                  }}
-                >
-                  <option value="">Select Month</option>
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {new Date(0, i).toLocaleString('default', { month: 'long' })}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-
-              {/* Year Picker */}
-              <CCol md={6} style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    display: 'block',
-                  }}
-                >
-                  Year
-                </label>
-                <DatePicker
-                  selected={new Date(selectedRecord.year, 0)} // Selects only the year
-                  onChange={(date) =>
-                    handleInputEditChange({ target: { value: date.getFullYear() } }, 'year')
-                  }
-                  dateFormat="yyyy" // Year only
-                  showYearPicker // Enables year picker
-                  placeholderText="Select Year"
-                  className="form-control" // To match Bootstrap's input styling
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    fontSize: '14px',
-                    border: '1px solid #ccc',
-                    borderRadius: '5px',
-                    backgroundColor: '#fff',
-                  }}
-                />
-              </CCol>
-
-              {/* Other Fields */}
-              <CCol md={6} style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    display: 'block',
-                  }}
-                >
-                  Overtime Days
-                </label>
-                <CFormInput
-                  type="number"
-                  value={selectedRecord.overtime_days}
-                  onChange={(e) => handleInputEditChange(e, 'overtime_days')}
-                  style={{
-                    padding: '10px',
-                    fontSize: '14px',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    width: '100%',
-                  }}
-                />
-              </CCol>
-              <CCol md={6} style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    display: 'block',
-                  }}
-                >
-                  Normal Overtime Days
-                </label>
-                <CFormInput
-                  type="number"
-                  value={selectedRecord.normal_overtime_days}
-                  onChange={(e) => handleInputEditChange(e, 'normal_overtime_days')}
-                  style={{
-                    padding: '10px',
-                    fontSize: '14px',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    width: '100%',
-                  }}
-                />
-              </CCol>
-              <CCol md={6} style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    display: 'block',
-                  }}
-                >
-                  Unpaid Leaves
-                </label>
-                <CFormInput
-                  type="number"
-                  value={selectedRecord.unpaid_days}
-                  onChange={(e) => handleInputEditChange(e, 'unpaid_days')}
-                  style={{
-                    padding: '10px',
-                    fontSize: '14px',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    width: '100%',
-                  }}
-                />
-              </CCol>
-              <CCol md={6} style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    display: 'block',
-                  }}
-                >
-                  Other Deduction in AED
-                </label>
-                <CFormInput
-                  type="number"
-                  value={selectedRecord.other_deductions}
-                  onChange={(e) => handleInputEditChange(e, 'other_deductions')}
-                  style={{
-                    padding: '10px',
-                    fontSize: '14px',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    width: '100%',
-                  }}
-                />
-              </CCol>
-              <CCol md={6} style={{ marginBottom: '15px' }}>
-                <label
-                  style={{
-                    fontWeight: 'bold',
-                    marginBottom: '5px',
-                    display: 'block',
-                  }}
-                >
-                  Remarks
-                </label>
-                <CFormInput
-                  type="text"
-                  value={selectedRecord.remarks}
-                  onChange={(e) => handleInputEditChange(e, 'remarks')}
-                  style={{
-                    padding: '10px',
-                    fontSize: '14px',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    width: '100%',
-                  }}
-                />
-              </CCol>
-            </CRow>
-            <CButton color="primary" onClick={handleUpdateRecord} style={{ marginTop: '15px', padding: '10px 20px' }}>
-              Save Changes
-            </CButton>
-          </CModalBody>
-        </CModal>
-      )}
-
-    </div>
+      </div>
+    </CCard>
   )
 }
 

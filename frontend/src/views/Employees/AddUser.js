@@ -60,10 +60,10 @@ const AddUser = () => {
 
   return (
     <div className="bg-light min-vh-100">
-      <CContainer className="py-4">
+      <CContainer className='mt-2 mb-2'>
         <CCard className="shadow-sm">
-          <CCardHeader className="text-center bg-light text-black">
-            <h2>Register User</h2>
+          <CCardHeader className="bg-light text-black">
+            <h4>Register User</h4>
           </CCardHeader>
           <CCardBody>
             {alert.visible && (
