@@ -273,7 +273,7 @@ const AddEmployee = () => {
 
     useEffect(() => {
         if (!token) {
-            navigate('/');
+            window.location.href = "/";
             return;
         }
         axios
@@ -289,8 +289,7 @@ const AddEmployee = () => {
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
                     localStorage.removeItem('authToken');
-                    window.location.reload();
-                    navigate('/');
+                    window.location.href = '/'
                 }
             });
     }, [navigate, token]);
@@ -363,7 +362,7 @@ const AddEmployee = () => {
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
                     localStorage.removeItem('authToken');
-                    window.location.reload();
+                    window.location.href = '/'
                     return;
                 }
                 if (error.response && error.response.status === 400) {

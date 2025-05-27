@@ -32,7 +32,7 @@ const EmployeeOwnLeaveBalance = () => {
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 localStorage.removeItem("authToken");
-                window.location.reload();
+                window.location.href = '/'
             }
             if (error.response && error.response.status === 404) {
                 setLeaveBalance(null);
@@ -56,7 +56,7 @@ const EmployeeOwnLeaveBalance = () => {
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 localStorage.removeItem("authToken");
-                window.location.reload();
+                window.location.href = '/'
             }
         }
     };
@@ -64,7 +64,7 @@ const EmployeeOwnLeaveBalance = () => {
 
     useEffect(() => {
         if (!token) {
-            window.location.reload();
+            window.location.href = '/';
             return;
         }
         fetchLeaveBalance();

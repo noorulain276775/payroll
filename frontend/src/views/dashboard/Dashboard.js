@@ -16,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const authToken = localStorage.getItem('authToken');
     if (!authToken) {
-      window.location.reload();
+      window.location.href = '/'
     }
   }, [navigate]);
 
@@ -31,7 +31,7 @@ const Dashboard = () => {
       } catch (error) {
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           localStorage.removeItem('authToken');
-          window.location.reload();
+          window.location.href = '/'
         } else {
           console.error('Error fetching dashboard data:', error);
         }
@@ -47,7 +47,7 @@ const Dashboard = () => {
       } catch (error) {
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           localStorage.removeItem('authToken');
-          window.location.reload();
+          window.location.href = '/'
         } else {
           console.error('Error fetching new employees:', error);
         }

@@ -29,7 +29,7 @@ const EmployeeSalaryRevisions = () => {
 
   useEffect(() => {
     if (!token) {
-      window.location.reload()
+      window.location.href = '/'
       return
     }
 
@@ -47,7 +47,7 @@ const EmployeeSalaryRevisions = () => {
           localStorage.removeItem('authToken')
           localStorage.removeItem('user')
           localStorage.removeItem('user_type')
-          window.location.reload()
+          window.location.href = '/'
         } else {
           setError('Failed to fetch salary revisions.')
         }

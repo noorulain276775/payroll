@@ -19,7 +19,7 @@ const EmployeeLeavesRequests = () => {
   const token = localStorage.getItem('authToken')
   useEffect(() => {
     if (!token) {
-      window.location.reload()
+      window.location.href = '/';
       return
     }
 
@@ -36,7 +36,7 @@ const EmployeeLeavesRequests = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
-          window.location.reload()
+          window.location.href = '/';
         }
       }
     }

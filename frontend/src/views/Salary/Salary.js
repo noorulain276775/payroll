@@ -59,7 +59,7 @@ const Salary = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate('/');
+      window.location.href = '/';
       return;
     }
 
@@ -86,7 +86,7 @@ const Salary = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
-          window.location.reload();
+          window.location.href = '/'
         }
       }
     };
@@ -103,7 +103,7 @@ const Salary = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
-          window.location.reload();
+          window.location.href = '/'
         }
       }
     };

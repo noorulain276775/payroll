@@ -78,7 +78,7 @@ const EmployeeApplyLeaves = () => {
       setError('Error submitting leave application.');
       if (err.response && err.response.status === 401) {
         localStorage.removeItem('authToken');
-        window.location.reload();
+        window.location.href = '/';
       }
       if (err.response && err.response.status === 400) {
         setError('Invalid data. Please check your input.');

@@ -25,7 +25,7 @@ const ManageLeaveRequests = () => {
 
   useEffect(() => {
     if (!token) {
-      window.location.reload()
+      window.location.href = '/'
       return
     }
 
@@ -41,7 +41,7 @@ const ManageLeaveRequests = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
-          window.location.reload()
+          window.location.href = '/'
         }
       }
     }
