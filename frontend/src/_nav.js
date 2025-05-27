@@ -59,6 +59,12 @@ const adminNav = [
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Leaves Summary',
+    to: '/employees/leaves-summary',
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+  },
+  {
 
     component: CNavItem,
     name: 'Employees Leave Balances',

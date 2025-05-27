@@ -7,7 +7,9 @@ from .serializers import LeaveSerializer, LeaveBalanceSerializer, LeaveAccrualSe
 from employees.models import Employee
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.db.models import Case, When, Value, IntegerField
+from django.db.models import Case, When, Value, IntegerField, Sum
+from django.utils.timezone import now
+
 
 # List and create leave
 class LeaveListCreateAPIView(generics.ListCreateAPIView):
@@ -49,6 +51,32 @@ class LeaveDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         employee = get_object_or_404(Employee, user=self.request.user)
         return Leave.objects.filter(employee=employee)
     
+
+class EmployeeLeaveListAPIView(generics.ListAPIView):
+    serializer_class = LeaveSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = get_object_or_404(Employee, user=self.request.user)
+        return Leave.objects.filter(employee=employee)
+    
+class EmployeeApprovedLeaveListAPIView(generics.ListAPIView):
+    serializer_class = LeaveSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        employee = get_object_or_404(Employee, user=self.request.user)
+        return Leave.objects.filter(employee=employee).filter(status='Approved')
+    
+
+class AdminLeaveSummaryAPIView(generics.ListAPIView):
+    serializer_class = LeaveSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        return Leave.objects.filter(status='Approved')
+
+    
 class LeaveApproveAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -75,12 +103,18 @@ class LeaveBalanceAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        employee = get_object_or_404(Employee, user=request.user)
+        user_id = request.user.id
+        if not user_id:
+            return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+        employee = Employee.objects.filter(user=user_id).first()
+        if not employee:
+            return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
         balance = get_object_or_404(LeaveBalance, employee=employee)
         serializer = LeaveBalanceSerializer(balance)
         return Response(serializer.data)
     
 class LeaveBalanceListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = LeaveBalance.objects.select_related('employee').all()
     serializer_class = LeaveBalanceSerializer
     permission_classes = [IsAdminUser]

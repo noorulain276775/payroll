@@ -120,8 +120,9 @@ const Payroll = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('user_type');
           window.location.reload();
-          navigate('/');
         }
       }
     };

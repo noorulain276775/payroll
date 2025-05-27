@@ -225,6 +225,12 @@ const AddEmployee = () => {
             setAlertVisible(true);
             return false;
         }
+        if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(companyEmail)) {
+            setAlertMessage("Invalid company email format.");
+            setAlertColor("danger");
+            setAlertVisible(true);
+            return false;
+        }
         if (photo && !/\.(jpg|jpeg|png)$/i.test(photo.name)) {
             setAlertMessage("Photo must be a JPG, JPEG, or PNG.");
             setAlertColor("danger");
@@ -355,6 +361,18 @@ const AddEmployee = () => {
                 }, 200);
             })
             .catch((error) => {
+                if (error.response && error.response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    window.location.reload();
+                    return;
+                }
+                if (error.response && error.response.status === 400) {
+                    setAlertMessage('Error: ' + 'Check either email format is not correct or user is already registered with this email');
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setAlertColor('danger');
+                    setAlertVisible(true);
+                    return;
+                }
                 setAlertMessage(`Error: ${error.response.data.error}`);
                 setAlertColor('danger');
                 setAlertVisible(true);

@@ -51,3 +51,6 @@ class LeaveAccrualSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveAccrual
         fields = '__all__'
+
+
+

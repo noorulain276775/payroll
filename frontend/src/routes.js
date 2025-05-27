@@ -37,21 +37,23 @@ const ChangePassword = React.lazy(() => import('./views/ChangePassword/ChangePas
 // Salary Revisions
 const SalaryRevisions = React.lazy(() => import('./views/Salary/SalaryRevisions'))
 // Admin View Annual Leaves
-const EmployeeAnnualLeaves = React.lazy(() => import('./views/AnnualLeaves/EmployeeAnnualLeaves'))
+const EmployeeAnnualLeaves = React.lazy(() => import('./views/Leaves/EmployeeDashboard/EmployeeApplyLeaves'))
 
 // Employee Annual Leaves
-const AdminAnnualLeaves = React.lazy(() => import('./views/AnnualLeaves/AdminAnnualLeaves'))
+const AdminAnnualLeaves = React.lazy(() => import('./views/Leaves/AdminDashboard/ManageLeaveRequests'))
 
 // Employee Leave Balances Creation for each leave type
-const AdminCreatingLeaveBalances = React.lazy(() => import('./views/AnnualLeaves/EmployeeLeaveBalances'))
+const AdminCreatingLeaveBalances = React.lazy(() => import('./views/Leaves/AdminDashboard/EmployeeLeaveBalances'))
 
 // Employee Leave Request History
-const EmployeeLeavesRequests = React.lazy(() => import('./views/AnnualLeaves/EmployeeLeavesRequests'))
+const EmployeeLeavesRequests = React.lazy(() => import('./views/Leaves/EmployeeDashboard/EmployeeLeavesRequests'))
 
 // Employee Salary Revisions
 const EmployeeSalaryRevisions = React.lazy(() => import('./views/Salary/EmployeeSalaryRevisions'))
 
-const EmployeeOwnLeaveBalance = React.lazy(() => import('./views/AnnualLeaves/EmployeeOwnLeaveBalance'))
+const EmployeeOwnLeaveBalance = React.lazy(() => import('./views/Leaves/EmployeeDashboard/EmployeeOwnLeaveBalance'))
+
+const EmployeeLeavesSummary = React.lazy(() => import('./views/Leaves/AdminDashboard/EmployeeLeavesSummary'));
 
 const routes = [
   // Admin Routes
@@ -64,6 +66,7 @@ const routes = [
   { path: '/employees/salary-revision', name: 'Salary Revisions', element: SalaryRevisions, allowedRoles: ['Admin'] },
   { path: '/employees/leave-applications', name: 'Employees Annual Leaves', element: AdminAnnualLeaves, allowedRoles: ['Admin'] },
   { path: '/employees/leave-balances', name: 'Leave Balances', element: AdminCreatingLeaveBalances, allowedRoles: ['Admin'] },
+  { path: '/employees/leaves-summary', name: 'Leave Summary', element: EmployeeLeavesSummary, allowedRoles: ['Admin'] },
 
 
   // For both (Admin and Employee)

@@ -32,9 +32,9 @@ const AppHeaderDropdown = () => {
         }
       );
       localStorage.removeItem('authToken');
-      window.location.reload();
       localStorage.removeItem('refreshToken');
       localStorage.setItem("logged_in_status", JSON.stringify(false));
+      window.location.reload();
 
     } catch (error) {
       console.error('Logout failed:', error);

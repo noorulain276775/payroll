@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CForm, CFormLabel, CFormInput, CFormTextarea, CFormSelect, CButton, CAlert, CCard, CCardHeader, CCardBody } from '@coreui/react';
-import { BASE_URL } from '../../../config';
+import { BASE_URL } from '../../../../config';
 
 const leaveTypeOptions = [
   'Annual',
@@ -15,7 +15,7 @@ const leaveTypeOptions = [
   'Other',
 ];
 
-const EmployeeAnnualLeaves = () => {
+const EmployeeApplyLeaves = () => {
   const [leaveType, setLeaveType] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -176,4 +176,4 @@ const EmployeeAnnualLeaves = () => {
   );
 };
 
-export default EmployeeAnnualLeaves;
+export default EmployeeApplyLeaves;
