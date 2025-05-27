@@ -34,7 +34,7 @@ const AppHeaderDropdown = () => {
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
       localStorage.setItem("logged_in_status", JSON.stringify(false));
-      navigate('/', { replace: true });
+      window.location.href = '/';
 
     } catch (error) {
       console.error('Logout failed:', error);
