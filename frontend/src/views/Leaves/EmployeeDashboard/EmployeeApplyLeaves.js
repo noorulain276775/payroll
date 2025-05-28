@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CForm, CFormLabel, CFormInput, CFormTextarea, CFormSelect, CButton, CAlert, CCard, CCardHeader, CCardBody } from '@coreui/react';
-import { BASE_URL } from '../../../config';
+import { BASE_URL } from '../../../../config';
 
 const leaveTypeOptions = [
   'Annual',
@@ -15,7 +15,7 @@ const leaveTypeOptions = [
   'Other',
 ];
 
-const EmployeeAnnualLeaves = () => {
+const EmployeeApplyLeaves = () => {
   const [leaveType, setLeaveType] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -78,7 +78,7 @@ const EmployeeAnnualLeaves = () => {
       setError('Error submitting leave application.');
       if (err.response && err.response.status === 401) {
         localStorage.removeItem('authToken');
-        window.location.reload();
+        window.location.href = '/';
       }
       if (err.response && err.response.status === 400) {
         setError('Invalid data. Please check your input.');
@@ -176,4 +176,4 @@ const EmployeeAnnualLeaves = () => {
   );
 };
 
-export default EmployeeAnnualLeaves;
+export default EmployeeApplyLeaves;

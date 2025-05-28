@@ -79,7 +79,7 @@ const Employees = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate('/')
+      window.location.href = '/';
       return
     }
     axios
@@ -94,8 +94,7 @@ const Employees = () => {
       .catch((error) => {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
-          window.location.reload();
-          navigate('/')
+          window.location.href = '/'
         }
       })
   }, [navigate, token])
@@ -154,7 +153,7 @@ const Employees = () => {
 
   const handleEditSubmit = () => {
     if (!token) {
-      navigate('/');
+      window.location.href = '/';
       return;
     }
 
@@ -185,8 +184,7 @@ const Employees = () => {
         console.error('Error updating employee:', error.response?.data || error.message);
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
-          window.location.reload();
-          navigate('/');
+          window.location.href = '/'
         }
       });
   };

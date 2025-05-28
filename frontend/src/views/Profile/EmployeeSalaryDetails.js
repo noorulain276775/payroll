@@ -36,8 +36,7 @@ const EmployeeSalaryDetails = () => {
           localStorage.removeItem('authToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user_type');
-          window.location.reload();
-          navigate('/');
+          window.location.href = '/'
         }
       });
   }, [navigate, token]);

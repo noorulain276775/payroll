@@ -40,7 +40,6 @@ const SalaryRevisions = () => {
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [ViewModalVisible, setViewModalVisible] = useState(false);
     const [EditModalVisible, setEditModalVisible] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [employees, setEmployees] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState('');
@@ -81,10 +80,8 @@ const SalaryRevisions = () => {
                 },
             });
             setSalaryRevisions(response.data);
-            setLoading(false);
         } catch (error) {
             setError("There was an error fetching the data.");
-            setLoading(false);
         }
     };
     useEffect(() => {
@@ -103,7 +100,7 @@ const SalaryRevisions = () => {
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 localStorage.removeItem('authToken');
-                window.location.reload();
+                window.location.href = '/'
             }
         }
     };
@@ -261,16 +258,6 @@ const SalaryRevisions = () => {
             console.error(error);
         }
     };
-
-
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
-    }
 
     return (
         <CCard>

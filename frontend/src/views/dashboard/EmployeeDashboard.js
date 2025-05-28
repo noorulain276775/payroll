@@ -16,8 +16,7 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     const authToken = localStorage.getItem('authToken');
     if (!authToken) {
-      window.location.reload();
-      navigate('/');
+      window.location.href = '/';
     }
   }, [navigate]);
 
@@ -32,8 +31,7 @@ const EmployeeDashboard = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
-          window.location.reload();
-          navigate('/');
+          window.location.href = '/';
         } else {
           console.error('Error fetching new employees:', error);
         }

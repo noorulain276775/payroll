@@ -8,7 +8,7 @@ const formatValue = (value) => {
     return 'N/A';
   }
   // Otherwise, return the value formatted to 2 decimal points
-  return parseFloat(value).toFixed(2);
+  return parseFloat(value).toFixed(0);
 }
 
 export const DashboardWidgets = ({

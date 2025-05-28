@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BASE_URL } from '../../../config';
+import { BASE_URL } from '../../../../config';
 import axios from 'axios'
 import {
   CTable,
@@ -11,28 +11,22 @@ import {
   CCard,
   CCardHeader,
   CCardBody,
-  CDropdown,
-  CDropdownToggle,
-  CDropdownMenu,
-  CDropdownItem,
-  CButton,
 } from '@coreui/react'
 
 const EmployeeLeavesRequests = () => {
   const [leaves, setLeaves] = useState([])
 
   const token = localStorage.getItem('authToken')
-
   useEffect(() => {
     if (!token) {
-      window.location.reload()
+      window.location.href = '/';
       return
     }
 
     // Fetch Leaves
     const fetchLeaves = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/leaves/`, {
+        const response = await axios.get(`${BASE_URL}/employee/leaves-requests/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -42,7 +36,7 @@ const EmployeeLeavesRequests = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
-          window.location.reload()
+          window.location.href = '/';
         }
       }
     }

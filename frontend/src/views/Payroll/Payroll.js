@@ -75,7 +75,7 @@ const Payroll = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate('/');
+      window.location.href = '/';
       return;
     }
 
@@ -102,8 +102,7 @@ const Payroll = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
-          window.location.reload();
-          navigate('/');
+          window.location.href = '/';
         }
       }
     };
@@ -120,8 +119,9 @@ const Payroll = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken');
-          window.location.reload();
-          navigate('/');
+          localStorage.removeItem('user');
+          localStorage.removeItem('user_type');
+          window.location.href = '/'
         }
       }
     };

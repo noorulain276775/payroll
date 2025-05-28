@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BASE_URL } from '../../../config';
+import { BASE_URL } from '../../../../config';
 import axios from 'axios'
 import {
   CTable,
@@ -18,14 +18,14 @@ import {
   CCardHeader,
 } from '@coreui/react'
 
-const AdminAnnualLeaves = () => {
+const ManageLeaveRequests = () => {
   const [leaves, setLeaves] = useState([])
 
   const token = localStorage.getItem('authToken')
 
   useEffect(() => {
     if (!token) {
-      window.location.reload()
+      window.location.href = '/'
       return
     }
 
@@ -41,7 +41,7 @@ const AdminAnnualLeaves = () => {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('authToken')
-          window.location.reload()
+          window.location.href = '/'
         }
       }
     }
@@ -172,4 +172,4 @@ const AdminAnnualLeaves = () => {
   )
 }
 
-export default AdminAnnualLeaves
+export default ManageLeaveRequests
