@@ -36,15 +36,26 @@ class UserRegisterView(APIView):
         email = request.data.get('email')
         password = request.data.get('password')
         user_type = request.data.get('user_type')
+
         if CustomUser.objects.filter(username=username).exists():
             return Response({'error': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
-        user = CustomUser.objects.create_user(username=username, email=email, password=password, user_type=user_type)
+
+        is_staff = 1 if user_type in ['Admin', 'Both'] else 0
+
+        user = CustomUser.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            user_type=user_type,
+            is_staff=is_staff
+        )
         user_data = CustomUserSerializer(user).data
-        
+
         return Response({
             'message': 'User registered successfully',
             'user': user_data
         }, status=status.HTTP_201_CREATED)
+
 
 
 class UserListView(APIView):

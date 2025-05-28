@@ -97,6 +97,7 @@ const AddUser = () => {
                   >
                     <option value="Employee">Employee</option>
                     <option value="Admin">Admin</option>
+                    <option value="Both">Both</option>
                   </CFormSelect>
                 </CCol>
               </CRow>
