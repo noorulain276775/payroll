@@ -136,6 +136,12 @@ const bothNav = [
   },
   {
     component: CNavItem,
+    name: 'Add Employee Leaves',
+    to: '/employees/add-leave',
+    icon: <CIcon icon={cilThumbUp} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Leave Requests',
     to: '/employees/leave-applications',
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,

@@ -55,6 +55,8 @@ const EmployeeOwnLeaveBalance = React.lazy(() => import('./views/Leaves/Employee
 
 const EmployeeLeavesSummary = React.lazy(() => import('./views/Leaves/AdminDashboard/EmployeeLeavesSummary'));
 
+const AddEmployeeLeaves = React.lazy(() => import('./views/Leaves/AdminDashboard/AddEmployeeLeaves'));
+
 const routes = [
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees', name: 'Employees', element: Employees, allowedRoles: ['Admin' , 'Both'] },
@@ -66,9 +68,10 @@ const routes = [
   { path: '/employees/leave-applications', name: 'Employees Annual Leaves', element: AdminAnnualLeaves, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees/leave-balances', name: 'Leave Balances', element: AdminCreatingLeaveBalances, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees/leaves-summary', name: 'Leave Summary', element: EmployeeLeavesSummary, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/add-leave', name: 'Add Employee Leaves', element: AddEmployeeLeaves, allowedRoles: ['Admin' , 'Both'] },
 
 
-  // For both (Admin and Employee)
+  // For (Admin and Employee and Both)
   { path: '/employee/change-password', name: 'Change Password', element: ChangePassword, allowedRoles: ['Admin', 'Employee', 'Both'] },
 
 

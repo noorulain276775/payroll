@@ -13,10 +13,12 @@ from .views import (
     EmployeeLeaveListAPIView,
     EmployeeApprovedLeaveListAPIView,
     AdminLeaveSummaryAPIView,
+    AdminLeaveCreateAPIView
 )
 
 urlpatterns = [
     path('leaves/', LeaveListCreateAPIView.as_view(), name='leave_list_create'),
+    path('add-leaves/', AdminLeaveCreateAPIView.as_view(), name='admin_leave_create'),
     path('employee/leaves/<int:pk>', LeaveDetailAPIView.as_view(), name='leave_detail'),
     path('employee/leaves-requests/', EmployeeLeaveListAPIView.as_view(), name='employee_leave_list'),
     path('employee/approve/leaves-requests/', EmployeeApprovedLeaveListAPIView.as_view(), name='employee_leave_list_APPROVED'),

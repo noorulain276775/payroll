@@ -36,6 +36,33 @@ class LeaveSerializer(serializers.ModelSerializer):
         if data['start_date'] > data['end_date']:
             raise serializers.ValidationError("End date must be after start date.")
         return data
+    def create(self, validated_data):
+        requested_by = self.context.get('requested_by')
+        instance = Leave(**validated_data)
+        instance.save(requested_by=requested_by)
+        return instance
+    
+class AdminCreateLeaveSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(read_only=True)
+    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all())
+
+    class Meta:
+        model = Leave
+        fields = [
+            'id', 'employee', 'leave_type', 'start_date', 'end_date',
+            'reason', 'days_taken', 'status', 'applied_on',
+            'approved_on', 'approved_by', 'user'
+        ]
+
+    def validate(self, data):
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError("End date must be after start date.")
+        return data
+    def create(self, validated_data):
+        requested_by = self.context.get('requested_by', None)  # get from context, not from validated_data
+        leave = Leave(**validated_data)
+        leave.save(requested_by=requested_by)  # pass it here
+        return leave
 
 
 class LeaveBalanceSerializer(serializers.ModelSerializer):

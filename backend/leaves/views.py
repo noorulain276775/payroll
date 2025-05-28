@@ -3,12 +3,13 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from .models import Leave, LeaveBalance, LeaveAccrual
-from .serializers import LeaveSerializer, LeaveBalanceSerializer, LeaveAccrualSerializer
+from .serializers import LeaveSerializer, LeaveBalanceSerializer, LeaveAccrualSerializer, AdminCreateLeaveSerializer
 from employees.models import Employee
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Case, When, Value, IntegerField, Sum
 from django.utils.timezone import now
+from rest_framework.exceptions import PermissionDenied
 
 
 # List and create leave
@@ -41,6 +42,33 @@ class LeaveListCreateAPIView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         employee = get_object_or_404(Employee, user=self.request.user)
         serializer.save(employee=employee)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['requested_by'] = self.request.user
+        return context
+
+# Admin Creating leaves for employees
+class AdminLeaveCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if not user.is_staff:
+            raise PermissionDenied("Only staff members can access this endpoint.")
+
+        serializer = AdminCreateLeaveSerializer(
+            data=request.data,
+            context={'requested_by': request.user}
+        )
+
+        if serializer.is_valid():
+            employee = serializer.validated_data.get('employee')
+            serializer.save(employee=employee)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Detail, update, delete leave
 class LeaveDetailAPIView(generics.RetrieveUpdateDestroyAPIView):

@@ -32,15 +32,17 @@ class Leave(models.Model):
     applied_on = models.DateTimeField(auto_now_add=True)
     approved_on = models.DateTimeField(null=True, blank=True)
     approved_by = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_leaves')
+    remarks = models.TextField(default="Awaiting approval", blank=True)
+
 
     def save(self, *args, **kwargs):
+
+        requested_by = kwargs.pop('requested_by', None)
         is_new = self.pk is None
 
         if is_new:
-            # Calculate number of leave days
             self.days_taken = (self.end_date - self.start_date).days + 1
 
-            # Map leave type to LeaveBalance field
             leave_type_to_field = {
                 'Annual': 'annual_leave_balance',
                 'Sick': 'sick_leave_balance',
@@ -59,18 +61,43 @@ class Leave(models.Model):
                 self.status = 'Rejected'
                 self.approved_by = None
                 self.approved_on = timezone.now()
+                self.remarks = "Don't have enough leave balance for this type"
             else:
                 try:
                     leave_balance = LeaveBalance.objects.get(employee=self.employee)
                     current_balance = getattr(leave_balance, balance_field, 0)
-                    if self.leave_type == 'Unpaid' or current_balance >= self.days_taken:
-                        self.status = 'Pending'
+
+                    if self.leave_type == 'Unpaid':
+                        self.status = 'Approved' if requested_by and requested_by.is_staff else 'Pending'
+                        if requested_by and requested_by.is_staff:
+                            self.approved_by = requested_by
+                            self.approved_on = timezone.now()
+                            self.remarks = "Auto-approved by staff for unpaid leave"
+
+                    elif current_balance >= self.days_taken:
+                        print(requested_by)
+                        print(requested_by.is_staff)
+                        print(requested_by.id)
+                        if requested_by and requested_by.is_staff:
+                            setattr(leave_balance, balance_field, current_balance - self.days_taken)
+                            leave_balance.save()
+                            self.status = 'Approved'
+                            self.approved_by = requested_by
+                            self.approved_on = timezone.now()
+                            self.remarks = "Auto-approved by staff"
+                        else:
+                            self.status = 'Pending'
+                            self.remarks = "Awaiting approval"
                     else:
                         self.status = 'Rejected'
-                        self.approved_by = None
+                        self.approved_by = requested_by if requested_by and requested_by.is_staff else None
+                        self.approved_on = timezone.now()
+                        self.remarks = "Not enough leave balance"
                 except LeaveBalance.DoesNotExist:
                     self.status = 'Rejected'
-                    self.approved_by = None
+                    self.approved_by = requested_by if requested_by and requested_by.is_staff else None
+                    self.approved_on = timezone.now()
+                    self.remarks = "Leave balance not found"
 
         super().save(*args, **kwargs)
 
