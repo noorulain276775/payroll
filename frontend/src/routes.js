@@ -55,6 +55,15 @@ const EmployeeOwnLeaveBalance = React.lazy(() => import('./views/AnnualLeaves/Em
 
 const routes = [
   // Admin Routes
+  { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin'] },
+  { path: '/employees', name: 'Employees', element: Employees, allowedRoles: ['Admin'] },
+  { path: '/employees/salary-details', name: 'Salary', element: Salary, allowedRoles: ['Admin'] },
+  { path: '/employees/payroll', name: 'Payroll', element: Payroll, allowedRoles: ['Admin'] },
+  { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee, allowedRoles: ['Admin'] },
+  { path: '/register/new-user', name: 'Add Admin', element: AddUser, allowedRoles: ['Admin'] },
+  { path: '/employees/salary-revision', name: 'Salary Revisions', element: SalaryRevisions, allowedRoles: ['Admin'] },
+  { path: '/employees/leave-applications', name: 'Employees Annual Leaves', element: AdminAnnualLeaves, allowedRoles: ['Admin'] },
+  { path: '/employees/leave-balances', name: 'Leave Balances', element: AdminCreatingLeaveBalances, allowedRoles: ['Admin'] },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees', name: 'Employees', element: Employees, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees/salary-details', name: 'Salary', element: Salary, allowedRoles: ['Admin' , 'Both'] },
