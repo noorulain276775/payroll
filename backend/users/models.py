@@ -6,6 +6,7 @@ class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = [
         ('Admin', 'Admin'),
         ('Employee', 'Employee'),
+        ('Both', 'Both'),
     ]
 
     COMPANY_TYPE_CHOICES = [

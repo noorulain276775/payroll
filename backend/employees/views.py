@@ -34,8 +34,9 @@ EMPLOYEES PERSONAL AND WORK INFORMATION
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_all_employees(request):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
+
     
     employees = Employee.objects.all()
     serializer = EmployeeSerializer(employees, many=True)
@@ -45,7 +46,7 @@ def view_all_employees(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_all_employees_with_salary(request):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
     
     employees = Employee.objects.all()
@@ -57,7 +58,7 @@ def view_all_employees_with_salary(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_employee(request):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can create employees."}, status=status.HTTP_403_FORBIDDEN)
     serializer = EmployeeSerializer(data=request.data)
     if serializer.is_valid():
@@ -70,7 +71,7 @@ def create_employee(request):
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def update_employee(request, employee_id):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can update employee details."}, status=status.HTTP_403_FORBIDDEN)
     try:
         employee = Employee.objects.get(id=employee_id)
@@ -86,7 +87,7 @@ def update_employee(request, employee_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_view_single_employee(request, employee_id):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can view employee details."}, status=status.HTTP_403_FORBIDDEN)
 
     try:
@@ -104,7 +105,7 @@ SALARIES
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_salary_details(request):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can create salary details."}, status=status.HTTP_403_FORBIDDEN)
     serializer = SalaryDetailsSerializer(data=request.data)
     if serializer.is_valid():
@@ -121,7 +122,7 @@ def update_salary_record(request, employee_id):
     API to update the salary details of an employee.
     Only admins are allowed to perform this operation.
     """
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can update salary records."}, status=status.HTTP_403_FORBIDDEN)
     
     try:
@@ -144,7 +145,7 @@ def update_salary_record(request, employee_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_all_employees_salaries(request):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can view all employees."}, status=status.HTTP_403_FORBIDDEN)
     
     employees = SalaryDetails.objects.all()
@@ -155,7 +156,7 @@ def view_all_employees_salaries(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_view_single_employee_salary(request, employee_id):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can view employee salary details."}, status=status.HTTP_403_FORBIDDEN)
 
     try:
@@ -179,7 +180,7 @@ def create_payroll_record(request):
     API to create a new payroll record.
     Only admins are allowed to perform this operation.
     """
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can create payroll records."}, status=status.HTTP_403_FORBIDDEN)
 
     # Extract employee, month, and year from the request data
@@ -213,7 +214,7 @@ def update_payroll_record(request, payroll_id):
     API to update a payroll record.
     Only admins are allowed to perform this operation.
     """
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can update payroll records."}, status=status.HTTP_403_FORBIDDEN)
 
     try:
@@ -245,7 +246,7 @@ def update_payroll_record(request, payroll_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def view_all_payroll(request):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can view all payroll records."}, status=status.HTTP_403_FORBIDDEN)
     payroll_records = PayrollRecord.objects.all().order_by('-year', '-month')
     serializer = PayrollRecordSerializer(payroll_records, many=True)
@@ -274,7 +275,7 @@ def send_salary_slip_email(employee, payroll_record):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def send_salary_slip(request, payroll_id):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can generate and send salary slips."}, status=status.HTTP_403_FORBIDDEN)
     
     try:
@@ -296,6 +297,8 @@ SALARY REVISION
 @permission_classes([IsAuthenticated])
 def create_salary_revision(request, employee_id):
     try:
+        if request.user.user_type not in ['Admin', 'Both']:
+            return Response({"detail": "Only admins can create salary revisions."}, status=status.HTTP_403_FORBIDDEN)
         employee = get_object_or_404(Employee, id=employee_id)
 
         if request.method == 'POST':
@@ -332,7 +335,7 @@ def create_salary_revision(request, employee_id):
 @permission_classes([IsAuthenticated])
 def get_salary_revisions(request, employee_id):
     try:
-        if request.user.user_type != 'Admin':
+        if request.user.user_type not in ['Admin', 'Both']:
             return Response({"detail": "Only admins can see salary revisions records for an employee."}, status=status.HTTP_403_FORBIDDEN)
         employee = get_object_or_404(Employee, id=employee_id)
         salary_revisions = SalaryRevision.objects.filter(employee=employee)
@@ -345,7 +348,7 @@ def get_salary_revisions(request, employee_id):
 @permission_classes([IsAuthenticated])
 def get_own_salary_revisions(request):
     try:
-        if request.user.user_type != 'Employee':
+        if request.user.user_type not in ['Employee', 'Both']:
             return Response({"detail": "Only employees can access their own salary records."}, status=status.HTTP_403_FORBIDDEN)
 
         user_id = request.query_params.get('user')
@@ -376,7 +379,7 @@ def get_own_salary_revisions(request):
 @permission_classes([IsAuthenticated])
 def get_all_salary_revisions(request):
     try:
-        if request.user.user_type != 'Admin':
+        if request.user.user_type not in ['Admin', 'Both']:
             return Response({"detail": "Only admins can see salary revisions records for all employees."}, status=status.HTTP_403_FORBIDDEN)
         latest_salary_revisions = SalaryRevision.objects.values('employee').annotate(latest_revision_date=Max('revision_date'))
         revisions = []
@@ -399,7 +402,7 @@ def get_all_salary_revisions(request):
 @permission_classes([IsAuthenticated])
 def edit_salary_revision(request, revision_id):
     try:
-        if request.user.user_type != 'Admin':
+        if request.user.user_type not in ['Admin', 'Both']:
             return Response({"detail": "Only admins can update salary revisions records."}, status=status.HTTP_403_FORBIDDEN)
         salary_revision = get_object_or_404(SalaryRevision, id=revision_id)
         if request.method == 'PUT':
@@ -446,7 +449,7 @@ def view_new_employees(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def dashboard_summary(request):
-    if request.user.user_type != 'Admin':
+    if request.user.user_type not in ['Admin', 'Both']:
         return Response({"detail": "Only admins can view the dashboard summary."}, status=status.HTTP_403_FORBIDDEN)
     
     # Get the current year and month

@@ -55,29 +55,31 @@ const EmployeeOwnLeaveBalance = React.lazy(() => import('./views/AnnualLeaves/Em
 
 const routes = [
   // Admin Routes
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin'] },
-  { path: '/employees', name: 'Employees', element: Employees, allowedRoles: ['Admin'] },
-  { path: '/employees/salary-details', name: 'Salary', element: Salary, allowedRoles: ['Admin'] },
-  { path: '/employees/payroll', name: 'Payroll', element: Payroll, allowedRoles: ['Admin'] },
-  { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee, allowedRoles: ['Admin'] },
-  { path: '/register/new-user', name: 'Add Admin', element: AddUser, allowedRoles: ['Admin'] },
-  { path: '/employees/salary-revision', name: 'Salary Revisions', element: SalaryRevisions, allowedRoles: ['Admin'] },
-  { path: '/employees/leave-applications', name: 'Employees Annual Leaves', element: AdminAnnualLeaves, allowedRoles: ['Admin'] },
-  { path: '/employees/leave-balances', name: 'Leave Balances', element: AdminCreatingLeaveBalances, allowedRoles: ['Admin'] },
+  { path: '/dashboard', name: 'Dashboard', element: Dashboard, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees', name: 'Employees', element: Employees, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/salary-details', name: 'Salary', element: Salary, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/payroll', name: 'Payroll', element: Payroll, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/register/new-user', name: 'Add Admin', element: AddUser, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/salary-revision', name: 'Salary Revisions', element: SalaryRevisions, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/leave-applications', name: 'Employees Annual Leaves', element: AdminAnnualLeaves, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/leave-balances', name: 'Leave Balances', element: AdminCreatingLeaveBalances, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/employees/leaves-summary', name: 'Leave Summary', element: EmployeeLeavesSummary, allowedRoles: ['Admin' , 'Both'] },
 
 
   // For both (Admin and Employee)
-  { path: '/employee/change-password', name: 'Change Password', element: ChangePassword, allowedRoles: ['Admin', 'Employee'] },
+  { path: '/employee/change-password', name: 'Change Password', element: ChangePassword, allowedRoles: ['Admin', 'Employee', 'Both'] },
 
-  // Employee Routes
+
+  // Employee and Both Routes
   { path: '/employee-dashboard', name: 'Employee Dashboard', element: EmployeeDashboard, allowedRoles: ['Employee'] },
-  { path: '/employee/payslips', name: 'Employee Payslip', element: EmployeePayslips, allowedRoles: ['Employee'] },
-  { path: '/employee/profile', name: 'Employee Profile', element: EmployeeProfile, allowedRoles: ['Employee'] },
-  { path: '/employee/salary-details', name: 'Employee Salary', element: EmployeeSalaryDetails, allowedRoles: ['Employee'] },
-  { path: '/employee/leave-applications', name: 'Employee Annual Leaves', element: EmployeeAnnualLeaves, allowedRoles: ['Employee'] },
-  { path: '/employee/leave-applications/history', name: 'Leave Requests', element: EmployeeLeavesRequests, allowedRoles: ['Employee'] },
-  { path: '/employee/salary-revision', name: 'Employee Salary Revisions', element: EmployeeSalaryRevisions, allowedRoles: ['Employee'] },
-  { path: '/employee/leave-balances', name: 'My Leave Balances', element: EmployeeOwnLeaveBalance, allowedRoles: ['Employee'] },
+  { path: '/employee/payslips', name: 'Employee Payslip', element: EmployeePayslips, allowedRoles: ['Employee', 'Both'] },
+  { path: '/employee/profile', name: 'Employee Profile', element: EmployeeProfile, allowedRoles: ['Employee', 'Both'] },
+  { path: '/employee/salary-details', name: 'Employee Salary', element: EmployeeSalaryDetails, allowedRoles: ['Employee', 'Both'] },
+  { path: '/employee/leave-applications', name: 'Employee Annual Leaves', element: EmployeeAnnualLeaves, allowedRoles: ['Employee', 'Both'] },
+  { path: '/employee/leave-applications/history', name: 'Leave Requests', element: EmployeeLeavesRequests, allowedRoles: ['Employee', 'Both'] },
+  { path: '/employee/salary-revision', name: 'Employee Salary Revisions', element: EmployeeSalaryRevisions, allowedRoles: ['Employee', 'Both'] },
+  { path: '/employee/leave-balances', name: 'My Leave Balances', element: EmployeeOwnLeaveBalance, allowedRoles: ['Employee', 'Both'] },
 ];
 
 export default routes;
