@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from leave.models import LeaveBalance, LeaveAccrual
+from leaves.models import LeaveBalance, LeaveAccrual
 from employees.models import Employee
 
 class Command(BaseCommand):
@@ -12,7 +12,7 @@ class Command(BaseCommand):
         if today.day == 1:
             for employee in Employee.objects.all():
                 accrual, _ = LeaveAccrual.objects.get_or_create(employee=employee)
-                accrual.accrue_leave()  # <-- Use the method
+                accrual.accrue_leave()
             self.stdout.write(self.style.SUCCESS("Leave accrued for all employees."))
         else:
             self.stdout.write("Today is not the 1st of the month. No action taken.")
