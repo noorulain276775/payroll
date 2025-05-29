@@ -51,7 +51,6 @@ const EmployeeProfile = () => {
       })
       .then((response) => {
         setEmployee(response.data);
-        console.log("Employee data:", response.data);
         const {
           first_name, last_name, date_of_birth, place_of_birth, nationality,
           gender, marital_status, spouse_name, children, father_name, mother_name,
