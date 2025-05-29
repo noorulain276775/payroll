@@ -51,11 +51,12 @@ const EmployeeProfile = () => {
       })
       .then((response) => {
         setEmployee(response.data);
+        console.log("Employee data:", response.data);
         const {
           first_name, last_name, date_of_birth, place_of_birth, nationality,
-          gender, marital_status, spouse_name, father_name, mother_name,
+          gender, marital_status, spouse_name, children, father_name, mother_name,
           phone_number, company_phone_number, home_town_number,
-          email, personal_email, joining_date, address,
+          email, personal_email, joining_date, address, emirates_id_expiry, visa_expiry, insurance_expiry_date,
           emergency_contact_name, emergency_contact_number, emergency_contact_relation,
           emirates_id, passport_no, qualification, visa_no,
           designation, department, previous_company_name, previous_company_designation
@@ -64,10 +65,10 @@ const EmployeeProfile = () => {
         setFormData({
           first_name, last_name, date_of_birth, place_of_birth, nationality,
           gender, marital_status, spouse_name, father_name, mother_name,
-          phone_number, company_phone_number, home_town_number,
-          email, personal_email, joining_date, address,
+          phone_number, company_phone_number, home_town_number, children, 
+          email, personal_email, joining_date, address, emirates_id_expiry, visa_expiry,
           emergency_contact_name, emergency_contact_number, emergency_contact_relation,
-          emirates_id, passport_no, qualification, visa_no,
+          emirates_id, passport_no, qualification, visa_no, insurance_expiry_date,
           designation, department, previous_company_name, previous_company_designation
         });
         if (response.data.photo) {

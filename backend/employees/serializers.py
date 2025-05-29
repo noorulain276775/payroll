@@ -17,7 +17,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
         Custom validation for the serializer.
         Example: Add any field-specific or model-level validation here.
         """
-        if data.get('children', 0) < 0:
+        children = data.get('children')
+        if children is not None and children < 0:
             raise serializers.ValidationError({"children": "Number of children cannot be negative."})
         return data
     
@@ -36,7 +37,8 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
         Custom validation for the serializer.
         Example: Add any field-specific or model-level validation here.
         """
-        if data.get('children', 0) < 0:
+        children = data.get('children')
+        if children is not None and children < 0:
             raise serializers.ValidationError({"children": "Number of children cannot be negative."})
         return data
 
