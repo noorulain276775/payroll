@@ -81,11 +81,7 @@ const EmployeeSalaryRevisions = () => {
             {salaryRevisions.length === 0 ? (
               <CTableRow>
                 <CTableDataCell colSpan="8" style={{ textAlign: 'center' }}>
-                  {error ? (
-                    <CAlert color="danger">{error}</CAlert>
-                  ) : (
-                    'No salary revisions found for you.'
-                  )}
+                  No data available
                 </CTableDataCell>
               </CTableRow>
             ) : (

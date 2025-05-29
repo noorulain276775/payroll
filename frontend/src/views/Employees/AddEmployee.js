@@ -198,20 +198,6 @@ const AddEmployee = () => {
             return false;
         }
 
-        if (!motherName) {
-            setAlertMessage("Mother Name is required.");
-            setAlertColor("danger");
-            setAlertVisible(true);
-            return false;
-        }
-
-        if (!fatherName) {
-            setAlertMessage("Father Name is required.");
-            setAlertColor("danger");
-            setAlertVisible(true);
-            return false;
-        }
-
         if (!qualification) {
             setAlertMessage("Qualification is required.");
             setAlertColor("danger");
@@ -546,14 +532,14 @@ const AddEmployee = () => {
                                     />
                                 </CCol>
                                 <CCol md={6}>
-                                    <label>Father Name <span style={{ color: 'red' }}>*</span></label>
+                                    <label>Father Name </label>
                                     <CFormInput
                                         value={fatherName}
                                         onChange={(e) => handleInputChange(e, setFatherName)}
                                     />
                                 </CCol>
                                 <CCol md={6}>
-                                    <label>Mother Name <span style={{ color: 'red' }}>*</span></label>
+                                    <label>Mother Name </label>
                                     <CFormInput
                                         value={motherName}
                                         onChange={(e) => handleInputChange(e, setMotherName)}
