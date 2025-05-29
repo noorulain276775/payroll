@@ -443,12 +443,12 @@ const EmployeeProfile = () => {
 
             <CRow className="mt-3">
               <CCol xs={12} md={6}>
-                <CFormLabel htmlFor="pasport_no">Passport no:</CFormLabel>
+                <CFormLabel htmlFor="passport_no">Passport no:</CFormLabel>
                 <CFormInput
                   type="text"
-                  id="pasport_no"
-                  name="pasport_no"
-                  value={formData.pasport_no || ''}
+                  id="passport_no"
+                  name="passport_no"
+                  value={formData.passport_no || ''}
                   onChange={handleChange}
                   disabled={!isEditing}
                 />
