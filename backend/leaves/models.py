@@ -75,9 +75,6 @@ class Leave(models.Model):
                             self.remarks = "Auto-approved by staff for unpaid leave"
 
                     elif current_balance >= self.days_taken:
-                        print(requested_by)
-                        print(requested_by.is_staff)
-                        print(requested_by.id)
                         if requested_by and requested_by.is_staff:
                             setattr(leave_balance, balance_field, current_balance - self.days_taken)
                             leave_balance.save()

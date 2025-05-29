@@ -8,7 +8,6 @@ from dateutil.relativedelta import relativedelta
 @receiver(post_save, sender=Employee)
 def create_leave_records(sender, instance, created, **kwargs):
     if created:
-        print(f"New employee created: {instance.first_name} {instance.last_name}, Complete Instance: {instance.joining_date}")
         date_of_joining = instance.joining_date
         today = date.today()
 
