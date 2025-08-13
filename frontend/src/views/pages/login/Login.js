@@ -40,13 +40,23 @@ const Login = () => {
         localStorage.setItem('logged_in_status', JSON.stringify(true))
         localStorage.setItem('user_id', response.data.user_id)
         if (response.data.user_type === 'Admin') {
-          window.location.href = '/dashboard'
+          navigate('/dashboard')
         } else {
-          window.location.href = '/employee-dashboard'
+          navigate('/employee-dashboard')
         }
       }
     } catch (error) {
-      setError('Invalid credentials or server error')
+      if (error.response) {
+        // Server responded with error status
+        setError(error.response.data.detail || 'Login failed. Please check your credentials.')
+      } else if (error.request) {
+        // Network error
+        setError('Network error. Please check your connection.')
+      } else {
+        // Other error
+        setError('An unexpected error occurred. Please try again.')
+      }
+      console.error('Login error:', error)
     }
   }
 

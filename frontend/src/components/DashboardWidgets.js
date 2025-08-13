@@ -2,13 +2,17 @@ import React from 'react'
 import { CChartLine } from '@coreui/react-chartjs'
 import { CCol, CRow, CWidgetStatsA } from '@coreui/react'
 
+// Constants
+const DEFAULT_VALUE = 'N/A';
+const DECIMAL_PLACES = 0;
+
 const formatValue = (value) => {
   // If value is null, undefined, or NaN, return 'N/A'
   if (value == null || isNaN(value)) {
-    return 'N/A';
+    return DEFAULT_VALUE;
   }
-  // Otherwise, return the value formatted to 2 decimal points
-  return parseFloat(value).toFixed(0);
+  // Otherwise, return the value formatted to specified decimal places
+  return parseFloat(value).toFixed(DECIMAL_PLACES);
 }
 
 export const DashboardWidgets = ({

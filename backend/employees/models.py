@@ -22,12 +22,22 @@ class Employee(models.Model):
     ]
 
     def validate_file_type(file):
+        # Check file extension
         ext = os.path.splitext(file.name)[1].lower()
         valid_extensions = ['.jpg', '.jpeg', '.png', '.pdf']
         if ext not in valid_extensions:
             raise ValidationError(f'Unsupported file extension. Allowed types: .jpg, .jpeg, .png, .pdf.')
-        if file.size > 5 * 1024 * 1024:
-            raise ValidationError('File size too large. Max size is 5MB.')
+        
+        # Check file size (5MB limit)
+        MAX_FILE_SIZE = 5 * 1024 * 1024
+        if file.size > MAX_FILE_SIZE:
+            raise ValidationError(f'File size too large. Max size is {MAX_FILE_SIZE // (1024 * 1024)}MB.')
+        
+        # Additional security: check MIME type if possible
+        if hasattr(file, 'content_type'):
+            valid_mime_types = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+            if file.content_type not in valid_mime_types:
+                raise ValidationError('Invalid file type detected.')
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='employee_profile')
     photo = models.ImageField(upload_to='photos/', blank=True, null=True, verbose_name='Photo', validators=[validate_file_type], default='photos/default.png')
     first_name = models.CharField(max_length=100, verbose_name='First Name')
@@ -44,7 +54,7 @@ class Employee(models.Model):
     phone_number = models.CharField(max_length=15, verbose_name='Phone Number')
     company_phone_number = models.CharField(max_length=15, verbose_name='Company Phone Number', null=True, blank=True)
     home_town_number = models.CharField(max_length=15, verbose_name='Home Town Number', null=True, blank=True)
-    email = models.EmailField(verbose_name='Company Email', default="example@liya.ae")
+    email = models.EmailField(verbose_name='Company Email', blank=True, null=True)
     personal_email = models.EmailField(verbose_name='Personal Email')
     joining_date = models.DateField(verbose_name='Joining Date')
     insurance_expiry_date = models.DateField(verbose_name='Insurance Expiry Date', null=True, blank=True)
@@ -93,10 +103,18 @@ class SalaryDetails(models.Model):
 
     def calculate_gross_salary(self):
         try:
-            gross_Salary = self.basic_salary + self.housing_allowance + self.transport_allowance + self.other_allowance or Decimal(0)
-            return gross_Salary
+            # Use proper null coalescing and ensure all values are Decimal
+            basic = self.basic_salary or Decimal('0')
+            housing = self.housing_allowance or Decimal('0')
+            transport = self.transport_allowance or Decimal('0')
+            other = self.other_allowance or Decimal('0')
+            
+            gross_salary = basic + housing + transport + other
+            return gross_salary
         except AttributeError:
             raise ValidationError("Salary details for this employee are not defined.")
+        except (TypeError, ValueError) as e:
+            raise ValidationError(f"Invalid salary data: {str(e)}")
 
     def save(self, *args, **kwargs):
         self.gross_salary= self.calculate_gross_salary()

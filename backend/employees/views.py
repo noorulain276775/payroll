@@ -82,6 +82,8 @@ def update_employee(request, employee_id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Employee.DoesNotExist:
         return Response({"detail": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"detail": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 # Admin can get single employee details
 @api_view(['GET'])
@@ -606,13 +608,16 @@ def download_payroll_pdf(request, payroll_id):
         title_style = ParagraphStyle("title", parent=styles["Heading1"], fontSize=16, textColor=colors.black, alignment=1)
         normal_style = styles["BodyText"]
 
-        logo_path = "media/company-images/logo.png" 
+        # Use configurable logo path with fallback
+        logo_path = getattr(settings, 'COMPANY_LOGO_PATH', 'media/company-images/logo.png')
         try:
             logo = Image(logo_path, width=100, height=40)
             logo.hAlign = "LEFT"
             elements.append(logo)
         except Exception as e:
-            print("Logo not found:", str(e))
+            # Log error but don't crash the PDF generation
+            print(f"Logo not found at {logo_path}: {str(e)}")
+            # Continue without logo
         elements.append(Spacer(1, 10)) 
         elements.append(Paragraph("<b>Payslip</b>", title_style))
         elements.append(Spacer(1, 20))

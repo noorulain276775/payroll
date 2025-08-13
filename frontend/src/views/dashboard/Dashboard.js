@@ -16,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const authToken = localStorage.getItem('authToken');
     if (!authToken) {
-      window.location.href = '/'
+      navigate('/');
     }
   }, [navigate]);
 
@@ -28,14 +28,14 @@ const Dashboard = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
         });
         setDashboardData(response.data);
-      } catch (error) {
-        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-          localStorage.removeItem('authToken');
-          window.location.href = '/'
-        } else {
-          console.error('Error fetching dashboard data:', error);
+              } catch (error) {
+          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            localStorage.removeItem('authToken');
+            navigate('/');
+          } else {
+            console.error('Error fetching dashboard data:', error);
+          }
         }
-      }
     };
 
     const fetchNewEmployees = async () => {
@@ -44,14 +44,14 @@ const Dashboard = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
         });
         setNewEmployees(response.data);
-      } catch (error) {
-        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-          localStorage.removeItem('authToken');
-          window.location.href = '/'
-        } else {
-          console.error('Error fetching new employees:', error);
+              } catch (error) {
+          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            localStorage.removeItem('authToken');
+            navigate('/');
+          } else {
+            console.error('Error fetching new employees:', error);
+          }
         }
-      }
     };
 
     fetchDashboardData();

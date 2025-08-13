@@ -68,11 +68,15 @@ class Leave(models.Model):
                     current_balance = getattr(leave_balance, balance_field, 0)
 
                     if self.leave_type == 'Unpaid':
-                        self.status = 'Approved' if requested_by and requested_by.is_staff else 'Pending'
-                        if requested_by and requested_by.is_staff:
+                        # Prevent self-approval - staff cannot approve their own leaves
+                        if requested_by and requested_by.is_staff and requested_by != self.employee.user:
+                            self.status = 'Approved'
                             self.approved_by = requested_by
                             self.approved_on = timezone.now()
                             self.remarks = "Auto-approved by staff for unpaid leave"
+                        else:
+                            self.status = 'Pending'
+                            self.remarks = "Awaiting approval"
 
                     elif current_balance >= self.days_taken:
                         if requested_by and requested_by.is_staff:

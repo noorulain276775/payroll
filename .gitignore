@@ -173,3 +173,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Codebase analysis (personal notes)
+CODEBASE_ANALYSIS.md

@@ -5,10 +5,18 @@ const initialState = {
   theme: 'light',
 }
 
-const changeState = (state = initialState, { type, ...rest }) => {
-  switch (type) {
+// Action types
+const SET_SIDEBAR_SHOW = 'SET_SIDEBAR_SHOW'
+const SET_THEME = 'SET_THEME'
+
+const changeState = (state = initialState, action) => {
+  switch (action.type) {
+    case SET_SIDEBAR_SHOW:
+      return { ...state, sidebarShow: action.payload }
+    case SET_THEME:
+      return { ...state, theme: action.payload }
     case 'set':
-      return { ...state, ...rest }
+      return { ...state, ...action }
     default:
       return state
   }
