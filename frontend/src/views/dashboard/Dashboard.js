@@ -1,66 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { CAvatar, CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilPeople } from '@coreui/icons';
 import MainChart from './MainChart';
 import { DashboardWidgets } from '../../components/DashboardWidgets';
 import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../../../config';
+import { selectIsAuthenticated } from '../../../store/slices/authSlice';
+import { fetchEmployees } from '../../../store/slices/employeeSlice';
+import { selectEmployees, selectEmployeesLoading } from '../../../store/slices/employeeSlice';
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState(null);
-  const [newEmployees, setNewEmployees] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const employees = useSelector(selectEmployees);
+  const isLoading = useSelector(selectEmployeesLoading);
 
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    if (!authToken) {
+    if (!isAuthenticated) {
       navigate('/');
+      return;
     }
-  }, [navigate]);
 
-  // Fetch dashboard summary and new employees
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/dashboard-summary/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
-        });
-        setDashboardData(response.data);
-              } catch (error) {
-          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            localStorage.removeItem('authToken');
-            navigate('/');
-          } else {
-            console.error('Error fetching dashboard data:', error);
-          }
-        }
-    };
+    // Fetch employees for dashboard
+    dispatch(fetchEmployees());
+  }, [isAuthenticated, navigate, dispatch]);
 
-    const fetchNewEmployees = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/new_employees/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
-        });
-        setNewEmployees(response.data);
-              } catch (error) {
-          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            localStorage.removeItem('authToken');
-            navigate('/');
-          } else {
-            console.error('Error fetching new employees:', error);
-          }
-        }
-    };
+  // Mock dashboard data (replace with actual API call)
+  const dashboardData = {
+    total_salary_for_month: 150000,
+    total_overtime_for_month: 5000,
+    previous_month_salary: 145000,
+    previous_month_overtime: 4500,
+    total_employees: employees.length || 0,
+    average_salary_for_month: employees.length > 0 ? 150000 / employees.length : 0,
+    monthly_data: [
+      { month: 'Jan', salary: 140000, overtime: 4000 },
+      { month: 'Feb', salary: 142000, overtime: 4200 },
+      { month: 'Mar', salary: 145000, overtime: 4500 },
+      { month: 'Apr', salary: 148000, overtime: 4800 },
+      { month: 'May', salary: 150000, overtime: 5000 },
+      { month: 'Jun', salary: 152000, overtime: 5200 },
+    ]
+  };
 
-    fetchDashboardData();
-    fetchNewEmployees();
-  }, [navigate]);
+  if (!isAuthenticated) {
+    return null;
+  }
 
-
-  if (!dashboardData) {
-    return <div>Loading...</div>; // Show a loading state if data is not yet loaded
+  if (isLoading) {
+    return <div>Loading dashboard...</div>;
   }
 
   return (
@@ -98,20 +89,25 @@ const Dashboard = () => {
                 <CTableHeaderCell className="bg-body-tertiary text-center">
                   <CIcon icon={cilPeople} />
                 </CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary">Employee Name</CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary">Designation</CTableHeaderCell>
+                <CTableHeaderCell className="bg-body-tertiary">Employee</CTableHeaderCell>
                 <CTableHeaderCell className="bg-body-tertiary">Department</CTableHeaderCell>
+                <CTableHeaderCell className="bg-body-tertiary">Designation</CTableHeaderCell>
+                <CTableHeaderCell className="bg-body-tertiary">Joining Date</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {newEmployees.map((item, index) => (
-                <CTableRow key={index}>
+              {employees.slice(0, 5).map((employee) => (
+                <CTableRow key={employee.id}>
                   <CTableDataCell className="text-center">
-                    <img height={50} width={50} style={{ borderRadius: '50px' }} size="md" src={`${BASE_URL}${item.photo}`} />
+                    <CAvatar size="md" src={employee.profile_picture} />
                   </CTableDataCell>
-                  <CTableDataCell>{item.first_name} {item.last_name}</CTableDataCell>
-                  <CTableDataCell>{item.designation}</CTableDataCell>
-                  <CTableDataCell>{item.department}</CTableDataCell>
+                  <CTableDataCell>
+                    <div>{employee.first_name} {employee.last_name}</div>
+                    <div className="small text-body-secondary">{employee.personal_email}</div>
+                  </CTableDataCell>
+                  <CTableDataCell>{employee.department}</CTableDataCell>
+                  <CTableDataCell>{employee.designation}</CTableDataCell>
+                  <CTableDataCell>{employee.joining_date}</CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>

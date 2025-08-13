@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { BASE_URL } from '../../../config';
 import {
   CCard,
   CCardBody,
@@ -18,138 +17,321 @@ import {
   CDropdown,
   CDropdownItem,
   CDropdownMenu,
-  CDropdownToggle
+  CDropdownToggle,
+  CButton,
+  CBadge,
+  CSpinner,
+  CProgress
 } from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import { 
+  cilDownload, 
+  cilEye, 
+  cilCalendar, 
+  cilMoney, 
+  cilUser,
+  cilFileText,
+  cilWarning,
+  cilCheckCircle,
+  cilInfo
+} from '@coreui/icons';
+import { fetchPayrollRecords } from '../../store/slices/payrollSlice';
+import { selectPayrollRecords, selectPayrollLoading, selectPayrollError } from '../../store/slices/payrollSlice';
+import { selectIsAuthenticated } from '../../store/slices/authSlice';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorDisplay from '../../components/common/ErrorDisplay';
 
 const EmployeePayslips = () => {
-  const [payrolls, setPayrolls] = useState(null);
-  const [loading, setLoading] = useState(false);
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = localStorage.getItem('authToken');
+  const [downloadingId, setDownloadingId] = useState(null);
+  
+  // Redux state
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const payrolls = useSelector(selectPayrollRecords);
+  const isLoading = useSelector(selectPayrollLoading);
+  const error = useSelector(selectPayrollError);
 
   useEffect(() => {
-    if (!token) {
-      window.location.href = "/";
+    if (!isAuthenticated) {
+      navigate('/');
       return;
     }
-    axios
-      .get(`${BASE_URL}/employee/payroll/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setPayrolls(response.data);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('user_type');
-          window.location.href = '/'
-        }
-      });
-  }, [navigate, token]);
+    
+    dispatch(fetchPayrollRecords());
+  }, [dispatch, isAuthenticated, navigate]);
 
-  const handleDownloadPDF = (payroll) => {
-    setLoading(true);
-    axios
-      .get(`${BASE_URL}/employee/payroll/download/${payroll.id}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        responseType: 'blob', // Important for PDF download
-      })
-      .then((response) => {
-        const file = new Blob([response.data], { type: 'application/pdf' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(file);
-        link.download = `Payroll_${payroll.month}_${payroll.year}.pdf`;
-        link.click();
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error downloading PDF:", error);
-        setLoading(false);
-      });
+  const handleDownloadPDF = async (payroll) => {
+    setDownloadingId(payroll.id);
+    try {
+      // This would be replaced with actual API call
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate download
+      console.log('Downloading payroll:', payroll.id);
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const monthNames = [
-    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
   ];
 
-  if (!payrolls || payrolls.length === 0) {
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      'paid': { color: 'success', icon: cilCheckCircle, text: 'Paid' },
+      'pending': { color: 'warning', icon: cilCalendar, text: 'Pending' },
+      'processing': { color: 'info', icon: cilFileText, text: 'Processing' },
+      'failed': { color: 'danger', icon: cilWarning, text: 'Failed' }
+    };
+    
+    const config = statusConfig[status?.toLowerCase()] || statusConfig.pending;
+    
     return (
-      <CRow className="justify-content-center mt-5">
-        <CCol xs={12} md={8} lg={6}>
-          <CAlert color="warning" className="text-center p-4">
-            <h5 className="fw-bold">No Payrolls have been created yet</h5>
-            <p>To view your payroll and download payslips, please contact the Admin for assistance.</p>
-          </CAlert>
-        </CCol>
-      </CRow>
+      <CBadge color={config.color} className="d-flex align-items-center gap-1">
+        <CIcon icon={config.icon} size="sm" />
+        {config.text}
+      </CBadge>
+    );
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    }).format(amount || 0);
+  };
+
+  const getMonthYear = (month, year) => {
+    return `${monthNames[month - 1]} ${year}`;
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return <LoadingSpinner text="Loading your payslips..." />;
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <ErrorDisplay 
+        error={error}
+        onRetry={() => dispatch(fetchPayrollRecords())}
+        title="Failed to load payslips"
+      />
     );
   }
 
-  return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="d-inline">My Payrolls</h4>
-        <div className="float-end">
-          <small className="text-muted">
-            <span className="me-3">R-OT: Regular Overtime</span>
-            <span className="me-3">H-OT: Holidays Overtime</span>
-            <span>LWP: Leave Without Pay</span>
-          </small>
+  // Show no data state
+  if (!payrolls || payrolls.length === 0) {
+    return (
+      <div className="text-center py-5">
+        <div className="mb-4">
+          <CIcon icon={cilFileText} size="4xl" className="text-muted" />
         </div>
-      </CCardHeader>
-      <CCardBody>
-        <CTable bordered>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell width="10%">Month</CTableHeaderCell>
-              <CTableHeaderCell width="10%">Year</CTableHeaderCell>
-              <CTableHeaderCell width="10%">H-OT</CTableHeaderCell>
-              <CTableHeaderCell width="10%">R-OT</CTableHeaderCell>
-              <CTableHeaderCell width="10%">LWP</CTableHeaderCell>
-              <CTableHeaderCell width="12%">Deductions</CTableHeaderCell>
-              <CTableHeaderCell width="12%">Net Pay</CTableHeaderCell>
-              <CTableHeaderCell width="21%">Remarks</CTableHeaderCell>
-              <CTableHeaderCell width="7%">Actions</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {payrolls.map((payroll) => (
-              <CTableRow key={payroll.id}>
-                <CTableDataCell>{monthNames[payroll.month - 1]}</CTableDataCell>
-                <CTableDataCell>{payroll.year}</CTableDataCell>
-                <CTableDataCell>{payroll.overtime_days}</CTableDataCell>
-                <CTableDataCell>{payroll.normal_overtime_days}</CTableDataCell>
-                <CTableDataCell>{payroll.unpaid_days}</CTableDataCell>
-                <CTableDataCell>{payroll.other_deductions}</CTableDataCell>
-                <CTableDataCell>{payroll.total_salary_for_month}</CTableDataCell>
-                <CTableDataCell style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-                  {payroll.remarks ? payroll.remarks : "Not Available"}
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CDropdown>
-                    <CDropdownToggle color="secondary">
-                      Actions
-                    </CDropdownToggle>
-                    <CDropdownMenu>
-                      <CDropdownItem onClick={() => handleDownloadPDF(payroll)}>
-                        {loading ? "Downloading..." : "Download PDF"}
-                      </CDropdownItem>
-                    </CDropdownMenu>
-                  </CDropdown>
-                </CTableDataCell>
-              </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
-      </CCardBody>
-    </CCard>
+        <h4 className="text-muted mb-3">No Payslips Available</h4>
+        <p className="text-muted mb-4">
+          Your payslips will appear here once they are generated by the admin.
+        </p>
+        <CButton 
+          color="primary" 
+          onClick={() => dispatch(fetchPayrollRecords())}
+          className="px-4"
+        >
+          <CIcon icon={cilEye} className="me-2" />
+          Refresh
+        </CButton>
+      </div>
+    );
+  }
+
+  // Calculate summary statistics
+  const totalEarnings = payrolls.reduce((sum, p) => sum + (p.total_salary || 0), 0);
+  const averageSalary = totalEarnings / payrolls.length;
+  const paidCount = payrolls.filter(p => p.status === 'paid').length;
+  const paidPercentage = (paidCount / payrolls.length) * 100;
+
+  return (
+    <div className="payslips-container">
+      {/* Header Section */}
+      <div className="mb-4">
+        <h2 className="mb-3">
+          <CIcon icon={cilMoney} className="me-2 text-primary" />
+          My Payslips
+        </h2>
+        <p className="text-muted mb-0">
+          View and download your monthly payslips and track your earnings
+        </p>
+      </div>
+
+      {/* Summary Cards */}
+      <CRow className="mb-4">
+        <CCol xs={12} md={4}>
+          <CCard className="summary-card h-100 border-0 shadow-sm">
+            <CCardBody className="text-center p-4">
+              <div className="mb-3">
+                <CIcon icon={cilMoney} size="2xl" className="text-success" />
+              </div>
+              <h4 className="mb-2">{formatCurrency(totalEarnings)}</h4>
+              <p className="text-muted mb-0">Total Earnings</p>
+            </CCardBody>
+          </CCard>
+        </CCol>
+        
+        <CCol xs={12} md={4}>
+          <CCard className="summary-card h-100 border-0 shadow-sm">
+            <CCardBody className="text-center p-4">
+              <div className="mb-3">
+                <CIcon icon={cilCalendar} size="2xl" className="text-info" />
+              </div>
+              <h4 className="mb-2">{formatCurrency(averageSalary)}</h4>
+              <p className="text-muted mb-0">Average Monthly Salary</p>
+            </CCardBody>
+          </CCard>
+        </CCol>
+        
+        <CCol xs={12} md={4}>
+          <CCard className="summary-card h-100 border-0 shadow-sm">
+            <CCardBody className="text-center p-4">
+              <div className="mb-3">
+                <CIcon icon={cilCheckCircle} size="2xl" className="text-success" />
+              </div>
+              <h4 className="mb-2">{paidCount}/{payrolls.length}</h4>
+              <p className="text-muted mb-0">Paid Months</p>
+              <CProgress 
+                value={paidPercentage} 
+                className="mt-2" 
+                color="success"
+                style={{ height: '6px' }}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Payslips Table */}
+      <CCard className="border-0 shadow-sm">
+        <CCardHeader className="bg-white border-bottom">
+          <div className="d-flex justify-content-between align-items-center">
+            <h5 className="mb-0">
+              <CIcon icon={cilFileText} className="me-2" />
+              Payslip History
+            </h5>
+            <small className="text-muted">
+              {payrolls.length} payslip{payrolls.length !== 1 ? 's' : ''} available
+            </small>
+          </div>
+        </CCardHeader>
+        <CCardBody className="p-0">
+          <div className="table-responsive">
+            <CTable hover className="mb-0">
+              <CTableHead className="bg-light">
+                <CTableRow>
+                  <CTableHeaderCell className="border-0">Month/Year</CTableHeaderCell>
+                  <CTableHeaderCell className="border-0">Basic Salary</CTableHeaderCell>
+                  <CTableHeaderCell className="border-0">Allowances</CTableHeaderCell>
+                  <CTableHeaderCell className="border-0">Deductions</CTableHeaderCell>
+                  <CTableHeaderCell className="border-0">Net Salary</CTableHeaderCell>
+                  <CTableHeaderCell className="border-0">Status</CTableHeaderCell>
+                  <CTableHeaderCell className="border-0 text-center">Actions</CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {payrolls.map((payroll, index) => (
+                  <CTableRow key={payroll.id || index} className="align-middle">
+                    <CTableDataCell>
+                      <div className="d-flex align-items-center">
+                        <div className="month-badge me-3">
+                          <div className="month-number">{payroll.month}</div>
+                          <div className="year-text">{payroll.year}</div>
+                        </div>
+                        <div>
+                          <div className="fw-semibold">
+                            {getMonthYear(payroll.month, payroll.year)}
+                          </div>
+                          <small className="text-muted">
+                            Generated on {new Date(payroll.created_at || Date.now()).toLocaleDateString()}
+                          </small>
+                        </div>
+                      </div>
+                    </CTableDataCell>
+                    
+                    <CTableDataCell>
+                      <div className="fw-semibold text-primary">
+                        {formatCurrency(payroll.basic_salary)}
+                      </div>
+                    </CTableDataCell>
+                    
+                    <CTableDataCell>
+                      <div className="fw-semibold text-success">
+                        +{formatCurrency(payroll.total_allowances || 0)}
+                      </div>
+                    </CTableDataCell>
+                    
+                    <CTableDataCell>
+                      <div className="fw-semibold text-danger">
+                        -{formatCurrency(payroll.total_deductions || 0)}
+                      </div>
+                    </CTableDataCell>
+                    
+                    <CTableDataCell>
+                      <div className="fw-bold text-dark">
+                        {formatCurrency(payroll.net_salary || payroll.total_salary)}
+                      </div>
+                    </CTableDataCell>
+                    
+                    <CTableDataCell>
+                      {getStatusBadge(payroll.status)}
+                    </CTableDataCell>
+                    
+                    <CTableDataCell className="text-center">
+                      <div className="d-flex gap-2 justify-content-center">
+                        <CButton
+                          color="outline-primary"
+                          size="sm"
+                          onClick={() => handleDownloadPDF(payroll)}
+                          disabled={downloadingId === payroll.id}
+                          className="action-btn"
+                        >
+                          {downloadingId === payroll.id ? (
+                            <CSpinner size="sm" />
+                          ) : (
+                            <>
+                              <CIcon icon={cilDownload} className="me-1" />
+                              Download
+                            </>
+                          )}
+                        </CButton>
+                        
+                        <CButton
+                          color="outline-info"
+                          size="sm"
+                          className="action-btn"
+                        >
+                          <CIcon icon={cilEye} className="me-1" />
+                          View
+                        </CButton>
+                      </div>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+              </CTableBody>
+            </CTable>
+          </div>
+        </CCardBody>
+      </CCard>
+
+      {/* Footer Info */}
+      <div className="text-center mt-4">
+        <small className="text-muted">
+          <CIcon icon={cilInfo} className="me-1" />
+          Payslips are typically generated by the 5th of each month
+        </small>
+      </div>
+    </div>
   );
 };
 

@@ -3,7 +3,6 @@
 
 // Import styles
 @import "@coreui/coreui/scss/coreui";
-@import "@coreui/chartjs/scss/coreui-chartjs";
 
 // Vendors
 @import "vendors/simplebar";
@@ -13,3 +12,1652 @@
 
 // If you want to add custom CSS you can put it here
 @import "custom";
+
+// Custom layout fixes
+.c-app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.c-wrapper {
+  flex: 1;
+  margin-left: 0;
+  transition: margin-left 0.35s ease-in-out;
+  
+  @media (min-width: 992px) {
+    margin-left: 260px; // Default sidebar width
+  }
+}
+
+.c-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1030;
+  
+  &.c-sidebar-unfoldable {
+    width: 260px;
+  }
+  
+  &.c-sidebar-foldable {
+    width: 56px;
+  }
+}
+
+.c-body {
+  padding: 1rem;
+  margin-top: 1rem;
+  
+  @media (min-width: 992px) {
+    margin-left: 0;
+  }
+}
+
+// Responsive sidebar behavior
+@media (max-width: 991.98px) {
+  .c-wrapper {
+    margin-left: 0;
+  }
+  
+  .c-sidebar {
+    transform: translateX(-100%);
+    
+    &.c-sidebar-visible {
+      transform: translateX(0);
+    }
+  }
+}
+
+// Fix for content overflow
+.c-main {
+  min-height: calc(100vh - 120px); // Account for header and footer
+}
+
+// Fix for sidebar toggle button positioning
+.c-header-toggler {
+  margin-left: -0.5rem;
+}
+
+// Fix for breadcrumb positioning
+.c-breadcrumb {
+  margin-bottom: 1rem;
+}
+
+// Fix for footer positioning
+.c-footer {
+  margin-top: auto;
+}
+
+// Fix for sidebar brand logo
+.c-sidebar-brand {
+  img {
+    max-height: 60px;
+    width: auto;
+    object-fit: contain;
+  }
+}
+
+// Fix for sidebar navigation
+.c-sidebar-nav {
+  .c-sidebar-nav-item {
+    .c-sidebar-nav-link {
+      padding: 0.75rem 1rem;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      &.c-active {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+
+// Fix for header dropdown positioning
+.c-header-nav {
+  .c-dropdown {
+    .c-dropdown-toggle {
+      padding: 0.5rem;
+      
+      &:after {
+        display: none;
+      }
+    }
+  }
+}
+
+// Fix for content container
+.c-container {
+  &.px-4 {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+}
+
+// Fix for responsive tables
+.c-table {
+  @media (max-width: 767.98px) {
+    font-size: 0.875rem;
+    
+    .c-table-cell {
+      padding: 0.5rem 0.25rem;
+    }
+  }
+}
+
+// Fix for card layouts
+.c-card {
+  margin-bottom: 1.5rem;
+  
+  .c-card-header {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  }
+}
+
+// Fix for form layouts
+.c-form {
+  .c-form-control {
+    &:focus {
+      border-color: #321fdb;
+      box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
+    }
+  }
+}
+
+// Fix for button layouts
+.c-btn {
+  &.c-btn-primary {
+    background-color: #321fdb;
+    border-color: #321fdb;
+    
+    &:hover {
+      background-color: #2a1a9a;
+      border-color: #2a1a9a;
+    }
+  }
+}
+
+// Fix for loading states
+.c-spinner {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Enhanced UI Components
+.summary-card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .stat-icon {
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover .stat-icon {
+    opacity: 1;
+  }
+}
+
+.chart-card {
+  border-radius: 12px;
+  
+  .chart-toggle-btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+  
+  .stat-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.chart-legend {
+  .legend-item {
+    transition: opacity 0.2s ease;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+    
+    .legend-color {
+      transition: transform 0.2s ease;
+    }
+    
+    &:hover .legend-color {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Payslips specific styles
+.payslips-container {
+  .month-badge {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    
+    .month-number {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+    
+    .year-text {
+      font-size: 0.7rem;
+      opacity: 0.9;
+    }
+  }
+  
+  .action-btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:disabled {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+// Salary revisions specific styles
+.salary-revisions-container {
+  .table-primary {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+    
+    .c-table-data-cell {
+      border-color: rgba(33, 150, 243, 0.2);
+    }
+  }
+  
+  .table-success {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%) !important;
+    
+    .c-table-data-cell {
+      border-color: rgba(76, 175, 80, 0.2);
+    }
+  }
+  
+  .ps-4 {
+    padding-left: 2rem !important;
+  }
+}
+
+// Enhanced table styles
+.c-table {
+  .c-table-head {
+    .c-table-header-cell {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.8rem;
+      color: #6c757d;
+      border: none;
+      padding: 1rem 0.75rem;
+    }
+  }
+  
+  .c-table-body {
+    .c-table-row {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+        transform: scale(1.001);
+      }
+      
+      .c-table-data-cell {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+}
+
+// Enhanced badge styles
+.c-badge {
+  border-radius: 20px;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.3px;
+  
+  &.bg-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+  }
+  
+  &.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+  }
+  
+  &.bg-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%) !important;
+  }
+  
+  &.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%) !important;
+  }
+}
+
+// Enhanced button styles
+.c-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &.c-btn-outline-primary {
+    border-width: 2px;
+    
+    &:hover {
+      background: linear-gradient(135deg, #321fdb 0%, #5a4fcf 100%);
+      border-color: transparent;
+    }
+  }
+  
+  &.c-btn-outline-info {
+    border-width: 2px;
+    
+    &:hover {
+      background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+      border-color: transparent;
+    }
+  }
+}
+
+// Enhanced card styles
+.c-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .c-card-header {
+    border-radius: 12px 12px 0 0;
+    padding: 1.5rem;
+    
+    h5 {
+      font-weight: 600;
+      color: #495057;
+    }
+  }
+  
+  .c-card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Enhanced progress bar
+.c-progress {
+  border-radius: 10px;
+  overflow: hidden;
+  
+  .c-progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+  }
+}
+
+// Enhanced alert styles
+.c-alert {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  &.c-alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+  }
+  
+  &.c-alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+  }
+  
+  &.c-alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+  }
+  
+  &.c-alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+  }
+}
+
+// Enhanced form styles
+.c-form-control {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: #321fdb;
+    box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.15);
+    transform: translateY(-1px);
+  }
+}
+
+.c-form-select {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: #321fdb;
+    box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.15);
+  }
+}
+
+// Enhanced dropdown styles
+.c-dropdown-menu {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  
+  .c-dropdown-item {
+    border-radius: 8px;
+    margin: 0.25rem 0;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(50, 31, 219, 0.1);
+      transform: translateX(5px);
+    }
+  }
+}
+
+// Enhanced modal styles
+.c-modal {
+  .c-modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  }
+  
+  .c-modal-header {
+    border-radius: 16px 16px 0 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .c-modal-body {
+    padding: 2rem;
+  }
+}
+
+// Responsive improvements
+@media (max-width: 767.98px) {
+  .summary-card {
+    margin-bottom: 1rem;
+  }
+  
+  .chart-container {
+    height: 300px !important;
+  }
+  
+  .month-badge {
+    width: 40px !important;
+    height: 40px !important;
+    
+    .month-number {
+      font-size: 1rem !important;
+    }
+    
+    .year-text {
+      font-size: 0.6rem !important;
+    }
+  }
+  
+  .action-btn {
+    padding: 0.375rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+// Animation classes
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Utility classes
+.text-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #321fdb 0%, #5a4fcf 100%);
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.bg-gradient-info {
+  background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.bg-gradient-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+}
+
+/* Enhanced Component Styles */
+.main-chart-container {
+  .summary-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .card-body {
+      position: relative;
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #321fdb, #39f, #321fdb);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+      }
+    }
+  }
+  
+  .chart-controls {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+    
+    .btn-group {
+      .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+  
+  .chart-container {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    
+    .card-header {
+      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      
+      h5 {
+        color: #321fdb;
+        font-weight: 600;
+      }
+    }
+  }
+  
+  .insights-card {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    
+    .card-header {
+      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      
+      h6 {
+        color: #321fdb;
+        font-weight: 600;
+      }
+    }
+    
+    .progress {
+      height: 8px;
+      border-radius: 4px;
+      background-color: rgba(0, 0, 0, 0.05);
+      
+      .progress-bar {
+        border-radius: 4px;
+        transition: width 0.6s ease;
+      }
+    }
+  }
+}
+
+/* Enhanced Salary Management Styles */
+.salary-management-container {
+  .summary-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .card-body {
+      position: relative;
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #321fdb, #39f, #321fdb);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+      }
+    }
+  }
+  
+  .table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .table {
+      margin-bottom: 0;
+      
+      thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+        
+        &:first-child {
+          border-top-left-radius: 12px;
+        }
+        
+        &:last-child {
+          border-top-right-radius: 12px;
+        }
+      }
+      
+      tbody {
+        tr {
+          transition: all 0.2s ease;
+          
+          &:hover {
+            background-color: rgba(50, 31, 219, 0.05);
+            transform: scale(1.01);
+          }
+          
+          td {
+            padding: 1rem;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+    }
+  }
+  
+  .action-btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    
+    .modal-header {
+      background: linear-gradient(135deg, #321fdb 0%, #39f 100%);
+      color: white;
+      border-bottom: none;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      
+      .modal-title {
+        font-weight: 600;
+      }
+      
+      .btn-close {
+        filter: invert(1);
+      }
+    }
+    
+    .modal-body {
+      padding: 2rem;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      transition: all 0.2s ease;
+      
+      &:focus {
+        border-color: #321fdb;
+        box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
+      }
+    }
+  }
+}
+
+/* Enhanced Payroll Management Styles */
+.payroll-management-container {
+  .summary-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .card-body {
+      position: relative;
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #321fdb, #39f, #321fdb);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+      }
+    }
+  }
+  
+  .progress-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    
+    .progress {
+      height: 10px;
+      border-radius: 5px;
+      background-color: rgba(0, 0, 0, 0.05);
+      
+      .progress-bar {
+        border-radius: 5px;
+        transition: width 0.6s ease;
+      }
+    }
+  }
+  
+  .month-selector {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-select {
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      transition: all 0.2s ease;
+      
+      &:focus {
+        border-color: #321fdb;
+        box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
+      }
+    }
+  }
+  
+  .table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .table {
+      margin-bottom: 0;
+      
+      thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+        
+        &:first-child {
+          border-top-left-radius: 12px;
+        }
+        
+        &:last-child {
+          border-top-right-radius: 12px;
+        }
+      }
+      
+      tbody {
+        tr {
+          transition: all 0.2s ease;
+          
+          &:hover {
+            background-color: rgba(50, 31, 219, 0.05);
+            transform: scale(1.01);
+          }
+          
+          td {
+            padding: 1rem;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+    }
+  }
+  
+  .action-btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  .dropdown-menu {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    
+    .dropdown-item {
+      padding: 0.75rem 1rem;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(50, 31, 219, 0.1);
+        color: #321fdb;
+      }
+    }
+  }
+}
+
+/* Enhanced Salary Revisions Styles */
+.salary-revisions-container {
+  .summary-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .card-body {
+      position: relative;
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #321fdb, #39f, #321fdb);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+      }
+    }
+  }
+  
+  .table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .table {
+      margin-bottom: 0;
+      
+      thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+        
+        &:first-child {
+          border-top-left-radius: 12px;
+        }
+        
+        &:last-child {
+          border-top-right-radius: 12px;
+        }
+      }
+      
+      tbody {
+        tr {
+          transition: all 0.2s ease;
+          
+          &:hover {
+            background-color: rgba(50, 31, 219, 0.05);
+            transform: scale(1.01);
+          }
+          
+          td {
+            padding: 1rem;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+    }
+  }
+  
+  .action-btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    
+    .modal-header {
+      background: linear-gradient(135deg, #321fdb 0%, #39f 100%);
+      color: white;
+      border-bottom: none;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      
+      .modal-title {
+        font-weight: 600;
+      }
+      
+      .btn-close {
+        filter: invert(1);
+      }
+    }
+    
+    .modal-body {
+      padding: 2rem;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      transition: all 0.2s ease;
+      
+      &:focus {
+        border-color: #321fdb;
+        box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
+      }
+    }
+  }
+}
+
+/* Enhanced Badge Styles */
+.badge {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  
+  &.bg-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+  }
+  
+  &.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+  }
+  
+  &.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%) !important;
+  }
+  
+  &.bg-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%) !important;
+  }
+  
+  &.bg-primary {
+    background: linear-gradient(135deg, #321fdb 0%, #39f 100%) !important;
+  }
+}
+
+/* Enhanced Button Styles */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &.btn-primary {
+    background: linear-gradient(135deg, #321fdb 0%, #39f 100%);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #2a1bb8 0%, #2d8bff 100%);
+    }
+  }
+  
+  &.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    }
+  }
+  
+  &.btn-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #e0a800 0%, #e8590c 100%);
+    }
+  }
+  
+  &.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #c82333 0%, #d63384 100%);
+    }
+  }
+}
+
+/* Enhanced Card Styles */
+.card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.shadow-sm {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    
+    h5, h6 {
+      color: #321fdb;
+      font-weight: 600;
+    }
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+/* Enhanced Form Styles */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: #321fdb;
+    box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
+  }
+  
+  &.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+/* Enhanced Alert Styles */
+.alert {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  
+  &.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+  }
+  
+  &.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+  }
+  
+  &.alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+  }
+  
+  &.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+  }
+}
+
+/* Enhanced Modal Styles */
+.modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  
+  .modal-header {
+    background: linear-gradient(135deg, #321fdb 0%, #39f 100%);
+    color: white;
+    border-bottom: none;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    
+    .modal-title {
+      font-weight: 600;
+    }
+    
+    .btn-close {
+      filter: invert(1);
+    }
+  }
+  
+  .modal-body {
+    padding: 2rem;
+  }
+  
+  .modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* Enhanced Table Styles */
+.table {
+  border-radius: 8px;
+  overflow: hidden;
+  
+  thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    font-weight: 600;
+    color: #495057;
+    padding: 1rem;
+    
+    &:first-child {
+      border-top-left-radius: 8px;
+    }
+    
+    &:last-child {
+      border-top-right-radius: 8px;
+    }
+  }
+  
+  tbody {
+    tr {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(50, 31, 219, 0.05);
+        transform: scale(1.01);
+      }
+      
+      td {
+        padding: 1rem;
+        vertical-align: middle;
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+}
+
+/* Enhanced Progress Bar Styles */
+.progress {
+  height: 10px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.05);
+  
+  .progress-bar {
+    border-radius: 5px;
+    transition: width 0.6s ease;
+  }
+}
+
+/* Enhanced Dropdown Styles */
+.dropdown-menu {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  
+  .dropdown-item {
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(50, 31, 219, 0.1);
+      color: #321fdb;
+    }
+  }
+}
+
+/* Enhanced Button Group Styles */
+.btn-group {
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+    }
+    
+    &:first-child {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    
+    &:last-child {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+  }
+}
+
+/* Enhanced Spinner Styles */
+.spinner-border {
+  border-width: 0.25em;
+}
+
+/* Enhanced Icon Styles */
+.icon {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .main-chart-container,
+  .salary-management-container,
+  .payroll-management-container,
+  .salary-revisions-container {
+    .summary-card {
+      margin-bottom: 1rem;
+    }
+    
+    .chart-controls {
+      .row {
+        .col-md-3 {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+    
+    .table-responsive {
+      font-size: 0.875rem;
+      
+      .table {
+        thead th,
+        tbody td {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+    }
+    
+    .action-btn {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+  
+  .modal-content {
+    .modal-body {
+      padding: 1rem;
+    }
+    
+    .modal-footer {
+      padding: 1rem;
+    }
+  }
+}
+
+/* Animation Keyframes */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Apply animations to components */
+.main-chart-container,
+.salary-management-container,
+.payroll-management-container,
+.salary-revisions-container {
+  animation: fadeInUp 0.6s ease-out;
+  
+  .summary-card {
+    animation: slideInLeft 0.6s ease-out;
+    
+    &:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+    
+    &:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+    
+    &:nth-child(4) {
+      animation-delay: 0.3s;
+    }
+  }
+  
+  .chart-container,
+  .table-container {
+    animation: slideInRight 0.6s ease-out;
+    animation-delay: 0.4s;
+  }
+}
+
+/* Enhanced Focus States */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+  /* Removed box-shadow to prevent border issues */
+}
+
+/* Enhanced Hover States */
+.card:hover,
+.summary-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Enhanced Active States */
+.btn:active {
+  /* Removed transform to prevent movement */
+}
+
+/* Enhanced Disabled States */
+.btn:disabled,
+.form-control:disabled,
+.form-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Enhanced Loading States */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Enhanced Error States */
+.has-error {
+  .form-control,
+  .form-select {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+  
+  .form-text {
+    color: #dc3545;
+  }
+}
+
+/* Enhanced Success States */
+.has-success {
+  .form-control,
+  .form-select {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  }
+  
+  .form-text {
+    color: #28a745;
+  }
+}
+
+/* Enhanced Warning States */
+.has-warning {
+  .form-control,
+  .form-select {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+  }
+  
+  .form-text {
+    color: #856404;
+  }
+}
+
+/* Enhanced Info States */
+.has-info {
+  .form-control,
+  .form-select {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+  }
+  
+  .form-text {
+    color: #0c5460;
+  }
+}
+
+/* Custom styles for login form */
+.login-form {
+  .c-input-group {
+    width: 100%;
+    
+    .c-form-input {
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      flex: 1;
+      
+      &:focus {
+        outline: none;
+        box-shadow: none;
+        border-color: #80bdff;
+      }
+    }
+    
+    .c-btn {
+      border-left: none;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      background-color: #f8f9fa;
+      flex-shrink: 0;
+      
+      &:hover {
+        background-color: #e9ecef;
+      }
+      
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+  
+  .c-card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+}

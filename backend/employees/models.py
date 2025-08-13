@@ -5,38 +5,29 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from decimal import Decimal
 import datetime
+from .constants import (
+    DEPARTMENT_CHOICES, GENDER_CHOICES, MARITAL_CHOICES,
+    MAX_FILE_SIZE, VALID_FILE_EXTENSIONS, VALID_MIME_TYPES,
+    DEFAULT_CHILDREN_COUNT, DEFAULT_LEAVE_BALANCES
+)
 
 class Employee(models.Model):
-    DEPARTMENT_CHOICES = [
-        ('Accounts', 'Accounts'),
-        ('Operations', 'Operations'),
-        ('IT', 'IT'),
-    ]
-    GENDER_CHOICES = [
-        ('Male', 'Male'),
-        ('Female', 'Female'),
-    ]
-    MARITAL_CHOICES = [
-        ('Married', 'Married'),
-        ('Unmarried', 'Unmarried'),
-    ]
 
+    @staticmethod
     def validate_file_type(file):
+        """Validate file type and size"""
         # Check file extension
         ext = os.path.splitext(file.name)[1].lower()
-        valid_extensions = ['.jpg', '.jpeg', '.png', '.pdf']
-        if ext not in valid_extensions:
-            raise ValidationError(f'Unsupported file extension. Allowed types: .jpg, .jpeg, .png, .pdf.')
+        if ext not in VALID_FILE_EXTENSIONS:
+            raise ValidationError(f'Unsupported file extension. Allowed types: {", ".join(VALID_FILE_EXTENSIONS)}.')
         
-        # Check file size (5MB limit)
-        MAX_FILE_SIZE = 5 * 1024 * 1024
+        # Check file size
         if file.size > MAX_FILE_SIZE:
             raise ValidationError(f'File size too large. Max size is {MAX_FILE_SIZE // (1024 * 1024)}MB.')
         
         # Additional security: check MIME type if possible
         if hasattr(file, 'content_type'):
-            valid_mime_types = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
-            if file.content_type not in valid_mime_types:
+            if file.content_type not in VALID_MIME_TYPES:
                 raise ValidationError('Invalid file type detected.')
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='employee_profile')
     photo = models.ImageField(upload_to='photos/', blank=True, null=True, verbose_name='Photo', validators=[validate_file_type], default='photos/default.png')
@@ -48,7 +39,7 @@ class Employee(models.Model):
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, verbose_name='Gender')
     marital_status = models.CharField(max_length=10, choices=MARITAL_CHOICES, verbose_name='Marital Status')
     spouse_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='Spouse Name')
-    children = models.PositiveIntegerField(default=0, verbose_name='Children', null=True, blank=True)
+    children = models.PositiveIntegerField(default=DEFAULT_CHILDREN_COUNT, verbose_name='Children', null=True, blank=True)
     father_name = models.CharField(max_length=100, verbose_name='Father Name', null=True, blank=True)
     mother_name = models.CharField(max_length=100, verbose_name='Mother Name', null=True, blank=True)
     phone_number = models.CharField(max_length=15, verbose_name='Phone Number')

@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { CForm, CFormLabel, CFormInput, CFormTextarea, CFormSelect, CButton, CAlert, CCard, CCardHeader, CCardBody } from '@coreui/react';
-import { BASE_URL } from '../../../../config';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { 
+  CForm, 
+  CFormLabel, 
+  CFormInput, 
+  CFormTextarea, 
+  CFormSelect, 
+  CButton, 
+  CAlert, 
+  CCard, 
+  CCardHeader, 
+  CCardBody,
+  CSpinner
+} from '@coreui/react';
+import { createLeave } from '../../../../store/slices/leaveSlice';
+import { selectLeavesCreating, selectLeavesError, selectLeavesSuccessMessage } from '../../../../store/slices/leaveSlice';
+import { selectIsAuthenticated } from '../../../../store/slices/authSlice';
 
 const leaveTypeOptions = [
   'Annual',
@@ -16,14 +31,21 @@ const leaveTypeOptions = [
 ];
 
 const EmployeeApplyLeaves = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  // Local state
   const [leaveType, setLeaveType] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [daysTaken, setDaysTaken] = useState(0);
   const [reason, setReason] = useState('');
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const token = localStorage.getItem('authToken');
+  
+  // Redux state
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isCreating = useSelector(selectLeavesCreating);
+  const error = useSelector(selectLeavesError);
+  const successMessage = useSelector(selectLeavesSuccessMessage);
 
   // Disable past dates
   const today = new Date().toISOString().split("T")[0];
@@ -41,137 +63,178 @@ const EmployeeApplyLeaves = () => {
     }
   }, [startDate, endDate]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    // Frontend validation
-    if (!leaveType || !startDate || !endDate || !reason) {
-      setError('Please fill in all required fields.');
-      return;
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/');
     }
+  }, [isAuthenticated, navigate]);
 
-    try {
-      const response = await axios.post(`${BASE_URL}/leaves/`, {
-        leave_type: leaveType,
-        start_date: startDate,
-        end_date: endDate,
-        reason,
-        days_taken: daysTaken
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      setSuccessMsg('Leave application submitted successfully! Please check your leave balance incase it is rejected by the system.');
+  // Clear form on successful submission
+  useEffect(() => {
+    if (successMessage) {
       setLeaveType('');
       setStartDate('');
       setEndDate('');
       setReason('');
       setDaysTaken(0);
-      setTimeout(() => {
-        setSuccessMsg('');
-      }
-        , 9000);
-    } catch (err) {
-      console.error(err);
-      setError('Error submitting leave application.');
-      if (err.response && err.response.status === 401) {
-        localStorage.removeItem('authToken');
-        window.location.href = '/';
-      }
-      if (err.response && err.response.status === 400) {
-        setError('Invalid data. Please check your input.');
-      }
-      if (err.response && err.response.status === 500) {
-        setError('Server error. Please try again later.');
-      }
-      setTimeout(() => {
-        setError('');
-      }
-        , 5000);
     }
+  }, [successMessage]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Frontend validation
+    if (!leaveType || !startDate || !endDate || !reason) {
+      return;
+    }
+
+    const leaveData = {
+      leave_type: leaveType,
+      start_date: startDate,
+      end_date: endDate,
+      reason,
+      days_taken: daysTaken
+    };
+
+    dispatch(createLeave(leaveData));
   };
+
+  const resetForm = () => {
+    setLeaveType('');
+    setStartDate('');
+    setEndDate('');
+    setReason('');
+    setDaysTaken(0);
+  };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <CCard>
-      <div>
-        <CCardHeader>
-          <h4 className="mb-2">Apply for Leave</h4>
-        </CCardHeader>
-        <CCardBody>
-          <div className='mb-2 nt-2'>
-            {error && <CAlert color="danger">{error}</CAlert>}
-            {successMsg && <CAlert color="success">{successMsg}</CAlert>}
-          </div>
-          <CForm onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <CFormLabel>
-                Leave Type <span style={{ color: 'red' }}>*</span>
-              </CFormLabel>
+      <CCardHeader>
+        <h4 className="mb-2">Apply for Leave</h4>
+        <p className="text-muted mb-0">Submit your leave request for approval</p>
+      </CCardHeader>
+      <CCardBody>
+        {/* Success Message */}
+        {successMessage && (
+          <CAlert color="success" className="mb-4">
+            <strong>Success!</strong> {successMessage}
+          </CAlert>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <CAlert color="danger" className="mb-4">
+            <strong>Error:</strong> {error}
+          </CAlert>
+        )}
+
+        <CForm onSubmit={handleSubmit}>
+          <div className="row">
+            <div className="col-md-6 mb-3">
+              <CFormLabel htmlFor="leaveType">Leave Type *</CFormLabel>
               <CFormSelect
+                id="leaveType"
                 value={leaveType}
                 onChange={(e) => setLeaveType(e.target.value)}
                 required
+                disabled={isCreating}
               >
-                <option value="">Select leave type</option>
+                <option value="">Select Leave Type</option>
                 {leaveTypeOptions.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
                 ))}
               </CFormSelect>
             </div>
 
-            <div className="mb-3">
-              <CFormLabel>
-                Start Date <span style={{ color: 'red' }}>*</span>
-              </CFormLabel>
+            <div className="col-md-6 mb-3">
+              <CFormLabel htmlFor="daysTaken">Days Requested</CFormLabel>
               <CFormInput
+                id="daysTaken"
+                type="number"
+                value={daysTaken}
+                readOnly
+                className="bg-light"
+              />
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-md-6 mb-3">
+              <CFormLabel htmlFor="startDate">Start Date *</CFormLabel>
+              <CFormInput
+                id="startDate"
                 type="date"
-                min={today}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
+                min={today}
                 required
+                disabled={isCreating}
               />
             </div>
 
-            <div className="mb-3">
-              <CFormLabel>
-                End Date <span style={{ color: 'red' }}>*</span>
-              </CFormLabel>
+            <div className="col-md-6 mb-3">
+              <CFormLabel htmlFor="endDate">End Date *</CFormLabel>
               <CFormInput
+                id="endDate"
                 type="date"
-                min={startDate || today}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                min={startDate || today}
                 required
+                disabled={isCreating}
               />
             </div>
+          </div>
 
-            {daysTaken > 0 && (
-              <div className="mb-3">
-                <CFormLabel>Days Taken</CFormLabel>
-                <CFormInput type="text" value={`${daysTaken} day(s)`} disabled />
-              </div>
-            )}
+          <div className="mb-4">
+            <CFormLabel htmlFor="reason">Reason for Leave *</CFormLabel>
+            <CFormTextarea
+              id="reason"
+              rows={4}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Please provide a detailed reason for your leave request..."
+              required
+              disabled={isCreating}
+            />
+          </div>
 
-            <div className="mb-3">
-              <CFormLabel>
-                Reason <span style={{ color: 'red' }}>*</span>
-              </CFormLabel>
-              <CFormTextarea
-                rows="3"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                required
-              />
-            </div>
-
-            <CButton type="submit" color="primary">
-              Submit
+          <div className="d-flex gap-2">
+            <CButton
+              type="submit"
+              color="primary"
+              disabled={isCreating || !leaveType || !startDate || !endDate || !reason}
+              className="px-4"
+            >
+              {isCreating ? (
+                <>
+                  <CSpinner size="sm" className="me-2" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit Leave Request'
+              )}
             </CButton>
-          </CForm>
-        </CCardBody>
-      </div>
+            
+            <CButton
+              type="button"
+              color="outline-secondary"
+              onClick={resetForm}
+              disabled={isCreating}
+              className="px-4"
+            >
+              Reset Form
+            </CButton>
+          </div>
+        </CForm>
+      </CCardBody>
     </CCard>
   );
 };

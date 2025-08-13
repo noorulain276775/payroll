@@ -1,101 +1,141 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { CAvatar, CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { 
+  CAvatar, 
+  CCard, 
+  CCardBody, 
+  CCardHeader, 
+  CCol, 
+  CRow, 
+  CTable, 
+  CTableBody, 
+  CTableDataCell, 
+  CTableHead, 
+  CTableHeaderCell, 
+  CTableRow,
+  CSpinner,
+  CAlert
+} from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import { cilPeople } from '@coreui/icons';
-// import MainChart from './MainChart';
-// import { DashboardWidgets } from '../../components/DashboardWidgets';
-import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../../../config';
+import { fetchEmployees } from '../../store/slices/employeeSlice';
+import { selectEmployees, selectEmployeesLoading, selectEmployeesError } from '../../store/slices/employeeSlice';
+import { selectIsAuthenticated } from '../../store/slices/authSlice';
 
 const EmployeeDashboard = () => {
-  // const [dashboardData, setDashboardData] = useState(null);
-  const [newEmployees, setNewEmployees] = useState([]);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // Redux state
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const employees = useSelector(selectEmployees);
+  const isLoading = useSelector(selectEmployeesLoading);
+  const error = useSelector(selectEmployeesError);
 
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    if (!authToken) {
-      window.location.href = '/';
+    // Redirect if not authenticated
+    if (!isAuthenticated) {
+      navigate('/');
+      return;
     }
-  }, [navigate]);
 
-  useEffect(() => {
+    // Fetch employees data
+    dispatch(fetchEmployees());
+  }, [dispatch, isAuthenticated, navigate]);
 
-    const fetchNewEmployees = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/new_employees/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
-        });
-        setNewEmployees(response.data);
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('authToken');
-          window.location.href = '/';
-        } else {
-          console.error('Error fetching new employees:', error);
-        }
-      }
-    };
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+        <CSpinner color="primary" size="lg" />
+      </div>
+    );
+  }
 
-    fetchNewEmployees();
-  }, [navigate]);
+  // Show error state
+  if (error) {
+    return (
+      <CAlert color="danger" className="mb-4">
+        <strong>Error:</strong> {error}
+      </CAlert>
+    );
+  }
 
-
+  // Get recent employees (last 10)
+  const recentEmployees = employees.slice(0, 10);
 
   return (
     <>
-      {/* <DashboardWidgets
-        totalSalaryForMonth={dashboardData.total_salary_for_month}
-        totalOvertimeForMonth={dashboardData.total_overtime_for_month}
-        previousMonthSalary={dashboardData.previous_month_salary}
-        previousMonthOvertime={dashboardData.previous_month_overtime}
-        totalEmployees={dashboardData.total_employees}
-        averageSalaryForMonth={dashboardData.average_salary_for_month}
-      />
-
-      <CCard className="mb-4">
-        <CCardBody>
-          <CRow>
-            <CCol sm={12}>
-              <h4 id="payroll" className="card-title mb-0">
-                Total Payroll Each Month this year
-              </h4>
-              <div className="small text-body-secondary">This is 12 months data for current year</div>
-            </CCol>
-          </CRow>
-          <MainChart monthlyData={dashboardData.monthly_data} />
-        </CCardBody>
-      </CCard> */}
-
-      {/* Newly Added Employees Table */}
+      {/* Recent Employees Table */}
       <CCard>
-        <CCardHeader>Newly Added Colleagues</CCardHeader>
+        <CCardHeader>
+          <h4 className="mb-0">
+            <CIcon icon={cilPeople} className="me-2" />
+            Recent Colleagues
+          </h4>
+        </CCardHeader>
         <CCardBody>
-          <CTable align="middle" className="mb-0 border" hover responsive>
-            <CTableHead className="text-nowrap">
-              <CTableRow>
-                <CTableHeaderCell className="bg-body-tertiary text-center">
-                  <CIcon icon={cilPeople} />
-                </CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary">Employee Name</CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary">Designation</CTableHeaderCell>
-                <CTableHeaderCell className="bg-body-tertiary">Department</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {newEmployees.map((item, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell className="text-center">
-                    <img height={50} width={50} style={{borderRadius: '50px'}} size="md" src={`${BASE_URL}${item.photo}`} />
-                  </CTableDataCell>
-                  <CTableDataCell>{item.first_name} {item.last_name}</CTableDataCell>
-                  <CTableDataCell>{item.designation}</CTableDataCell>
-                  <CTableDataCell>{item.department}</CTableDataCell>
+          {recentEmployees.length === 0 ? (
+            <div className="text-center text-muted py-4">
+              <CIcon icon={cilPeople} size="3xl" className="mb-3" />
+              <p>No employees found</p>
+            </div>
+          ) : (
+            <CTable align="middle" className="mb-0 border" hover responsive>
+              <CTableHead className="text-nowrap">
+                <CTableRow>
+                  <CTableHeaderCell className="bg-body-tertiary text-center">
+                    <CIcon icon={cilPeople} />
+                  </CTableHeaderCell>
+                  <CTableHeaderCell className="bg-body-tertiary">Employee Name</CTableHeaderCell>
+                  <CTableHeaderCell className="bg-body-tertiary">Designation</CTableHeaderCell>
+                  <CTableHeaderCell className="bg-body-tertiary">Department</CTableHeaderCell>
+                  <CTableHeaderCell className="bg-body-tertiary">Joining Date</CTableHeaderCell>
                 </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
+              </CTableHead>
+              <CTableBody>
+                {recentEmployees.map((employee, index) => (
+                  <CTableRow key={employee.id || index}>
+                    <CTableDataCell className="text-center">
+                      {employee.photo ? (
+                        <img 
+                          height={50} 
+                          width={50} 
+                          style={{ borderRadius: '50px', objectFit: 'cover' }} 
+                          src={employee.photo.startsWith('http') ? employee.photo : `${process.env.REACT_APP_API_URL || ''}${employee.photo}`}
+                          alt={`${employee.first_name} ${employee.last_name}`}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'block';
+                          }}
+                        />
+                      ) : (
+                        <CAvatar 
+                          size="md" 
+                          color="primary"
+                          className="d-flex align-items-center justify-content-center"
+                        >
+                          {employee.first_name?.charAt(0)}{employee.last_name?.charAt(0)}
+                        </CAvatar>
+                      )}
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <strong>{employee.first_name} {employee.last_name}</strong>
+                      {employee.email && (
+                        <div className="small text-muted">{employee.email}</div>
+                      )}
+                    </CTableDataCell>
+                    <CTableDataCell>{employee.designation || 'N/A'}</CTableDataCell>
+                    <CTableDataCell>{employee.department || 'N/A'}</CTableDataCell>
+                    <CTableDataCell>
+                      {employee.joining_date ? new Date(employee.joining_date).toLocaleDateString() : 'N/A'}
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+              </CTableBody>
+            </CTable>
+          )}
         </CCardBody>
       </CCard>
     </>

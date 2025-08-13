@@ -9,9 +9,11 @@ const Employees = React.lazy(() => import('./views/Employees/Employees'));
 // Salary
 const Salary = React.lazy(() => import('./views/Salary/Salary'));
 
-
 // Payroll
 const Payroll = React.lazy(() => import('./views/Payroll/Payroll'));
+
+// AI Analytics
+const AIAnalyticsDashboard = React.lazy(() => import('./views/AIAnalytics/AIAnalyticsDashboard'));
 
 // Add Employee (Admin Only)
 const AddEmployee = React.lazy(() => import('./views/Employees/AddEmployee'));
@@ -62,6 +64,7 @@ const routes = [
   { path: '/employees', name: 'Employees', element: Employees, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees/salary-details', name: 'Salary', element: Salary, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees/payroll', name: 'Payroll', element: Payroll, allowedRoles: ['Admin' , 'Both'] },
+  { path: '/ai-analytics', name: 'AI Analytics', element: AIAnalyticsDashboard, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees/add-employee', name: 'Add Employee', element: AddEmployee, allowedRoles: ['Admin' , 'Both'] },
   { path: '/register/new-user', name: 'Add Admin', element: AddUser, allowedRoles: ['Admin' , 'Both'] },
   { path: '/employees/salary-revision', name: 'Salary Revisions', element: SalaryRevisions, allowedRoles: ['Admin' , 'Both'] },

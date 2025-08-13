@@ -8,18 +8,41 @@ from rest_framework import status
 from .serializers import CustomUserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db import models
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
+from django.core.exceptions import ValidationError
+import re
 
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST'), name='post')
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
+    
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
+        
+        # Input validation
+        if not username or not password:
+            return Response({
+                'error': 'Username and password are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Rate limiting check
+        if getattr(request, 'limited', False):
+            return Response({
+                'error': 'Too many login attempts. Please try again later.'
+            }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        
         user = authenticate(username=username, password=password)
         
         if user:
             user.last_login = now()
             user.save(update_fields=['last_login'])
             refresh = RefreshToken.for_user(user)
+            
+            # Log successful login
+            print(f"Successful login: {username} at {now()}")
+            
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
@@ -29,48 +52,77 @@ class UserLoginView(APIView):
                 'user_id': user.id,
             })
         
+        # Log failed login attempt
+        print(f"Failed login attempt: {username} at {now()}")
+        
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 import re
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 
+@method_decorator(ratelimit(key='ip', rate='3/m', method='POST'), name='post')
 class UserRegisterView(APIView):
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
-        user_type = request.data.get('user_type')
-
+        user_type = request.data.get('user_type', 'Employee')
+        
         # Input validation
-        if not all([username, email, password, user_type]):
-            return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
-
+        if not all([username, email, password]):
+            return Response({
+                'error': 'All fields are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Rate limiting check
+        if getattr(request, 'limited', False):
+            return Response({
+                'error': 'Too many registration attempts. Please try again later.'
+            }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        
         # Username validation
         if len(username) < 3 or len(username) > 30:
-            return Response({'error': 'Username must be between 3 and 30 characters'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Username must be between 3 and 30 characters'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         if not re.match(r'^[a-zA-Z0-9_]+$', username):
-            return Response({'error': 'Username can only contain letters, numbers, and underscores'}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response({
+                'error': 'Username can only contain letters, numbers, and underscores'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         # Email validation
-        try:
-            validate_email(email)
-        except ValidationError:
-            return Response({'error': 'Invalid email format'}, status=status.HTTP_400_BAD_REQUEST)
-
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            return Response({
+                'error': 'Please enter a valid email address'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         # Password validation
-        if len(password) < 8:
-            return Response({'error': 'Password must be at least 8 characters long'}, status=status.HTTP_400_BAD_REQUEST)
+        if len(password) < 12:
+            return Response({
+                'error': 'Password must be at least 12 characters long'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         if not re.search(r'[A-Z]', password):
-            return Response({'error': 'Password must contain at least one uppercase letter'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Password must contain at least one uppercase letter'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         if not re.search(r'[a-z]', password):
-            return Response({'error': 'Password must contain at least one lowercase letter'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Password must contain at least one lowercase letter'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         if not re.search(r'\d', password):
-            return Response({'error': 'Password must contain at least one number'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Password must contain at least one number'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            return Response({
+                'error': 'Password must contain at least one special character'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         # User type validation - prevent unauthorized admin creation
         if user_type not in ['Employee', 'Both']:
@@ -98,67 +150,52 @@ class UserRegisterView(APIView):
             )
             user_data = CustomUserSerializer(user).data
 
+            # Log successful registration
+            print(f"User registered successfully: {username} ({user_type}) at {now()}")
+
             return Response({
                 'message': 'User registered successfully',
                 'user': user_data
             }, status=status.HTTP_201_CREATED)
         except Exception as e:
+            # Log registration error
+            print(f"Registration error for {username}: {str(e)} at {now()}")
             return Response({'error': f'Failed to create user: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
+@method_decorator(ratelimit(key='user', rate='100/h', method='GET'), name='get')
 class UserListView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
         # Only allow admins to view user list
-        if request.user.user_type not in ['Admin', 'Both']:
-            return Response({'error': 'Access denied. Admin privileges required.'}, status=status.HTTP_403_FORBIDDEN)
+        if not (request.user.is_staff or request.user.is_superuser):
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
         
         try:
-            # Filter users based on request parameters
-            users = CustomUser.objects.all()
+            users = CustomUser.objects.all().exclude(is_superuser=True)
+            user_data = CustomUserSerializer(users, many=True).data
             
-            # Apply search filter if provided
-            search = request.query_params.get('search', '')
-            if search:
-                users = users.filter(
-                    models.Q(username__icontains=search) |
-                    models.Q(email__icontains=search) |
-                    models.Q(user_type__icontains=search)
-                )
-            
-            # Apply user type filter if provided
-            user_type = request.query_params.get('user_type', '')
-            if user_type:
-                users = users.filter(user_type=user_type)
-            
-            # Apply pagination
-            page = int(request.query_params.get('page', 1))
-            page_size = min(int(request.query_params.get('page_size', 20)), 100)  # Max 100 per page
-            
-            start = (page - 1) * page_size
-            end = start + page_size
-            
-            total_users = users.count()
-            users = users[start:end]
-            
-            serializer = CustomUserSerializer(users, many=True)
+            # Log user list access
+            print(f"User list accessed by {request.user.username} at {now()}")
             
             return Response({
-                'users': serializer.data,
-                'pagination': {
-                    'page': page,
-                    'page_size': page_size,
-                    'total_users': total_users,
-                    'total_pages': (total_users + page_size - 1) // page_size
-                }
+                'users': user_data,
+                'count': len(user_data)
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
+            # Log error
+            print(f"Error fetching users by {request.user.username}: {str(e)} at {now()}")
             return Response({'error': f'Failed to fetch users: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+    def post(self, request):
+        return Response({
+            'error': 'Method not allowed'
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+@method_decorator(ratelimit(key='user', rate='10/m', method='POST'), name='post')
 class UserLogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -173,70 +210,106 @@ class UserLogoutView(APIView):
             token.blacklist()
             
             # Log the logout for security audit
-            print(f"User logged out: {request.user.username} at {timezone.now()}")
+            print(f"User logged out: {request.user.username} at {now()}")
             
             return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
             
         except Exception as e:
             # Log the error for debugging
-            print(f"Logout error for user {request.user.username}: {str(e)}")
+            print(f"Logout error for user {request.user.username}: {str(e)} at {now()}")
             return Response({'error': 'Invalid token or token already blacklisted'}, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request):
         """Handle logout via GET request (for compatibility)"""
         try:
             # Log the logout for security audit
-            print(f"User logged out via GET: {request.user.username} at {timezone.now()}")
+            print(f"User logged out via GET: {request.user.username} at {now()}")
             
             return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
             
         except Exception as e:
-            print(f"Logout error for user {request.user.username}: {str(e)}")
+            print(f"Logout error for user {request.user.username}: {str(e)} at {now()}")
             return Response({'error': 'Logout failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    def put(self, request):
+        return Response({
+            'error': 'Method not allowed'
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+@method_decorator(ratelimit(key='user', rate='5/m', method='POST'), name='post')
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     def post(self, request):
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+        
+        # Input validation
+        if not all([current_password, new_password, confirm_password]):
+            return Response({
+                'error': 'All password fields are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if current password is correct
+        if not request.user.check_password(current_password):
+            return Response({
+                'error': 'Current password is incorrect'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if new passwords match
+        if new_password != confirm_password:
+            return Response({
+                'error': 'New passwords do not match'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if new password is different from current
+        if current_password == new_password:
+            return Response({
+                'error': 'New password must be different from current password'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate new password strength
+        if len(new_password) < 12:
+            return Response({
+                'error': 'Password must be at least 12 characters long'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not re.search(r'[A-Z]', new_password):
+            return Response({
+                'error': 'Password must contain at least one uppercase letter'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not re.search(r'[a-z]', new_password):
+            return Response({
+                'error': 'Password must contain at least one lowercase letter'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not re.search(r'\d', new_password):
+            return Response({
+                'error': 'Password must contain at least one number'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', new_password):
+            return Response({
+                'error': 'Password must contain at least one special character'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         try:
-            user = request.user
-            current_password = request.data.get('current_password')
-            new_password = request.data.get('new_password')
-            
-            # Input validation
-            if not current_password or not new_password:
-                return Response({'error': 'Current password and new password are required'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Validate current password
-            if not user.check_password(current_password):
-                return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Password strength validation
-            if len(new_password) < 8:
-                return Response({'error': 'New password must be at least 8 characters long'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if not re.search(r'[A-Z]', new_password):
-                return Response({'error': 'New password must contain at least one uppercase letter'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if not re.search(r'[a-z]', new_password):
-                return Response({'error': 'New password must contain at least one lowercase letter'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            if not re.search(r'\d', new_password):
-                return Response({'error': 'New password must contain at least one number'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Prevent using current password as new password
-            if current_password == new_password:
-                return Response({'error': 'New password must be different from current password'}, status=status.HTTP_400_BAD_REQUEST)
-            
             # Update password
-            user.set_password(new_password)
-            user.save()
+            request.user.set_password(new_password)
+            request.user.save()
             
-            # Log the password change for security audit
-            print(f"Password changed for user: {user.username} at {timezone.now()}")
+            # Log password change
+            print(f"Password changed for user: {request.user.username} at {now()}")
             
-            return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
+            return Response({
+                'message': 'Password changed successfully'
+            }, status=status.HTTP_200_OK)
             
         except Exception as e:
-            return Response({'error': f'Failed to change password: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # Log error
+            print(f"Password change error for {request.user.username}: {str(e)} at {now()}")
+            return Response({
+                'error': 'Failed to change password'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

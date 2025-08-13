@@ -6,40 +6,46 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react';
-import { cilAccountLogout } from '@coreui/icons';
+import { cilAccountLogout, cilUser, cilSettings } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { BASE_URL } from '../../../config';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../../store/slices/authSlice';
+import { selectUser, selectIsAuthenticated } from '../../store/slices/authSlice';
 
 import avatar8 from './../../assets/images/avatars/8.jpg';
 
 const AppHeaderDropdown = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  // Redux state
+  const user = useSelector(selectUser);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const handleLogout = async () => {
     try {
-      const authToken = localStorage.getItem('authToken');
-      const refreshToken = localStorage.getItem('refreshToken');
-      console
-      await axios.post(
-        `${BASE_URL}/users/logout/`,
-        { refresh_token: refreshToken },
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.setItem("logged_in_status", JSON.stringify(false));
-      window.location.href = '/';
-
+      // Dispatch logout action
+      await dispatch(logoutUser());
+      // Redux will handle clearing localStorage and redirecting
     } catch (error) {
       console.error('Logout failed:', error);
+      // Force logout even if API call fails
+      navigate('/');
     }
   };
+
+  const handleProfile = () => {
+    navigate('/profile');
+  };
+
+  const handleSettings = () => {
+    navigate('/settings');
+  };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <CDropdown variant="nav-item">
@@ -47,6 +53,23 @@ const AppHeaderDropdown = () => {
         <CAvatar src={avatar8} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
+        {user && (
+          <CDropdownItem header className="text-center">
+            <strong>{user.first_name} {user.last_name}</strong>
+            <br />
+            <small className="text-muted">{user.email}</small>
+          </CDropdownItem>
+        )}
+        <CDropdownItem divider />
+        <CDropdownItem onClick={handleProfile}>
+          <CIcon icon={cilUser} className="me-2" />
+          Profile
+        </CDropdownItem>
+        <CDropdownItem onClick={handleSettings}>
+          <CIcon icon={cilSettings} className="me-2" />
+          Settings
+        </CDropdownItem>
+        <CDropdownItem divider />
         <CDropdownItem onClick={handleLogout}>
           <CIcon icon={cilAccountLogout} className="me-2" />
           Sign out

@@ -12,7 +12,8 @@ import {
   cilUser,
   cilTask,
   cilThumbUp,
-  cilBarChart
+  cilBarChart,
+  cilBrain
 } from '@coreui/icons';
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react';
 
@@ -73,7 +74,16 @@ const adminNav = [
     to: '/employees/leave-balances',
     icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
   },
-
+  {
+    component: CNavTitle,
+    name: 'AI & Analytics',
+  },
+  {
+    component: CNavItem,
+    name: 'AI Analytics',
+    to: '/ai-analytics',
+    icon: <CIcon icon={cilBrain} customClassName="nav-icon" />,
+  },
   {
     component: CNavGroup,
     name: 'Accounts',
