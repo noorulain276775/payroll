@@ -126,7 +126,7 @@ Our system incorporates cutting-edge **Artificial Intelligence and Machine Learn
 
 ---
 
-## 🛠 **Technology Stack**
+## **Technology Stack**
 
 ### **Backend (Django)**
 - **Framework**: Django 5.1.4 + Django REST Framework
@@ -377,7 +377,7 @@ EMAIL_HOST_PASSWORD = 'your-app-password'
 
 ---
 
-## 🧪 **Testing**
+## **Testing**
 
 ### **Backend Testing**
 ```bash
@@ -408,7 +408,7 @@ npm test -- --testNamePattern="Login"
 
 ---
 
-## 🚀 **Deployment**
+## **Deployment**
 
 ### **Production Checklist**
 - [ ] Set `DEBUG=False`
@@ -434,7 +434,7 @@ docker build -t payroll-frontend ./frontend
 
 ---
 
-## 🤝 **Contributing**
+## **Contributing**
 
 ### **Development Guidelines**
 1. Fork the repository
@@ -461,19 +461,19 @@ docker build -t payroll-frontend ./frontend
 
 ---
 
-## 🏆 **Features Summary**
+## **Features Summary**
 
 | Category | Features | Count |
 |----------|----------|-------|
-| 🤖 **AI & Machine Learning** | Predictive Analytics, Anomaly Detection, ML Models, Chatbot | 15+ |
-| 🔐 **Security** | JWT, Encryption, Rate Limiting, CSP, Audit Logging | 15+ |
-| 👥 **Employee Management** | Profiles, Documents, Positions, Departments | 20+ |
-| 📅 **Leave Management** | Types, Balances, Approvals, History | 12+ |
-| 💰 **Payroll** | Salaries, Allowances, Deductions, Reports | 18+ |
-| 📊 **Analytics** | Dashboards, Charts, Reports, Export | 10+ |
-| ⚡ **Automation** | Celery, Scheduling, Notifications | 8+ |
-| 🎨 **UI/UX** | Responsive, Themes, Animations, Accessibility | 12+ |
-| 🔧 **Technical** | API, Testing, Documentation, Deployment | 15+ |
+| **AI & Machine Learning** | Predictive Analytics, Anomaly Detection, ML Models, Chatbot | 15+ |
+| **Security** | JWT, Encryption, Rate Limiting, CSP, Audit Logging | 15+ |
+| **Employee Management** | Profiles, Documents, Positions, Departments | 20+ |
+| **Leave Management** | Types, Balances, Approvals, History | 12+ |
+| **Payroll** | Salaries, Allowances, Deductions, Reports | 18+ |
+| **Analytics** | Dashboards, Charts, Reports, Export | 10+ |
+| **Automation** | Celery, Scheduling, Notifications | 8+ |
+| **UI/UX** | Responsive, Themes, Animations, Accessibility | 12+ |
+| **Technical** | API, Testing, Documentation, Deployment | 15+ |
 
 **Total Features: 125+**
 
