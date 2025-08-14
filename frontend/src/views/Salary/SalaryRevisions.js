@@ -31,24 +31,23 @@ import {
   CSpinner
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { 
-  cilMoney, 
-  cilPlus, 
-  cilPencil, 
-  cilTrash, 
-  cilEye,
-  cilTrendingUp,
+import {
+  cilMoney,
+  cilPlus,
+  cilPencil,
+  cilTrash,
+  cilSearch,
   cilCalculator,
   cilUser,
   cilHistory,
-  cilCheckCircle
+  cilCheck
 } from '@coreui/icons';
-import { fetchEmployees } from '../../../store/slices/employeeSlice';
-import { selectEmployees, selectEmployeesLoading, selectEmployeesError } from '../../../store/slices/employeeSlice';
-import { selectIsAuthenticated } from '../../../store/slices/authSlice';
-import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import ErrorDisplay from '../../../components/common/ErrorDisplay';
-import { useReduxOperations, useFormState } from '../../../hooks/useReduxOperations';
+import { fetchEmployees } from '../../store/slices/employeeSlice';
+import { selectEmployees, selectEmployeesLoading, selectEmployeesError } from '../../store/slices/employeeSlice';
+import { selectIsAuthenticated } from '../../store/slices/authSlice';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorDisplay from '../../components/common/ErrorDisplay';
+import { useReduxOperations, useFormState } from '../../hooks/useReduxOperations';
 
 const SalaryRevisions = () => {
   const dispatch = useDispatch();
@@ -312,7 +311,7 @@ const SalaryRevisions = () => {
   const getStatusBadge = (status) => {
     return (
       <CBadge color="success" className="d-flex align-items-center gap-1">
-        <CIcon icon={cilCheckCircle} size="sm" />
+        <CIcon icon={cilCheck} size="sm" />
         Active
       </CBadge>
     );
@@ -331,7 +330,7 @@ const SalaryRevisions = () => {
     return (
       <div className="d-flex align-items-center">
         <CIcon 
-          icon={cilTrendingUp} 
+                        icon={cilPlus} 
           className={`me-1 ${isPositive ? 'text-success' : 'text-danger'}`}
         />
         <span className={`small ${isPositive ? 'text-success' : 'text-danger'}`}>
@@ -362,7 +361,7 @@ const SalaryRevisions = () => {
       {/* Header Section */}
       <div className="mb-4">
         <h2 className="mb-3">
-          <CIcon icon={cilTrendingUp} className="me-2 text-primary" />
+                          <CIcon icon={cilPlus} className="me-2" />
           Salary Revision Management
         </h2>
         <p className="text-muted mb-0">
@@ -522,7 +521,7 @@ const SalaryRevisions = () => {
                           onClick={() => openViewModal(revision)}
                           className="action-btn"
                         >
-                          <CIcon icon={cilEye} className="me-1" />
+                          <CIcon icon={cilSearch} className="me-1" />
                           View
                         </CButton>
                         
@@ -813,7 +812,7 @@ const SalaryRevisions = () => {
       >
         <CModalHeader closeButton>
           <CModalTitle>
-            <CIcon icon={cilEye} className="me-2" />
+            <CIcon icon={cilSearch} className="me-2" />
             Salary Revision Details
           </CModalTitle>
         </CModalHeader>

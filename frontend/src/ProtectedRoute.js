@@ -1,16 +1,14 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import secureStorage from './utils/secureStorage';
+import { useSelector } from 'react-redux';
+import { selectIsAuthenticated, selectUserType } from './store/slices/authSlice';
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
-  // Use secure storage instead of localStorage
-  const userType = secureStorage.getUserType();
-  const isAuthenticated = secureStorage.isAuthenticated();
-  
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const userType = useSelector(selectUserType);
+
   // Check if user is authenticated and has valid token
   if (!isAuthenticated || !userType) {
-    // Clear any invalid data and redirect to login
-    secureStorage.clearAll();
     return <Navigate to="/" replace />;
   }
   

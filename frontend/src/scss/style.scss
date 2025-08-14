@@ -13,6 +13,268 @@
 // If you want to add custom CSS you can put it here
 @import "custom";
 
+// ========================================
+// NEW CLEAN SIDEBAR STYLES
+// ========================================
+
+// Sidebar overlay for mobile
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  display: none;
+  
+  @media (max-width: 991.98px) {
+    display: block;
+  }
+}
+
+// Main sidebar container
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px;
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  z-index: 1050;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  
+  // Unfoldable state
+  &.unfoldable {
+    width: 56px;
+    
+    .sidebar-link span,
+    .sidebar-title,
+    .sidebar-group-header span {
+      display: none;
+    }
+    
+    .sidebar-logo {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  
+  // Mobile responsive
+  @media (max-width: 991.98px) {
+    transform: translateX(-100%);
+    
+    &.show {
+      transform: translateX(0);
+    }
+  }
+}
+
+// Sidebar header
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.sidebar-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  @media (min-width: 992px) {
+    display: none;
+  }
+}
+
+// Sidebar navigation
+.sidebar-nav {
+  padding: 1rem 0;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
+// Sidebar links
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  
+  &:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #3498db;
+  }
+  
+  &.active {
+    color: white;
+    background-color: rgba(52, 152, 219, 0.2);
+    border-left-color: #3498db;
+  }
+  
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  
+  span {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+}
+
+// Sidebar titles
+.sidebar-title {
+  padding: 1rem 1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 1rem;
+}
+
+// Sidebar groups
+.sidebar-group {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: white;
+  }
+  
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+.sidebar-group-items {
+  padding-left: 2.5rem;
+  
+  .sidebar-link {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+// Sidebar footer
+.sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  width: 100%;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Mobile toggle button
+.sidebar-mobile-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1030;
+  background: #2c3e50;
+  border: none;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: none;
+  
+  @media (max-width: 991.98px) {
+    display: block;
+  }
+}
+
+// ========================================
+// LAYOUT FIXES
+// ========================================
+
 // Custom layout fixes
 .c-app {
   display: flex;
@@ -26,22 +288,6 @@
   
   @media (min-width: 992px) {
     margin-left: 260px; // Default sidebar width
-  }
-}
-
-.c-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  z-index: 1030;
-  
-  &.c-sidebar-unfoldable {
-    width: 260px;
-  }
-  
-  &.c-sidebar-foldable {
-    width: 56px;
   }
 }
 
@@ -59,14 +305,6 @@
   .c-wrapper {
     margin-left: 0;
   }
-  
-  .c-sidebar {
-    transform: translateX(-100%);
-    
-    &.c-sidebar-visible {
-      transform: translateX(0);
-    }
-  }
 }
 
 // Fix for content overflow
@@ -74,7 +312,7 @@
   min-height: calc(100vh - 120px); // Account for header and footer
 }
 
-// Fix for sidebar toggle button positioning
+// Fix for header toggle button positioning
 .c-header-toggler {
   margin-left: -0.5rem;
 }

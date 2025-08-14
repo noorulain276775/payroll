@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
@@ -13,32 +13,32 @@ export const useReduxOperations = () => {
   const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  // Check authentication and redirect if needed
-  const checkAuth = (redirectTo = '/') => {
+  // Check authentication and redirect if needed - memoized with useCallback
+  const checkAuth = useCallback((redirectTo = '/') => {
     if (!isAuthenticated) {
       navigate(redirectTo);
       return false;
     }
     return true;
-  };
+  }, [isAuthenticated, navigate]);
 
-  // Safe dispatch with authentication check
-  const safeDispatch = (action, requireAuth = true) => {
+  // Safe dispatch with authentication check - memoized with useCallback
+  const safeDispatch = useCallback((action, requireAuth = true) => {
     if (requireAuth && !checkAuth()) {
       return false;
     }
     dispatch(action);
     return true;
-  };
+  }, [dispatch, checkAuth]);
 
-  // Handle API errors
-  const handleApiError = (error, fallbackMessage = 'An error occurred') => {
+  // Handle API errors - memoized with useCallback
+  const handleApiError = useCallback((error, fallbackMessage = 'An error occurred') => {
     if (error?.response?.status === 401) {
       navigate('/');
       return 'Session expired. Please login again.';
     }
     return error?.response?.data?.message || error?.message || fallbackMessage;
-  };
+  }, [navigate]);
 
   return {
     dispatch,

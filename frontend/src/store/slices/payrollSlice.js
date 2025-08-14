@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { BASE_URL } from '../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../config';
 
 export const fetchPayrollRecords = createAsyncThunk(
   'payroll/fetchPayrollRecords',
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/payroll/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.PAYROLL}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -24,7 +24,7 @@ export const fetchPayrollById = createAsyncThunk(
   async (payrollId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/payroll/${payrollId}/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.PAYROLL}${payrollId}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -41,7 +41,7 @@ export const createPayrollRecord = createAsyncThunk(
   async (payrollData, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.post(`${BASE_URL}/payroll/`, payrollData, {
+      const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.CREATE_PAYROLL}`, payrollData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;

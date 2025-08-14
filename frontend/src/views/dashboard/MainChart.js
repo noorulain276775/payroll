@@ -22,15 +22,13 @@ import {
 import CIcon from '@coreui/icons-react';
 import { 
   cilBarChart, 
-  cilChartLine, 
-  cilFilter, 
-  cilDownload, 
-  cilRefresh,
-  cilSettings,
-  cilTrendingUp,
-  cilTrendingDown,
-  cilDollar,
-  cilXCircle
+  cilCheckCircle, 
+  cilReload,
+  cilPlus,
+  cilMinus,
+  cilMoney,
+  cilX,
+  cilArrowRight
 } from '@coreui/icons';
 import {
   Chart as ChartJS,
@@ -83,54 +81,75 @@ const MainChart = () => {
   });
   const [exportFormat, setExportFormat] = useState('png');
 
-  useEffect(() => {
-    if (!checkAuth()) return;
-    
-    dispatch(fetchPayrollRecords());
-  }, [dispatch, checkAuth]);
+  // Fetch payroll data when component mounts
+  // useEffect(() => {
+  //   if (checkAuth()) {
+  //     dispatch(fetchPayrollRecords());
+  //   }
+  // }, [dispatch, checkAuth]); // Now safe to include checkAuth since it's memoized
 
-  // Generate mock data for demonstration
-  const generateMockData = () => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const currentYear = new Date().getFullYear();
-    
-    return months.map((month, index) => {
-      const baseSalary = 50000 + Math.random() * 20000;
-      const allowances = 8000 + Math.random() * 5000;
-      const overtime = 2000 + Math.random() * 3000;
-      const deductions = 3000 + Math.random() * 2000;
+  // TEMPORARILY DISABLED TO STOP INFINITE API CALLS
+  // TODO: Re-enable once the infinite loop issue is resolved
+
+  // Process real payroll data from API
+  const processedData = useMemo(() => {
+    if (!payrollRecords || payrollRecords.length === 0) {
+      return [];
+    }
+
+    // Group payroll records by month
+    const monthlyData = {};
+    payrollRecords.forEach(record => {
+      const date = new Date(record.payroll_month);
+      const monthKey = date.toLocaleString('default', { month: 'short' });
+      const year = date.getFullYear();
       
-      return {
-        month,
-        year: currentYear,
-        basicSalary: Math.round(baseSalary),
-        allowances: Math.round(allowances),
-        overtime: Math.round(overtime),
-        deductions: Math.round(deductions),
-        grossSalary: Math.round(baseSalary + allowances + overtime),
-        netSalary: Math.round(baseSalary + allowances + overtime - deductions)
-      };
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = {
+          month: monthKey,
+          year: year,
+          basicSalary: 0,
+          allowances: 0,
+          overtime: 0,
+          deductions: 0,
+          grossSalary: 0,
+          netSalary: 0,
+          count: 0
+        };
+      }
+      
+      monthlyData[monthKey].basicSalary += record.basic_salary || 0;
+      monthlyData[monthKey].allowances += (record.housing_allowance || 0) + (record.transport_allowance || 0) + (record.other_allowance || 0);
+      monthlyData[monthKey].overtime += record.overtime_amount || 0;
+      monthlyData[monthKey].deductions += record.total_deductions || 0;
+      monthlyData[monthKey].grossSalary += record.gross_salary || 0;
+      monthlyData[monthKey].netSalary += record.net_salary || 0;
+      monthlyData[monthKey].count += 1;
     });
-  };
 
-  const mockData = useMemo(() => generateMockData(), []);
+    // Convert to array and sort by date
+    return Object.values(monthlyData).sort((a, b) => {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return months.indexOf(a.month) - months.indexOf(b.month);
+    });
+  }, [payrollRecords]);
 
   // Filter data based on selected time range
   const filteredData = useMemo(() => {
     if (timeRange === 'custom' && customDateRange.startDate && customDateRange.endDate) {
       // Custom date range logic would go here
-      return mockData;
+      return processedData;
     } else if (timeRange === 'year') {
-      return mockData;
+      return processedData;
     } else if (timeRange === '6months') {
-      return mockData.slice(-6);
+      return processedData.slice(-6);
     } else if (timeRange === '3months') {
-      return mockData.slice(-3);
+      return processedData.slice(-3);
     }
-    return mockData;
-  }, [timeRange, customDateRange, mockData]);
+    return processedData;
+  }, [timeRange, customDateRange, processedData]);
 
-  // Calculate summary statistics
+  // Calculate summary statistics from real data
   const summaryStats = useMemo(() => {
     if (!filteredData.length) return {};
     
@@ -147,7 +166,7 @@ const MainChart = () => {
     // Calculate trends
     const firstMonth = filteredData[0];
     const lastMonth = filteredData[filteredData.length - 1];
-    const salaryGrowth = ((lastMonth.netSalary - firstMonth.netSalary) / firstMonth.netSalary) * 100;
+    const salaryGrowth = firstMonth && lastMonth ? ((lastMonth.netSalary - firstMonth.netSalary) / firstMonth.netSalary) * 100 : 0;
     
     return {
       totalBasicSalary,
@@ -159,11 +178,11 @@ const MainChart = () => {
       avgBasicSalary,
       avgNetSalary,
       salaryGrowth,
-      employeeCount: filteredData.length
+      employeeCount: filteredData.reduce((sum, item) => sum + item.count, 0)
     };
   }, [filteredData]);
 
-  // Chart data configuration
+  // Chart data configuration using real data
   const chartData = useMemo(() => ({
     labels: filteredData.map(item => item.month),
     datasets: [
@@ -310,7 +329,9 @@ const MainChart = () => {
 
   // Handle data refresh
   const handleRefresh = () => {
-    dispatch(fetchPayrollRecords());
+    if (checkAuth()) {
+      dispatch(fetchPayrollRecords());
+    }
   };
 
   // Format currency
@@ -325,19 +346,19 @@ const MainChart = () => {
   // Get trend indicator
   const getTrendIndicator = (value) => {
     if (value > 0) {
-      return (
-        <CBadge color="success" className="d-flex align-items-center gap-1">
-          <CIcon icon={cilTrendingUp} size="sm" />
-          +{value.toFixed(1)}%
-        </CBadge>
-      );
+              return (
+          <CBadge color="success" className="d-flex align-items-center gap-1">
+            <CIcon icon={cilPlus} size="sm" />
+            +{value.toFixed(1)}%
+          </CBadge>
+        );
     } else if (value < 0) {
-      return (
-        <CBadge color="danger" className="d-flex align-items-center gap-1">
-          <CIcon icon={cilTrendingDown} size="sm" />
-          {value.toFixed(1)}%
-        </CBadge>
-      );
+              return (
+          <CBadge color="danger" className="d-flex align-items-center gap-1">
+            <CIcon icon={cilMinus} size="sm" />
+            {value.toFixed(1)}%
+          </CBadge>
+        );
     }
     return (
       <CBadge color="secondary" className="d-flex align-items-center gap-1">
@@ -361,12 +382,12 @@ const MainChart = () => {
     return (
       <div className="text-center py-5">
         <div className="text-danger mb-3">
-          <CIcon icon={cilXCircle} size="3xl" />
+          <CIcon icon={cilX} size="3xl" />
         </div>
         <h5>Failed to load payroll data</h5>
         <p className="text-muted">{error}</p>
         <CButton color="primary" onClick={handleRefresh}>
-          <CIcon icon={cilRefresh} className="me-2" />
+          <CIcon icon={cilArrowRight} className="me-2" />
           Try Again
         </CButton>
       </div>
@@ -393,13 +414,13 @@ const MainChart = () => {
             onClick={handleRefresh}
             className="d-flex align-items-center gap-2"
           >
-            <CIcon icon={cilRefresh} />
+                            <CIcon icon={cilArrowRight} />
             Refresh
           </CButton>
           
           <CDropdown>
             <CDropdownToggle color="outline-primary">
-              <CIcon icon={cilDownload} className="me-2" />
+                              <CIcon icon={cilCheckCircle} className="me-2" />
               Export
             </CDropdownToggle>
             <CDropdownMenu>
@@ -417,7 +438,7 @@ const MainChart = () => {
             onClick={handleExport}
             className="d-flex align-items-center gap-2"
           >
-            <CIcon icon={cilDownload} />
+                            <CIcon icon={cilCheckCircle} />
             Download
           </CButton>
         </div>
@@ -429,7 +450,7 @@ const MainChart = () => {
           <CCard className="summary-card h-100 border-0 shadow-sm">
             <CCardBody className="text-center p-4">
               <div className="mb-3">
-                <CIcon icon={cilDollar} size="2xl" className="text-primary" />
+                <CIcon icon={cilMoney} size="2xl" className="text-primary" />
               </div>
               <h4 className="mb-2">{formatCurrency(summaryStats.totalNetSalary || 0)}</h4>
               <p className="text-muted mb-2">Total Net Payroll</p>
@@ -441,9 +462,9 @@ const MainChart = () => {
         <CCol xs={12} md={3}>
           <CCard className="summary-card h-100 border-0 shadow-sm">
             <CCardBody className="text-center p-4">
-              <div className="mb-3">
-                <CIcon icon={cilTrendingUp} size="2xl" className="text-success" />
-              </div>
+                              <div className="mb-3">
+                  <CIcon icon={cilPlus} size="2xl" className="text-success" />
+                </div>
               <h4 className="mb-2">{formatCurrency(summaryStats.avgNetSalary || 0)}</h4>
               <p className="text-muted mb-2">Average Net Salary</p>
               <div className="small text-muted">
@@ -471,9 +492,9 @@ const MainChart = () => {
         <CCol xs={12} md={3}>
           <CCard className="summary-card h-100 border-0 shadow-sm">
             <CCardBody className="text-center p-4">
-              <div className="mb-3">
-                <CIcon icon={cilTrendingDown} size="2xl" className="text-warning" />
-              </div>
+                              <div className="mb-3">
+                  <CIcon icon={cilMinus} size="2xl" className="text-warning" />
+                </div>
               <h4 className="mb-2">{formatCurrency(summaryStats.totalDeductions || 0)}</h4>
               <p className="text-muted mb-2">Total Deductions</p>
               <div className="small text-muted">
@@ -505,7 +526,7 @@ const MainChart = () => {
                     onClick={() => setChartType('line')}
                     size="sm"
                   >
-                    <CIcon icon={cilChartLine} className="me-1" />
+                    <CIcon icon={cilBarChart} className="me-1" />
                     Line
                   </CButton>
                 </CButtonGroup>
@@ -602,10 +623,10 @@ const MainChart = () => {
               Payroll Trends Analysis
             </h5>
             <div className="d-flex gap-2">
-              <CBadge color="primary" className="d-flex align-items-center gap-1">
-                <CIcon icon={cilTrendingUp} size="sm" />
-                {filteredData.length} months
-              </CBadge>
+                              <CBadge color="primary" className="d-flex align-items-center gap-1">
+                  <CIcon icon={cilPlus} size="sm" />
+                  {filteredData.length} months
+                </CBadge>
             </div>
           </div>
         </CCardHeader>
@@ -625,10 +646,10 @@ const MainChart = () => {
         <CCol md={6}>
           <CCard className="border-0 shadow-sm h-100">
             <CCardHeader className="bg-white border-bottom">
-              <h6 className="mb-0">
-                <CIcon icon={cilTrendingUp} className="me-2" />
-                Salary Growth Trends
-              </h6>
+                              <h6 className="mb-0">
+                  <CIcon icon={cilPlus} className="me-2" />
+                  Salary Growth Trends
+                </h6>
             </CCardHeader>
             <CCardBody>
               <div className="mb-3">
@@ -669,7 +690,7 @@ const MainChart = () => {
           <CCard className="border-0 shadow-sm h-100">
             <CCardHeader className="bg-white border-bottom">
               <h6 className="mb-0">
-                <CIcon icon={cilSettings} className="me-2" />
+                <CIcon icon={cilReload} className="me-2" />
                 Chart Configuration
               </h6>
             </CCardHeader>

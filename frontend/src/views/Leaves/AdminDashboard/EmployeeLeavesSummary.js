@@ -10,7 +10,7 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from "@coreui/react";
-import { BASE_URL } from "../../../../config";
+import { BASE_URL, API_ENDPOINTS } from "../../../config";
 import axios from "axios";
 
 const EmployeeLeavesSummary = () => {
@@ -21,7 +21,7 @@ const EmployeeLeavesSummary = () => {
   useEffect(() => {
     const fetchLeaveSummary = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/employees/leave-summary`, {
+        const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.LEAVE_SUMMARY}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

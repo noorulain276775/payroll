@@ -6,7 +6,7 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react';
-import { cilAccountLogout, cilUser, cilSettings } from '@coreui/icons';
+import { cilAccountLogout, cilUser, cilReload } from '@coreui/icons';
 import CIcon from '@coreui/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -54,22 +54,22 @@ const AppHeaderDropdown = () => {
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         {user && (
-          <CDropdownItem header className="text-center">
-            <strong>{user.first_name} {user.last_name}</strong>
+          <CDropdownItem header="true" className="text-center">
+            <strong>{user.username}</strong>
             <br />
-            <small className="text-muted">{user.email}</small>
+            <small className="text-muted">{user.user_type}</small>
           </CDropdownItem>
         )}
-        <CDropdownItem divider />
+        <CDropdownItem divider="true" />
         <CDropdownItem onClick={handleProfile}>
           <CIcon icon={cilUser} className="me-2" />
           Profile
         </CDropdownItem>
         <CDropdownItem onClick={handleSettings}>
-          <CIcon icon={cilSettings} className="me-2" />
+          <CIcon icon={cilReload} className="me-2" />
           Settings
         </CDropdownItem>
-        <CDropdownItem divider />
+        <CDropdownItem divider="true" />
         <CDropdownItem onClick={handleLogout}>
           <CIcon icon={cilAccountLogout} className="me-2" />
           Sign out

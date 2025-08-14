@@ -15,7 +15,7 @@ import {
     CAlert
 } from '@coreui/react';
 import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../config';
 
 const AddEmployee = () => {
     const [users, setUsers] = useState([]);
@@ -263,7 +263,7 @@ const AddEmployee = () => {
             return;
         }
         axios
-            .get(`${BASE_URL}/users/list/`, {
+            .get(`${BASE_URL}${API_ENDPOINTS.USERS_LIST}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -330,7 +330,7 @@ const AddEmployee = () => {
         if (passportDocument) formData.append('passport_image', passportDocument);
 
         axios
-            .post(`${BASE_URL}/create_employee/`, formData, {
+            .post(`${BASE_URL}${API_ENDPOINTS.CREATE_EMPLOYEE}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',

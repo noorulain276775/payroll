@@ -16,6 +16,7 @@ import {
   CModalBody,
   CModalHeader,
   CModalTitle,
+  CModalFooter,
   CButton,
   CCard,
   CCardBody,
@@ -34,19 +35,19 @@ import {
   cilPlus, 
   cilPencil, 
   cilTrash, 
-  cilEye,
+  cilSearch,
   cilBank,
   cilCalculator,
   cilUser,
   cilSettings,
-  cilCheckCircle
+  cilCheck
 } from '@coreui/icons';
-import { fetchEmployees } from '../../../store/slices/employeeSlice';
-import { selectEmployees, selectEmployeesLoading, selectEmployeesError } from '../../../store/slices/employeeSlice';
-import { selectIsAuthenticated } from '../../../store/slices/authSlice';
-import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import ErrorDisplay from '../../../components/common/ErrorDisplay';
-import { useReduxOperations, useFormState } from '../../../hooks/useReduxOperations';
+import { fetchEmployees } from '../../store/slices/employeeSlice';
+import { selectEmployees, selectEmployeesLoading, selectEmployeesError } from '../../store/slices/employeeSlice';
+import { selectIsAuthenticated } from '../../store/slices/authSlice';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorDisplay from '../../components/common/ErrorDisplay';
+import { useReduxOperations, useFormState } from '../../hooks/useReduxOperations';
 
 const Salary = () => {
   const dispatch = useDispatch();
@@ -285,7 +286,7 @@ const Salary = () => {
   const getStatusBadge = (status) => {
     return (
       <CBadge color="success" className="d-flex align-items-center gap-1">
-        <CIcon icon={cilCheckCircle} size="sm" />
+        <CIcon icon={cilCheck} size="sm" />
         Active
       </CBadge>
     );
@@ -480,7 +481,7 @@ const Salary = () => {
                           onClick={() => openViewModal(record)}
                           className="action-btn"
                         >
-                          <CIcon icon={cilEye} className="me-1" />
+                          <CIcon icon={cilSearch} className="me-1" />
                           View
                         </CButton>
                         
@@ -811,7 +812,7 @@ const Salary = () => {
       >
         <CModalHeader closeButton>
           <CModalTitle>
-            <CIcon icon={cilEye} className="me-2" />
+            <CIcon icon={cilSearch} className="me-2" />
             Salary Details
           </CModalTitle>
         </CModalHeader>

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { BASE_URL } from '../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../config';
 
 // Async thunks
 export const fetchEmployees = createAsyncThunk(
@@ -8,7 +8,7 @@ export const fetchEmployees = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/employees/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.EMPLOYEES}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -25,7 +25,7 @@ export const fetchEmployeeById = createAsyncThunk(
   async (employeeId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/employees/${employeeId}/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.UPDATE_EMPLOYEE}${employeeId}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -42,7 +42,7 @@ export const createEmployee = createAsyncThunk(
   async (employeeData, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.post(`${BASE_URL}/employees/`, employeeData, {
+      const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.CREATE_EMPLOYEE}`, employeeData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -59,7 +59,7 @@ export const updateEmployee = createAsyncThunk(
   async ({ employeeId, employeeData }, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.put(`${BASE_URL}/employees/${employeeId}/`, employeeData, {
+      const response = await axios.put(`${BASE_URL}${API_ENDPOINTS.UPDATE_EMPLOYEE}${employeeId}/`, employeeData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -76,7 +76,7 @@ export const deleteEmployee = createAsyncThunk(
   async (employeeId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      await axios.delete(`${BASE_URL}/employees/${employeeId}/`, {
+      await axios.delete(`${BASE_URL}${API_ENDPOINTS.UPDATE_EMPLOYEE}${employeeId}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return employeeId;
@@ -93,7 +93,7 @@ export const fetchSalaryDetails = createAsyncThunk(
   async (employeeId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/employees/${employeeId}/salary/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.UPDATE_EMPLOYEE}${employeeId}/salary-details/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;

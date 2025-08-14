@@ -4,7 +4,7 @@ import {
   CForm, CFormLabel, CFormInput, CFormTextarea, CFormSelect,
   CButton, CAlert, CCard, CCardHeader, CCardBody, CCol, CRow
 } from '@coreui/react';
-import { BASE_URL } from '../../../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../../config';
 
 const leaveTypeOptions = [
   'Annual', 'Sick', 'Unpaid', 'Maternity', 'Paternity',
@@ -27,7 +27,7 @@ const AddEmployeeLeaves = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/view_all_employees/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.EMPLOYEES}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEmployees(response.data);
@@ -65,7 +65,7 @@ const AddEmployeeLeaves = () => {
     }
 
     try {
-      await axios.post(`${BASE_URL}/add-leaves/`, {
+              await axios.post(`${BASE_URL}${API_ENDPOINTS.ADD_LEAVES}`, {
         employee: selectedEmployee,
         leave_type: leaveType,
         start_date: startDate,

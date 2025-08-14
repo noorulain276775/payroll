@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BASE_URL } from '../../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../config';
 import {
   CCard,
   CCardBody,
@@ -44,7 +44,7 @@ const EmployeeProfile = () => {
       return;
     }
     axios
-      .get(`${BASE_URL}/employee/profile/`, {
+      .get(`${BASE_URL}${API_ENDPOINTS.EMPLOYEE_PROFILE}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -194,7 +194,7 @@ const EmployeeProfile = () => {
     });
 
     try {
-      const response = await axios.put(`${BASE_URL}/employee/update/`, data, {
+      const response = await axios.put(`${BASE_URL}${API_ENDPOINTS.EMPLOYEE_UPDATE}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

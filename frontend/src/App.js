@@ -1,8 +1,8 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { CSpinner } from '@coreui/react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectIsAuthenticated, selectUserType, getCurrentUser } from './store/slices/authSlice';
+import { selectIsAuthenticated, selectUserType, initializeAuth } from './store/slices/authSlice';
 import ErrorBoundary from './components/ErrorBoundary';
 import './scss/style.scss';
 import './scss/examples.scss';
@@ -16,18 +16,26 @@ const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const userType = useSelector(selectUserType);
+  const initializedRef = useRef(false);
 
+  // Initialize auth state from storage on app start - only once
   useEffect(() => {
-    // If authenticated, get current user data
-    if (isAuthenticated) {
-      dispatch(getCurrentUser());
+    if (!initializedRef.current) {
+      dispatch(initializeAuth());
+      initializedRef.current = true;
     }
-  }, [isAuthenticated, dispatch]);
+  }, [dispatch]);
 
   // Determine redirect path based on user type
   const getRedirectPath = () => {
     if (!isAuthenticated) return '/';
-    return userType === 'Employee' ? '/employee-dashboard' : '/dashboard';
+    // Employee users go to employee dashboard, Admin and Both users go to admin dashboard
+    if (userType === 'Employee') {
+      return '/employee-dashboard';
+    } else {
+      // Admin, Both, and any other admin-like roles go to admin dashboard
+      return '/dashboard';
+    }
   };
 
   return (

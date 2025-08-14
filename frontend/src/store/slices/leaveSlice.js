@@ -1,14 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { BASE_URL } from '../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../config';
 
-// Async thunks
 export const fetchLeaves = createAsyncThunk(
   'leaves/fetchLeaves',
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/leaves/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.LEAVES}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -25,7 +24,7 @@ export const fetchLeaveById = createAsyncThunk(
   async (leaveId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/leaves/${leaveId}/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.EMPLOYEE_LEAVES}${leaveId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -42,13 +41,13 @@ export const createLeave = createAsyncThunk(
   async (leaveData, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.post(`${BASE_URL}/leaves/`, leaveData, {
+      const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.LEAVES}`, leaveData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to create leave request'
+        error.response?.data?.message || 'Failed to create leave'
       );
     }
   }
@@ -59,13 +58,13 @@ export const updateLeave = createAsyncThunk(
   async ({ leaveId, leaveData }, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.put(`${BASE_URL}/leaves/${leaveId}/`, leaveData, {
+      const response = await axios.put(`${BASE_URL}${API_ENDPOINTS.EMPLOYEE_LEAVES}${leaveId}`, leaveData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to update leave request'
+        error.response?.data?.message || 'Failed to update leave'
       );
     }
   }
@@ -76,13 +75,13 @@ export const deleteLeave = createAsyncThunk(
   async (leaveId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      await axios.delete(`${BASE_URL}/leaves/${leaveId}/`, {
+      await axios.delete(`${BASE_URL}${API_ENDPOINTS.EMPLOYEE_LEAVES}${leaveId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return leaveId;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to delete leave request'
+        error.response?.data?.message || 'Failed to delete leave'
       );
     }
   }
@@ -90,12 +89,10 @@ export const deleteLeave = createAsyncThunk(
 
 export const approveLeave = createAsyncThunk(
   'leaves/approveLeave',
-  async ({ leaveId, approverId }, { rejectWithValue, getState }) => {
+  async (leaveId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.post(`${BASE_URL}/leaves/${leaveId}/approve/`, {
-        approver: approverId
-      }, {
+      const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.APPROVE_LEAVE}${leaveId}/approve/`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -109,13 +106,10 @@ export const approveLeave = createAsyncThunk(
 
 export const rejectLeave = createAsyncThunk(
   'leaves/rejectLeave',
-  async ({ leaveId, approverId, remarks }, { rejectWithValue, getState }) => {
+  async (leaveId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.post(`${BASE_URL}/leaves/${leaveId}/reject/`, {
-        approver: approverId,
-        remarks: remarks || 'Leave request rejected'
-      }, {
+      const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.REJECT_LEAVE}${leaveId}/reject/`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -132,7 +126,7 @@ export const fetchLeaveBalances = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/leave-balances/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.LEAVE_BALANCES}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -144,12 +138,12 @@ export const fetchLeaveBalances = createAsyncThunk(
   }
 );
 
-export const fetchLeaveBalanceByEmployee = createAsyncThunk(
-  'leaves/fetchLeaveBalanceByEmployee',
+export const fetchLeaveBalanceByEmployeeId = createAsyncThunk(
+  'leaves/fetchLeaveBalanceByEmployeeId',
   async (employeeId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${BASE_URL}/leave-balances/${employeeId}/`, {
+      const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.LEAVE_BALANCES}${employeeId}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -380,16 +374,16 @@ const leaveSlice = createSlice({
       })
       
       // Fetch Leave Balance by Employee
-      .addCase(fetchLeaveBalanceByEmployee.pending, (state) => {
+      .addCase(fetchLeaveBalanceByEmployeeId.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchLeaveBalanceByEmployee.fulfilled, (state, action) => {
+      .addCase(fetchLeaveBalanceByEmployeeId.fulfilled, (state, action) => {
         state.isLoading = false;
         state.currentLeaveBalance = action.payload;
         state.error = null;
       })
-      .addCase(fetchLeaveBalanceByEmployee.rejected, (state, action) => {
+      .addCase(fetchLeaveBalanceByEmployeeId.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

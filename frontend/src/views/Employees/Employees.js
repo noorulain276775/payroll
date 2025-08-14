@@ -1,45 +1,49 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import axios from 'axios'
-import { BASE_URL } from '../../../config';
 import {
-  CTable,
-  CTableBody,
-  CTableRow,
-  CTableDataCell,
-  CTableHeaderCell,
-  CTableHead,
-  CDropdown,
-  CDropdownToggle,
-  CDropdownMenu,
-  CDropdownItem,
-  CModal,
-  CModalBody,
-  CModalHeader,
-  CModalTitle,
+  CAvatar,
+  CBadge,
   CButton,
   CCard,
   CCardBody,
   CCardHeader,
-  CRow,
   CCol,
-  CFormInput // Replacing CInput with CFormInput
+  CForm,
+  CFormInput,
+  CFormLabel,
+  CFormSelect,
+  CInputGroup,
+  CInputGroupText,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
+  CRow,
+  CTable,
+  CTableBody,
+  CTableDataCell,
+  CTableHead,
+  CTableHeaderCell,
+  CTableRow,
+  CAlert,
+  CSpinner,
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
+  CDropdownItem
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { BASE_URL, API_ENDPOINTS } from '../../config';
+import { selectToken, selectUserType } from '../../store/slices/authSlice';
 
 const Employees = () => {
   const [employees, setEmployees] = useState([])
-  const [selectedEmployee, setSelectedEmployee] = useState(null)
-  const [selectedemployeeid, setSelectedemployeeid] = useState(null)
   const [modalVisible, setModalVisible] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState(null)
   const [editModalVisible, setEditModalVisible] = useState(false)
-  const [editPreviewFiles, setEditPreviewFiles] = useState({
-    photo: null,
-    highest_degree_certificate: null,
-    emirates_id_image: null,
-    passport_image: null,
-    visa_image: null,
-    insurance_card: null,
-  });
   const [editEmployee, setEditEmployee] = useState({
     first_name: '',
     last_name: '',
@@ -47,7 +51,6 @@ const Employees = () => {
     phone_number: '',
     nationality: '',
     date_of_birth: '',
-    photo: '',
     place_of_birth: '',
     gender: '',
     marital_status: '',
@@ -67,37 +70,67 @@ const Employees = () => {
     emergency_contact_number: '',
     emergency_contact_relation: '',
     emirates_id: '',
-    emirates_id_expiry: '',
     passport_no: '',
     qualification: '',
     visa_no: '',
     visa_expiry_date: '',
     insurance_expiry_date: '',
   })
+  const [selectedemployeeid, setSelectedemployeeid] = useState(null)
+  const [editPreviewFiles, setEditPreviewFiles] = useState({
+    photo: null,
+    highest_degree_certificate: null,
+    emirates_id_image: null,
+    insurance_card: null,
+    visa_image: null,
+    passport_image: null,
+  });
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertColor, setAlertColor] = useState('danger');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate()
-  const token = localStorage.getItem('authToken')
+  
+  // Use Redux auth state instead of localStorage
+  const token = useSelector(selectToken);
+  const userType = useSelector(selectUserType);
+  const hasFetchedRef = useRef(false)
 
   useEffect(() => {
     if (!token) {
-      window.location.href = '/';
+      console.log('No token found, redirecting to login');
+      navigate('/');
       return
     }
-    axios
-      .get(`${BASE_URL}/view_all_employees/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setEmployees(response.data)
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('authToken')
-          window.location.href = '/'
-        }
-      })
-  }, [navigate, token])
+    
+    // Only fetch once when component mounts
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      setIsLoading(true);
+      axios
+        .get(`${BASE_URL}${API_ENDPOINTS.EMPLOYEES}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setEmployees(response.data)
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          setIsLoading(false);
+          if (error.response && error.response.status === 401) {
+            console.log('Token expired, redirecting to login');
+            navigate('/');
+          } else {
+            console.error('Error fetching employees:', error);
+            setAlertMessage('Failed to fetch employees. Please try again.');
+            setAlertColor('danger');
+            setAlertVisible(true);
+          }
+        })
+    }
+  }, [token, navigate]) // Include token and navigate in dependencies
 
   const handleView = (employee) => {
     setSelectedEmployee(employee)
@@ -153,7 +186,8 @@ const Employees = () => {
 
   const handleEditSubmit = () => {
     if (!token) {
-      window.location.href = '/';
+      console.log('No token found, redirecting to login');
+      navigate('/');
       return;
     }
 
@@ -165,7 +199,7 @@ const Employees = () => {
     }
 
     axios
-      .put(`${BASE_URL}/employee/${selectedemployeeid}/`, formData, {
+      .put(`${BASE_URL}${API_ENDPOINTS.UPDATE_EMPLOYEE}${selectedemployeeid}/`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -179,14 +213,45 @@ const Employees = () => {
           )
         );
         setEditModalVisible(false);
+        setAlertMessage('Employee updated successfully!');
+        setAlertColor('success');
+        setAlertVisible(true);
       })
       .catch((error) => {
-        console.error('Error updating employee:', error.response?.data || error.message);
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem('authToken');
-          window.location.href = '/'
-        }
+        console.error('Error updating employee:', error);
+        setAlertMessage(error.response?.data?.message || 'Failed to update employee.');
+        setAlertColor('danger');
+        setAlertVisible(true);
       });
+  };
+
+  const handleDelete = (id) => {
+    if (!token) {
+      console.log('No token found, redirecting to login');
+      navigate('/');
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to delete this employee?')) {
+      axios
+        .delete(`${BASE_URL}${API_ENDPOINTS.UPDATE_EMPLOYEE}${id}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(() => {
+          setEmployees(employees.filter((employee) => employee.id !== id));
+          setAlertMessage('Employee deleted successfully!');
+          setAlertColor('success');
+          setAlertVisible(true);
+        })
+        .catch((error) => {
+          console.error('Error deleting employee:', error);
+          setAlertMessage(error.response?.data?.message || 'Failed to delete employee.');
+          setAlertColor('danger');
+          setAlertVisible(true);
+        });
+    }
   };
 
 

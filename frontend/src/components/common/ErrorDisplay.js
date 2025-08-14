@@ -1,7 +1,7 @@
 import React from 'react';
 import { CAlert, CButton } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilExclamationTriangle, cilReload } from '@coreui/icons';
+import { cilWarning, cilReload } from '@coreui/icons';
 import PropTypes from 'prop-types';
 
 const ErrorDisplay = ({ 
@@ -39,7 +39,7 @@ const ErrorDisplay = ({
     >
       {showIcon && (
         <CIcon 
-          icon={cilExclamationTriangle} 
+          icon={cilWarning} 
           size="lg" 
           className="me-2 mt-1 flex-shrink-0"
         />

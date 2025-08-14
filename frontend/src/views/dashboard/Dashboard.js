@@ -1,18 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { CAvatar, CCard, CCardBody, CCardHeader, CCol, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilPeople } from '@coreui/icons';
+import { cilUser } from '@coreui/icons';
 import MainChart from './MainChart';
 import { DashboardWidgets } from '../../components/DashboardWidgets';
 import { useNavigate } from 'react-router-dom';
-import { selectIsAuthenticated } from '../../../store/slices/authSlice';
-import { fetchEmployees } from '../../../store/slices/employeeSlice';
-import { selectEmployees, selectEmployeesLoading } from '../../../store/slices/employeeSlice';
+import { selectIsAuthenticated } from '../../store/slices/authSlice';
+import { fetchEmployees } from '../../store/slices/employeeSlice';
+import { selectEmployees, selectEmployeesLoading } from '../../store/slices/employeeSlice';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const hasFetchedRef = useRef(false);
   
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const employees = useSelector(selectEmployees);
@@ -24,8 +25,11 @@ const Dashboard = () => {
       return;
     }
 
-    // Fetch employees for dashboard
-    dispatch(fetchEmployees());
+    // Fetch employees for dashboard - only once when component mounts
+    if (!hasFetchedRef.current) {
+      dispatch(fetchEmployees());
+      hasFetchedRef.current = true;
+    }
   }, [isAuthenticated, navigate, dispatch]);
 
   // Mock dashboard data (replace with actual API call)
@@ -87,7 +91,7 @@ const Dashboard = () => {
             <CTableHead className="text-nowrap">
               <CTableRow>
                 <CTableHeaderCell className="bg-body-tertiary text-center">
-                  <CIcon icon={cilPeople} />
+                  <CIcon icon={cilUser} />
                 </CTableHeaderCell>
                 <CTableHeaderCell className="bg-body-tertiary">Employee</CTableHeaderCell>
                 <CTableHeaderCell className="bg-body-tertiary">Department</CTableHeaderCell>

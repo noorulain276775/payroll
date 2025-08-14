@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 // Base URL configuration
 export const BASE_URL = isProduction 
-  ? 'https://your-production-domain.com/api'  // Replace with your actual production URL
+  ? 'https://your-production-domain.com/api'  // Replace with actual production URL
   : isDevelopment 
     ? 'http://localhost:8000/api'  // Django development server
     : 'http://localhost:8000/api'; // Default fallback
@@ -19,33 +19,40 @@ export const API_ENDPOINTS = {
   LOGOUT: '/users/logout/',
   REGISTER: '/users/register/',
   CHANGE_PASSWORD: '/users/change-password/',
+  REFRESH_TOKEN: '/users/refresh/',
+  USERS_LIST: '/users/list/',
   
   // Employees
-  EMPLOYEES: '/view_all_employees/',
-  CREATE_EMPLOYEE: '/create_employee/',
-  UPDATE_EMPLOYEE: '/employee/',
+  EMPLOYEES: '/employees/view_all_employees/',
+  CREATE_EMPLOYEE: '/employees/create_employee/',
+  UPDATE_EMPLOYEE: '/employees/employee/',
+  EMPLOYEE_PROFILE: '/employee/profile/',
+  EMPLOYEE_UPDATE: '/employee/update/',
   
   // Salary
-  SALARIES: '/salaries/',
-  CREATE_SALARY: '/create-salary-details/',
-  UPDATE_SALARY: '/update-salary-details/',
-  SALARY_REVISIONS: '/salary-revision/',
+  SALARIES: '/employees/salaries/',
+  CREATE_SALARY: '/employees/create-salary-details/',
+  UPDATE_SALARY: '/employees/update-salary-details/',
+  SALARY_REVISIONS: '/employees/salary-revision/',
   
   // Payroll
-  PAYROLL: '/view_all_payroll/',
-  CREATE_PAYROLL: '/create_payroll/',
-  UPDATE_PAYROLL: '/update-payroll-record/',
-  SEND_SALARY_SLIP: '/send_salary_slip/',
+  PAYROLL: '/employees/view_all_payroll/',
+  CREATE_PAYROLL: '/employees/create_payroll/',
+  UPDATE_PAYROLL: '/employees/update-payroll-record/',
+  SEND_SALARY_SLIP: '/employees/send_salary_slip/',
   
   // Leaves
-  LEAVES: '/leaves/',
-  LEAVE_BALANCES: '/leave-balances/',
-  APPROVE_LEAVE: '/leaves/',
-  REJECT_LEAVE: '/leaves/',
+  LEAVES: '/leaves/leaves/',
+  LEAVE_BALANCES: '/leaves/leave-balances/',
+  APPROVE_LEAVE: '/leaves/leaves/',
+  REJECT_LEAVE: '/leaves/leaves/',
+  EMPLOYEE_LEAVES: '/leaves/employee/leaves/',
+  ADD_LEAVES: '/leaves/add-leaves/',
+  LEAVE_SUMMARY: '/leaves/employees/leave-summary/',
   
   // Dashboard
-  DASHBOARD_SUMMARY: '/dashboard-summary/',
-  NEW_EMPLOYEES: '/new_employees/',
+  DASHBOARD_SUMMARY: '/employees/dashboard-summary/',
+  NEW_EMPLOYEES: '/employees/new_employees/',
 };
 
 // File upload configuration

@@ -21,16 +21,15 @@ import CIcon from '@coreui/icons-react';
 import { 
     cilCalendar, 
     cilClock, 
-    cilCheckCircle, 
-    cilXCircle, 
-    cilHourglass,
-    cilInfo
+    cilInfo,
+    cilCheck,
+    cilX
 } from '@coreui/icons';
-import { fetchLeaveBalances } from '../../../../store/slices/leaveSlice';
-import { selectLeaveBalances, selectLeaveBalancesLoading, selectLeaveBalancesError } from '../../../../store/slices/leaveSlice';
-import { selectIsAuthenticated } from '../../../../store/slices/authSlice';
-import LoadingSpinner from '../../../../components/common/LoadingSpinner';
-import ErrorDisplay from '../../../../components/common/ErrorDisplay';
+import { fetchLeaveBalances } from '../../../store/slices/leaveSlice';
+import { selectLeaveBalances, selectLeaveBalancesLoading, selectLeaveBalancesError } from '../../../store/slices/leaveSlice';
+import { selectIsAuthenticated } from '../../../store/slices/authSlice';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import ErrorDisplay from '../../../components/common/ErrorDisplay';
 
 const EmployeeOwnLeaveBalance = () => {
     const dispatch = useDispatch();
@@ -53,10 +52,10 @@ const EmployeeOwnLeaveBalance = () => {
 
     const getStatusBadge = (status) => {
         const statusConfig = {
-            'available': { color: 'success', icon: cilCheckCircle, text: 'Available' },
+            'available': { color: 'success', icon: cilCheck, text: 'Available' },
             'used': { color: 'info', icon: cilClock, text: 'Used' },
-            'pending': { color: 'warning', icon: cilHourglass, text: 'Pending' },
-            'exhausted': { color: 'danger', icon: cilXCircle, text: 'Exhausted' }
+            'pending': { color: 'warning', icon: cilClock, text: 'Pending' },
+            'exhausted': { color: 'danger', icon: cilX, text: 'Exhausted' }
         };
         
         const config = statusConfig[status?.toLowerCase()] || statusConfig.available;
@@ -133,7 +132,7 @@ const EmployeeOwnLeaveBalance = () => {
                     <CCard className="summary-card h-100 border-0 shadow-sm">
                         <CCardBody className="text-center p-4">
                             <div className="mb-3">
-                                <CIcon icon={cilCheckCircle} size="2xl" className="text-success" />
+                                <CIcon icon={cilCheck} size="2xl" className="text-success" />
                             </div>
                             <h4 className="mb-2">{currentBalance?.annual_leave_balance || 0}</h4>
                             <p className="text-muted mb-0">Annual Leave</p>
@@ -157,7 +156,7 @@ const EmployeeOwnLeaveBalance = () => {
                     <CCard className="summary-card h-100 border-0 shadow-sm">
                         <CCardBody className="text-center p-4">
                             <div className="mb-3">
-                                <CIcon icon={cilHourglass} size="2xl" className="text-warning" />
+                                <CIcon icon={cilClock} size="2xl" className="text-warning" />
                             </div>
                             <h4 className="mb-2">{currentBalance?.emergency_leave_balance || 0}</h4>
                             <p className="text-muted mb-0">Emergency Leave</p>

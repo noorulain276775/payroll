@@ -37,13 +37,13 @@ import {
   cilPlus, 
   cilPencil, 
   cilTrash, 
-  cilEye,
+  cilSearch,
   cilCalculator,
   cilUser,
   cilCalendar,
   cilBank,
-  cilCheckCircle,
-  cilXCircle,
+  cilCheck,
+  cilX,
   cilClock
 } from '@coreui/icons';
 import { fetchEmployees } from '../../store/slices/employeeSlice';
@@ -372,9 +372,9 @@ const Payroll = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'paid': { color: 'success', icon: cilCheckCircle, text: 'Paid' },
+      'paid': { color: 'success', icon: cilCheck, text: 'Paid' },
       'pending': { color: 'warning', icon: cilClock, text: 'Pending' },
-      'failed': { color: 'danger', icon: cilXCircle, text: 'Failed' }
+      'failed': { color: 'danger', icon: cilX, text: 'Failed' }
     };
     
     const config = statusConfig[status] || statusConfig.pending;
@@ -495,7 +495,7 @@ const Payroll = () => {
           <CCard className="summary-card h-100 border-0 shadow-sm">
             <CCardBody className="text-center p-4">
               <div className="mb-3">
-                <CIcon icon={cilCheckCircle} size="2xl" className="text-success" />
+                <CIcon icon={cilCheck} size="2xl" className="text-success" />
               </div>
               <h4 className="mb-2">{paidCount}</h4>
               <p className="text-muted mb-0">Paid</p>
@@ -655,7 +655,7 @@ const Payroll = () => {
                             onClick={() => openViewModal(record)}
                             className="action-btn"
                           >
-                            <CIcon icon={cilEye} className="me-1" />
+                            <CIcon icon={cilSearch} className="me-1" />
                             View
                           </CButton>
                           
@@ -1053,7 +1053,7 @@ const Payroll = () => {
       >
         <CModalHeader closeButton>
           <CModalTitle>
-            <CIcon icon={cilEye} className="me-2" />
+            <CIcon icon={cilSearch} className="me-2" />
             Payroll Details
           </CModalTitle>
         </CModalHeader>

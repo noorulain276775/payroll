@@ -14,9 +14,9 @@ import {
   CCardBody,
   CSpinner
 } from '@coreui/react';
-import { createLeave } from '../../../../store/slices/leaveSlice';
-import { selectLeavesCreating, selectLeavesError, selectLeavesSuccessMessage } from '../../../../store/slices/leaveSlice';
-import { selectIsAuthenticated } from '../../../../store/slices/authSlice';
+import { createLeave } from '../../../store/slices/leaveSlice';
+import { selectLeavesCreating, selectLeavesError, selectLeavesSuccessMessage } from '../../../store/slices/leaveSlice';
+import { selectIsAuthenticated } from '../../../store/slices/authSlice';
 
 const leaveTypeOptions = [
   'Annual',

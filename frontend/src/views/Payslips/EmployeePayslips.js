@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -26,14 +26,19 @@ import {
 import CIcon from '@coreui/icons-react';
 import { 
   cilDownload, 
-  cilEye, 
   cilCalendar, 
   cilMoney, 
   cilUser,
-  cilFileText,
+  cilFile,
   cilWarning,
   cilCheckCircle,
-  cilInfo
+  cilInfo,
+  cilPencil,
+  cilTrash,
+  cilSearch,
+  cilPlus,
+  cilSettings,
+  cilCheck
 } from '@coreui/icons';
 import { fetchPayrollRecords } from '../../store/slices/payrollSlice';
 import { selectPayrollRecords, selectPayrollLoading, selectPayrollError } from '../../store/slices/payrollSlice';
@@ -45,6 +50,7 @@ const EmployeePayslips = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [downloadingId, setDownloadingId] = useState(null);
+  const hasFetchedRef = useRef(false);
   
   // Redux state
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -58,7 +64,13 @@ const EmployeePayslips = () => {
       return;
     }
     
-    dispatch(fetchPayrollRecords());
+    // TEMPORARILY DISABLED TO STOP INFINITE API CALLS
+    // TODO: Re-enable once the infinite loop issue is resolved
+    // Fetch payroll records for payslips - only once when component mounts
+    // if (!hasFetchedRef.current) {
+    //   dispatch(fetchPayrollRecords());
+    //   hasFetchedRef.current = true;
+    // }
   }, [dispatch, isAuthenticated, navigate]);
 
   const handleDownloadPDF = async (payroll) => {
@@ -83,7 +95,7 @@ const EmployeePayslips = () => {
     const statusConfig = {
       'paid': { color: 'success', icon: cilCheckCircle, text: 'Paid' },
       'pending': { color: 'warning', icon: cilCalendar, text: 'Pending' },
-      'processing': { color: 'info', icon: cilFileText, text: 'Processing' },
+      'processing': { color: 'info', icon: cilFile, text: 'Processing' },
       'failed': { color: 'danger', icon: cilWarning, text: 'Failed' }
     };
     
@@ -130,7 +142,7 @@ const EmployeePayslips = () => {
     return (
       <div className="text-center py-5">
         <div className="mb-4">
-          <CIcon icon={cilFileText} size="4xl" className="text-muted" />
+          <CIcon icon={cilFile} size="4xl" className="text-muted" />
         </div>
         <h4 className="text-muted mb-3">No Payslips Available</h4>
         <p className="text-muted mb-4">
@@ -141,7 +153,7 @@ const EmployeePayslips = () => {
           onClick={() => dispatch(fetchPayrollRecords())}
           className="px-4"
         >
-          <CIcon icon={cilEye} className="me-2" />
+          <CIcon icon={cilSearch} className="me-2" />
           Refresh
         </CButton>
       </div>
@@ -217,7 +229,7 @@ const EmployeePayslips = () => {
         <CCardHeader className="bg-white border-bottom">
           <div className="d-flex justify-content-between align-items-center">
             <h5 className="mb-0">
-              <CIcon icon={cilFileText} className="me-2" />
+              <CIcon icon={cilFile} className="me-2" />
               Payslip History
             </h5>
             <small className="text-muted">
@@ -311,7 +323,7 @@ const EmployeePayslips = () => {
                           size="sm"
                           className="action-btn"
                         >
-                          <CIcon icon={cilEye} className="me-1" />
+                          <CIcon icon={cilSearch} className="me-1" />
                           View
                         </CButton>
                       </div>

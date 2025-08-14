@@ -12,12 +12,11 @@ import {
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
-  cilChat,
-  cilSend,
-  cilBrain,
+  cilEnvelopeClosed,
+  cilBarChart,
   cilUser,
-  cilRobot,
-  cilClose
+  cilPeople,
+  cilFile
 } from '@coreui/icons';
 
 const AIChatbot = () => {
@@ -186,7 +185,7 @@ const AIChatbot = () => {
         }}
         onClick={toggleChat}
       >
-        <CIcon icon={isOpen ? cilClose : cilChat} size="lg" />
+        <CIcon icon={isOpen ? cilFile : cilFile} size="lg" />
       </CButton>
 
       {/* Chat Window */}
@@ -204,7 +203,7 @@ const AIChatbot = () => {
         >
           <CCardHeader className="bg-primary text-white">
             <div className="d-flex align-items-center">
-              <CIcon icon={cilBrain} className="me-2" />
+              <CIcon icon={cilBarChart} className="me-2" />
               <strong>AI HR Assistant</strong>
             </div>
           </CCardHeader>
@@ -232,11 +231,11 @@ const AIChatbot = () => {
                         style={{ maxWidth: '80%' }}
                       >
                         <div className="d-flex align-items-center mb-2">
-                          <CIcon 
-                            icon={message.sender === 'user' ? cilUser : cilRobot} 
-                            size="sm" 
-                            className="me-2"
-                          />
+                                                     <CIcon 
+                             icon={message.sender === 'user' ? cilUser : cilUser} 
+                             size="sm" 
+                             className="me-2"
+                           />
                           <small className="text-muted">
                             {message.sender === 'user' ? 'You' : 'AI Assistant'}
                           </small>
@@ -273,7 +272,7 @@ const AIChatbot = () => {
                     <div className="d-flex justify-content-start">
                       <div className="p-3 rounded bg-white border" style={{ maxWidth: '80%' }}>
                         <div className="d-flex align-items-center">
-                          <CIcon icon={cilRobot} size="sm" className="me-2" />
+                                                     <CIcon icon={cilUser} size="sm" className="me-2" />
                           <span className="text-muted me-2">AI is typing</span>
                           <CSpinner size="sm" />
                         </div>
@@ -302,7 +301,7 @@ const AIChatbot = () => {
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isTyping}
                 >
-                  <CIcon icon={cilSend} />
+                  <CIcon icon={cilEnvelopeClosed} />
                 </CButton>
               </div>
             </div>

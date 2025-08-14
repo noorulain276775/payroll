@@ -47,17 +47,23 @@ class SecureStorage {
    * Store token securely
    */
   setToken(token) {
-    if (!token) return false;
+    if (!token) {
+      console.log('setToken: No token provided');
+      return false;
+    }
     
     try {
+      console.log('setToken: Attempting to encrypt and store token');
       const encrypted = this.encrypt(token);
       if (encrypted) {
         localStorage.setItem(this.tokenKey, encrypted);
+        console.log('setToken: Token stored successfully');
         return true;
       }
+      console.log('setToken: Encryption failed');
       return false;
     } catch (error) {
-      console.error('Failed to store token:', error);
+      console.error('setToken: Failed to store token:', error);
       return false;
     }
   }
@@ -117,17 +123,23 @@ class SecureStorage {
    * Store user type securely
    */
   setUserType(userType) {
-    if (!userType) return false;
+    if (!userType) {
+      console.log('setUserType: No user type provided');
+      return false;
+    }
     
     try {
+      console.log('setUserType: Attempting to encrypt and store user type:', userType);
       const encrypted = this.encrypt(userType);
       if (encrypted) {
         localStorage.setItem(this.userTypeKey, encrypted);
+        console.log('setUserType: User type stored successfully');
         return true;
       }
+      console.log('setUserType: Encryption failed');
       return false;
     } catch (error) {
-      console.error('Failed to store user type:', error);
+      console.error('setUserType: Failed to store user type:', error);
       return false;
     }
   }
@@ -152,17 +164,23 @@ class SecureStorage {
    * Store user data securely
    */
   setUserData(userData) {
-    if (!userData) return false;
+    if (!userData) {
+      console.log('setUserData: No user data provided');
+      return false;
+    }
     
     try {
+      console.log('setUserData: Attempting to encrypt and store user data:', userData);
       const encrypted = this.encrypt(userData);
       if (encrypted) {
         localStorage.setItem(this.userDataKey, encrypted);
+        console.log('setUserData: User data stored successfully');
         return true;
       }
+      console.log('setUserData: Encryption failed');
       return false;
     } catch (error) {
-      console.error('Failed to store user data:', error);
+      console.error('setUserData: Failed to store user data:', error);
       return false;
     }
   }
@@ -242,21 +260,31 @@ class SecureStorage {
    */
   isAuthenticated() {
     const token = this.getToken();
-    if (!token) return false;
+    console.log('isAuthenticated: Checking token:', token ? 'Token exists' : 'No token');
+    
+    if (!token) {
+      console.log('isAuthenticated: No token found, returning false');
+      return false;
+    }
     
     // Check if token is expired
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Date.now() / 1000;
+      console.log('isAuthenticated: Token payload:', payload);
+      console.log('isAuthenticated: Current time:', currentTime);
+      console.log('isAuthenticated: Token expires at:', payload.exp);
       
       if (payload.exp && payload.exp < currentTime) {
+        console.log('isAuthenticated: Token expired, clearing and returning false');
         this.clearToken();
         return false;
       }
       
+      console.log('isAuthenticated: Token valid, returning true');
       return true;
     } catch (error) {
-      console.error('Token validation failed:', error);
+      console.error('isAuthenticated: Token validation failed:', error);
       this.clearToken();
       return false;
     }
@@ -306,6 +334,18 @@ class SecureStorage {
       return false;
     }
   }
+
+  setAuthenticated(authenticated) {
+    try {
+      console.log('setAuthenticated: Setting authentication status:', authenticated);
+      localStorage.setItem('is_authenticated', authenticated.toString());
+      console.log('setAuthenticated: Authentication status stored successfully');
+      return true;
+    } catch (error) {
+      console.error('setAuthenticated: Failed to store authentication status:', error);
+      return false;
+    }
+  }
 }
 
 // Create singleton instance
@@ -331,5 +371,6 @@ export const {
   isAuthenticated,
   getTokenExpiration,
   isTokenExpiringSoon,
-  isValidToken
+  isValidToken,
+  setAuthenticated
 } = secureStorage;

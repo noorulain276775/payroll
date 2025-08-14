@@ -21,12 +21,12 @@ import {
 import CIcon from '@coreui/icons-react';
 import { 
   cilMoney, 
-  cilTrendingUp, 
-  cilTrendingDown, 
+  cilArrowDown, 
+  cilArrowUp, 
   cilCalendar, 
-  cilFileText,
+  cilFile,
   cilWarning,
-  cilCheckCircle,
+  cilCheck,
   cilInfo
 } from '@coreui/icons';
 import { selectIsAuthenticated } from '../../store/slices/authSlice';
@@ -126,7 +126,7 @@ const EmployeeSalaryRevisions = () => {
   const getStatusBadge = (status) => {
     return (
       <CBadge color="success" className="d-flex align-items-center gap-1">
-        <CIcon icon={cilCheckCircle} size="sm" />
+        <CIcon icon={cilCheck} size="sm" />
         Active
       </CBadge>
     );
@@ -145,7 +145,7 @@ const EmployeeSalaryRevisions = () => {
     return (
       <div className="d-flex align-items-center">
         <CIcon 
-          icon={isPositive ? cilTrendingUp : cilTrendingDown} 
+          icon={isPositive ? cilArrowUp : cilArrowDown} 
           className={`me-1 ${isPositive ? 'text-success' : 'text-danger'}`}
         />
         <span className={`small ${isPositive ? 'text-success' : 'text-danger'}`}>
@@ -220,7 +220,7 @@ const EmployeeSalaryRevisions = () => {
           <CCard className="summary-card h-100 border-0 shadow-sm">
             <CCardBody className="text-center p-4">
               <div className="mb-3">
-                <CIcon icon={cilFileText} size="2xl" className="text-info" />
+                <CIcon icon={cilFile} size="2xl" className="text-info" />
               </div>
               <h4 className="mb-2">{totalRevisions}</h4>
               <p className="text-muted mb-0">Total Revisions</p>
@@ -232,7 +232,7 @@ const EmployeeSalaryRevisions = () => {
           <CCard className="summary-card h-100 border-0 shadow-sm">
             <CCardBody className="text-center p-4">
               <div className="mb-3">
-                <CIcon icon={cilTrendingUp} size="2xl" className="text-success" />
+                <CIcon icon={cilArrowUp} size="2xl" className="text-success" />
               </div>
               <h4 className="mb-2">{formatCurrency(averageIncrease)}</h4>
               <p className="text-muted mb-0">Average Increase</p>
@@ -260,7 +260,7 @@ const EmployeeSalaryRevisions = () => {
         <CCardHeader className="bg-white border-bottom">
           <div className="d-flex justify-content-between align-items-center">
             <h5 className="mb-0">
-              <CIcon icon={cilTrendingUp} className="me-2" />
+              <CIcon icon={cilArrowUp} className="me-2" />
               Revision Details
             </h5>
             <small className="text-muted">
@@ -341,7 +341,7 @@ const EmployeeSalaryRevisions = () => {
                     {/* Total Gross Salary Row */}
                     <CTableRow className="table-success fw-bold">
                       <CTableDataCell>
-                        <CIcon icon={cilTrendingUp} className="me-2" />
+                        <CIcon icon={cilArrowUp} className="me-2" />
                         Total Gross Salary
                       </CTableDataCell>
                       <CTableDataCell>{formatCurrency(revision.previous_gross_salary)}</CTableDataCell>

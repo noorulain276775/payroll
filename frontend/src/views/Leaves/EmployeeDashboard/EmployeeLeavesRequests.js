@@ -18,16 +18,15 @@ import CIcon from '@coreui/icons-react';
 import { 
   cilCalendar, 
   cilClock, 
-  cilCheckCircle, 
-  cilXCircle, 
-  cilHourglass,
-  cilFileText
+  cilFile,
+  cilCheck,
+  cilX
 } from '@coreui/icons';
-import { fetchLeaves } from '../../../../store/slices/leaveSlice';
-import { selectLeaves, selectLeavesLoading, selectLeavesError } from '../../../../store/slices/leaveSlice';
-import { selectIsAuthenticated } from '../../../../store/slices/authSlice';
-import LoadingSpinner from '../../../../components/common/LoadingSpinner';
-import ErrorDisplay from '../../../../components/common/ErrorDisplay';
+import { fetchLeaves } from '../../../store/slices/leaveSlice';
+import { selectLeaves, selectLeavesLoading, selectLeavesError } from '../../../store/slices/leaveSlice';
+import { selectIsAuthenticated } from '../../../store/slices/authSlice';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import ErrorDisplay from '../../../components/common/ErrorDisplay';
 
 const EmployeeLeavesRequests = () => {
   const dispatch = useDispatch();
@@ -50,10 +49,10 @@ const EmployeeLeavesRequests = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'pending': { color: 'warning', icon: cilHourglass, text: 'Pending' },
-      'approved': { color: 'success', icon: cilCheckCircle, text: 'Approved' },
-      'rejected': { color: 'danger', icon: cilXCircle, text: 'Rejected' },
-      'cancelled': { color: 'secondary', icon: cilXCircle, text: 'Cancelled' }
+      'pending': { color: 'warning', icon: cilClock, text: 'Pending' },
+      'approved': { color: 'success', icon: cilCheck, text: 'Approved' },
+      'rejected': { color: 'danger', icon: cilX, text: 'Rejected' },
+      'cancelled': { color: 'secondary', icon: cilX, text: 'Cancelled' }
     };
     
     const config = statusConfig[status?.toLowerCase()] || statusConfig.pending;
@@ -134,7 +133,7 @@ const EmployeeLeavesRequests = () => {
         <CCardHeader className="bg-white border-bottom">
           <div className="d-flex justify-content-between align-items-center">
             <h5 className="mb-0">
-              <CIcon icon={cilFileText} className="me-2" />
+              <CIcon icon={cilFile} className="me-2" />
               Leave History
             </h5>
             <small className="text-muted">

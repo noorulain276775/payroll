@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BASE_URL } from '../../../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../../config';
 import axios from 'axios'
 import {
   CTable,
@@ -32,7 +32,7 @@ const ManageLeaveRequests = () => {
     // Fetch Leaves
     const fetchLeaves = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/leaves/`, {
+        const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.LEAVES}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -55,7 +55,7 @@ const ManageLeaveRequests = () => {
     )
     if (!confirmReject) return
     axios
-      .put(`${BASE_URL}/leaves/${id}/reject/`, {}, {
+              .put(`${BASE_URL}${API_ENDPOINTS.REJECT_LEAVE}${id}/reject/`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -72,7 +72,7 @@ const ManageLeaveRequests = () => {
     )
     if (!confirmApprove) return
     axios
-      .put(`${BASE_URL}/leaves/${id}/approve/`, {}, {
+              .put(`${BASE_URL}${API_ENDPOINTS.APPROVE_LEAVE}${id}/approve/`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

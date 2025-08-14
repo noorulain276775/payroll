@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { BASE_URL } from '../../../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../../config';
 import {
     CButton,
     CForm,
@@ -55,7 +55,7 @@ const LeaveBalanceManager = () => {
     // Fetch leave balances
     const fetchLeaveBalances = () => {
         setLoading(true);
-        axios.get(`${BASE_URL}/leave-balances/`, {
+        axios.get(`${BASE_URL}${API_ENDPOINTS.LEAVE_BALANCES}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -72,7 +72,7 @@ const LeaveBalanceManager = () => {
 
     // Fetch employee list
     useEffect(() => {
-        axios.get(`${BASE_URL}/view_all_employees/`, {
+        axios.get(`${BASE_URL}${API_ENDPOINTS.EMPLOYEES}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -119,7 +119,7 @@ const LeaveBalanceManager = () => {
             }
         }
         setAlertMessage('');
-        axios.post(`${BASE_URL}/leave-balances/`, formData, {
+        axios.post(`${BASE_URL}${API_ENDPOINTS.LEAVE_BALANCES}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -149,7 +149,7 @@ const LeaveBalanceManager = () => {
 
     const handleUpdate = async () => {
         try {
-            await axios.put(`${BASE_URL}/leave-balances/${selectedBalance.id}/`, selectedBalance, {
+            await axios.put(`${BASE_URL}${API_ENDPOINTS.LEAVE_BALANCES}${selectedBalance.id}/`, selectedBalance, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setShowEditModal(false);

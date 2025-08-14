@@ -12,12 +12,9 @@ import {
   cilUser,
   cilTask,
   cilThumbUp,
-  cilBarChart,
-  cilBrain
+  cilBarChart
 } from '@coreui/icons';
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react';
-
-
 
 // Navigation for Admin Users
 const adminNav = [
@@ -29,7 +26,7 @@ const adminNav = [
   },
   {
     component: CNavTitle,
-    name: 'Liya Employees',
+    name: 'Shan Ibrahim & Co',
   },
   {
     component: CNavItem,
@@ -68,7 +65,6 @@ const adminNav = [
     icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
   },
   {
-
     component: CNavItem,
     name: 'Employees Leave Balances',
     to: '/employees/leave-balances',
@@ -82,7 +78,7 @@ const adminNav = [
     component: CNavItem,
     name: 'AI Analytics',
     to: '/ai-analytics',
-    icon: <CIcon icon={cilBrain} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,
@@ -108,7 +104,7 @@ const adminNav = [
   },
 ];
 
-
+// Navigation for Both Admin and Employee Users
 const bothNav = [
   {
     component: CNavItem,
@@ -163,13 +159,12 @@ const bothNav = [
     icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
   },
   {
-
     component: CNavItem,
     name: 'Employees Leave Balances',
     to: '/employees/leave-balances',
     icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
   },
-    {
+  {
     component: CNavGroup,
     name: 'Accounts',
     icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
@@ -239,7 +234,6 @@ const bothNav = [
   },
 ];
 
-
 // Navigation for Employee Users
 const employeeNav = [
   {
@@ -298,20 +292,24 @@ const employeeNav = [
   },
 ];
 
-const getNavigation = () => {
-  const userType = localStorage.getItem('user_type');
-
+const getNavigation = (userType) => {
+  // Ensure userType is a string and handle edge cases
+  if (!userType || typeof userType !== 'string') {
+    console.warn('Invalid userType:', userType, 'defaulting to employeeNav');
+    return employeeNav;
+  }
+  
   switch (userType) {
     case 'Admin':
       return adminNav;
     case 'Both':
       return bothNav;
     case 'Employee':
+      return employeeNav;
     default:
+      console.warn('Unknown userType:', userType, 'defaulting to employeeNav');
       return employeeNav;
   }
 };
-
-
 
 export default getNavigation;

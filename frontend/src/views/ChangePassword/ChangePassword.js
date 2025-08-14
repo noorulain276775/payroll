@@ -13,7 +13,7 @@ import {
   CAlert,
 } from '@coreui/react';
 import axios from 'axios';
-import { BASE_URL } from '../../../config';
+import { BASE_URL, API_ENDPOINTS } from '../../config';
 
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ const ChangePassword = () => {
     // If passwords match, make the API call
     try {
       const response = await axios.post(
-        `${BASE_URL}/users/change-password/`,
+        `${BASE_URL}${API_ENDPOINTS.CHANGE_PASSWORD}`,
         formData,
         {
           headers: {

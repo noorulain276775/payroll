@@ -18,7 +18,7 @@ import {
   CAlert
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilPeople } from '@coreui/icons';
+import { cilUser } from '@coreui/icons';
 import { fetchEmployees } from '../../store/slices/employeeSlice';
 import { selectEmployees, selectEmployeesLoading, selectEmployeesError } from '../../store/slices/employeeSlice';
 import { selectIsAuthenticated } from '../../store/slices/authSlice';
@@ -71,14 +71,14 @@ const EmployeeDashboard = () => {
       <CCard>
         <CCardHeader>
           <h4 className="mb-0">
-            <CIcon icon={cilPeople} className="me-2" />
+            <CIcon icon={cilUser} className="me-2" />
             Recent Colleagues
           </h4>
         </CCardHeader>
         <CCardBody>
           {recentEmployees.length === 0 ? (
             <div className="text-center text-muted py-4">
-              <CIcon icon={cilPeople} size="3xl" className="mb-3" />
+              <CIcon icon={cilUser} size="3xl" className="mb-3" />
               <p>No employees found</p>
             </div>
           ) : (
@@ -86,7 +86,7 @@ const EmployeeDashboard = () => {
               <CTableHead className="text-nowrap">
                 <CTableRow>
                   <CTableHeaderCell className="bg-body-tertiary text-center">
-                    <CIcon icon={cilPeople} />
+                    <CIcon icon={cilUser} />
                   </CTableHeaderCell>
                   <CTableHeaderCell className="bg-body-tertiary">Employee Name</CTableHeaderCell>
                   <CTableHeaderCell className="bg-body-tertiary">Designation</CTableHeaderCell>

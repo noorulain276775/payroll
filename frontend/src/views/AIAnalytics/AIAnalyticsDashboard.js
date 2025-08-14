@@ -26,20 +26,24 @@ import {
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
-  cilBrain,
+  cilBarChart,
   cilChartLine,
-  cilTrendingUp,
-  cilTrendingDown,
+  cilArrowUp,
+  cilArrowDown,
   cilWarning,
   cilCheckCircle,
   cilInfo,
-  cilRefresh,
-  cilSettings,
   cilLightbulb,
   cilUser,
   cilMoney,
   cilCalendar,
-  cilSpeedometer
+  cilSpeedometer,
+  cilCheck,
+  cilArrowDown,
+  cilReload,
+  cilArrowRight,
+  cilPeople,
+  cilReload
 } from '@coreui/icons';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import {
@@ -212,9 +216,9 @@ const AIAnalyticsDashboard = () => {
   const getInsightIcon = (type) => {
     switch (type) {
       case 'seasonal': return cilCalendar;
-      case 'trend': return cilTrendingUp;
-      case 'prediction': return cilChartLine;
-      case 'talent_management': return cilUser;
+      case 'trend': return cilArrowRight;
+      case 'prediction': return cilBarChart;
+      case 'talent_management': return cilPeople;
       case 'feature_analysis': return cilLightbulb;
       default: return cilInfo;
     }
@@ -246,7 +250,7 @@ const AIAnalyticsDashboard = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="mb-2">
-            <CIcon icon={cilBrain} className="me-2 text-primary" />
+                          <CIcon icon={cilBarChart} className="me-2 text-primary" />
             AI-Powered Analytics Dashboard
           </h2>
           <p className="text-muted mb-0">
@@ -260,7 +264,7 @@ const AIAnalyticsDashboard = () => {
             onClick={() => setShowSettings(true)}
             className="d-flex align-items-center gap-2"
           >
-            <CIcon icon={cilSettings} />
+            <CIcon icon={cilCog} />
             Settings
           </CButton>
           
@@ -270,7 +274,7 @@ const AIAnalyticsDashboard = () => {
             className="d-flex align-items-center gap-2"
             disabled={isLoading}
           >
-            <CIcon icon={cilRefresh} />
+            <CIcon icon={cilReload} />
             {isLoading ? 'Analyzing...' : 'Refresh Insights'}
           </CButton>
         </div>
@@ -325,7 +329,7 @@ const AIAnalyticsDashboard = () => {
             <CCard className="border-0 shadow-sm h-100">
               <CCardBody className="text-center p-4">
                 <div className="mb-3">
-                  <CIcon icon={cilBrain} size="2xl" className="text-primary" />
+                  <CIcon icon={cilBarChart} size="2xl" className="text-primary" />
                 </div>
                 <h4 className="mb-2">AI Status</h4>
                 <CBadge color="success" className="mb-2">Active</CBadge>
@@ -351,7 +355,7 @@ const AIAnalyticsDashboard = () => {
             <CCard className="border-0 shadow-sm h-100">
               <CCardBody className="text-center p-4">
                 <div className="mb-3">
-                  <CIcon icon={cilTrendingUp} size="2xl" className="text-success" />
+                  <CIcon icon={cilArrowRight} size="2xl" className="text-success" />
                 </div>
                 <h4 className="mb-2">Model Accuracy</h4>
                 <CBadge color="success" className="mb-2">
@@ -369,7 +373,7 @@ const AIAnalyticsDashboard = () => {
             <CCard className="border-0 shadow-sm h-100">
               <CCardBody className="text-center p-4">
                 <div className="mb-3">
-                  <CIcon icon={cilLightbulb} size="2xl" className="text-warning" />
+                  <CIcon icon={cilInfo} size="2xl" className="text-warning" />
                 </div>
                 <h4 className="mb-2">Active Insights</h4>
                 <CBadge color="primary" className="mb-2">{insights.length}</CBadge>
@@ -383,7 +387,7 @@ const AIAnalyticsDashboard = () => {
             <CCard className="border-0 shadow-sm h-100">
               <CCardHeader className="bg-white border-bottom">
                 <h5 className="mb-0">
-                  <CIcon icon={cilLightbulb} className="me-2" />
+                  <CIcon icon={cilInfo} className="me-2" />
                   AI-Generated Insights
                 </h5>
               </CCardHeader>
@@ -444,7 +448,7 @@ const AIAnalyticsDashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-4">
-                    <CIcon icon={cilCheckCircle} size="2xl" className="text-success mb-3" />
+                    <CIcon icon={cilCheck} size="2xl" className="text-success mb-3" />
                     <p className="text-muted">No risks detected</p>
                   </div>
                 )}
@@ -653,7 +657,7 @@ const AIAnalyticsDashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-4">
-                    <CIcon icon={cilCheckCircle} size="2xl" className="text-success mb-3" />
+                    <CIcon icon={cilCheck} size="2xl" className="text-success mb-3" />
                     <p className="text-muted">No anomalies detected. All employees are performing within expected ranges.</p>
                   </div>
                 )}
@@ -670,7 +674,7 @@ const AIAnalyticsDashboard = () => {
             <CCard className="border-0 shadow-sm">
               <CCardHeader className="bg-white border-bottom">
                 <h5 className="mb-0">
-                  <CIcon icon={cilTrendingUp} className="me-2" />
+                  <CIcon icon={cilArrowRight} className="me-2" />
                   Performance Predictions & Analysis
                 </h5>
               </CCardHeader>
